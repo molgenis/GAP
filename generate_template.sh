@@ -3,13 +3,13 @@
 module load Molgenis-Compute/v17.08.1-Java-1.8.0_74
 module list
 
-project=GlobalScreeningArray-24+v1.0_000474
-runID=01
+project=${PROJECT}
+runID=${RUN}
 host=$(hostname -s)
 echo ${host}
 
-projectDir=/groups/umcg-gaf/tmp03/projects/${project}/run${runID}/jobs/
-genScripts=/groups/umcg-gaf/tmp03/generatedscripts/${project}
+projectDir=${PROJECTDIR}
+genScripts=${GENERATED_SCRIPTSDir}
 
 mkdir -p ${projectDir}
 

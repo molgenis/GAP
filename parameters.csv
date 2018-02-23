@@ -18,3 +18,5 @@ tmpDir,${workDir}/${tmpName}/
 inputDir,${tmpDir}/umcg-mbenjamins/Test_GSA_Data/GTC/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}
+projectDir,${workDir}/${tmpName}/projects/
+resultDir,${projectDir}/${Project}/run${runID}/results/

@@ -30,8 +30,9 @@ echo -en "Sample ID\tCall Rate\tGender" > "${intermediateDir}/callrate_header.tx
 
 
 #Add header to callrate report to create final results
-cat ("${intermediateDir}/callrate_header.txt" "\n" "${intermediateDir}/callratedata_project.txt"  > "${intermediateDir}/Callrates_${Project}.txt")
+#(cat ${intermediateDir}/callrate_header.txt; printf '\n'; cat ${intermediateDir}/callratedata_project.txt > "${intermediateDir}/Callrates_${Project}.txt")
 
+printf "\n" | cat "${intermediateDir}/callrate_header.txt" - "${intermediateDir}/callratedata_project.txt" > "${intermediateDir}/Callrates_${Project}.txt"
 
 #add gender [replace M/F/U with Male/Female/Unknown ]
 
