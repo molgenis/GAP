@@ -6,7 +6,7 @@
 #string beadArrayVersion
 #string GSA
 #string bpmFile
-#string inputDir
+#string rawfileDir
 #string intermediateDir
 #string tmpTmpdir
 #string tmpDir
@@ -20,6 +20,4 @@ module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module list
 
-mkdir -p "${intermediateDir}"
-
-python "${GSA}/Scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${inputDir}" "${intermediateDir}"
+python "${GSA}/Scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${rawfileDir}" "${intermediateDir}"

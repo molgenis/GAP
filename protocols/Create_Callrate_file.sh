@@ -7,7 +7,7 @@
 #string beadArrayVersion
 #string intermediateDir
 #string bpmFile
-#string inputDir
+#string rawfileDir
 #string GSA
 #list Sample_ID
 #list SentrixBarcode_A
@@ -17,13 +17,12 @@ module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module list
 
-# mkdir -p ${intermediateDir}/
 
 
 set -e
 set -u
 
-python "${GSA}/Scripts/Make_Callrate_Report.py" "${bpmFile}" "${inputDir}" "${intermediateDir}/callratedata_project.txt"
+python "${GSA}/Scripts/Make_Callrate_Report.py" "${bpmFile}" "${rawfileDir}" "${intermediateDir}/callratedata_project.txt"
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${intermediateDir}/callrate_header.txt"

@@ -15,8 +15,15 @@ CallrateDir,${tmpDir}/umcg-mbenjamins/Results/Callrate_Report/
 convertPath,${GSA}/Scripts/
 workDir,/groups/umcg-gaf/
 tmpDir,${workDir}/${tmpName}/
-inputDir,${tmpDir}/umcg-mbenjamins/Test_GSA_Data/GTC/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}
 projectDir,${workDir}/${tmpName}/projects/
 resultDir,${projectDir}/${Project}/run${runID}/results/
+prmDataDir,${workDir}/${prmName}/rawdata/array/
+tmpDataDir,${workDir}/${tmpName}/rawdata/array/
+projectRawTmpDataDir,${projectDir}/${Project}/run${runID}/rawdata/array/
+
+projectJobsDir,${projectDir}/${Project}/run${runID}/jobs/
+genScripts,${tmpDir}/generatedscripts/${Project}
+
+rawfileDir,${projectDir}/${Project}/run${runID}/rawdata/array/

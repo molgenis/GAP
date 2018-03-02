@@ -16,7 +16,5 @@ set -u
 #Copying Diagnostics outputfiles to resultsDir
 
 
-mkdir -p ${resultDir}
-
 rsync -a "${intermediateDir}/${Project}_PennCNV.txt" "${resultDir}"
 rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${resultDir}"
