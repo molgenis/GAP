@@ -103,7 +103,7 @@ function generateScripts () {
 	then
 		_version="${GAP_VERSION}"
 		module load "${_loadPipeline}/${_version}" || log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" ${?} "Failed to load ${_loadPipeline} module."
-		_pathToPipeline="${EBROOTNGS_GAP}"
+		_pathToPipeline="${EBROOTGAP}"
 	else
 		log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Unknown _sampleType: ${_sampleType}."
 	fi
