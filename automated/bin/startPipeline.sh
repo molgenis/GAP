@@ -77,8 +77,8 @@ EOH
 function generateScripts () {
 	local _project="${1}"
 	local _run="${2}"
-	local _sampleType="${3}" ## DNA or RNA
-	local _loadPipeline="NGS_${_sampleType}"
+	local _sampleType="${3}" ## GAP
+	local _loadPipeline="${_sampleType}"
 	local _generateShScript="${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh"
 	local _controlFileBase="${TMP_ROOT_DIR}/logs/${_project}/${_run}.generateScripts"
 	local _logFile="${_controlFileBase}.log"
@@ -92,23 +92,18 @@ function generateScripts () {
 	elif [[ -e "${_controlFileBase}.started" ]]
 	then
 		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${_controlFileBase}.started exists."
-                log4Bash 'INFO'  "${LINENO}" "${FUNCNAME:-main}" '0' "Will use existing scripts for ${_project}."
-                return
+		log4Bash 'INFO'  "${LINENO}" "${FUNCNAME:-main}" '0' "Will use existing scripts for ${_project}."
+		return
 	else
-		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${_controlFileBase}.finished does not exist."
+		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${_controlFileBase}.finished nor ${_controlFileBase}.started exists."
 		log4Bash 'INFO'  "${LINENO}" "${FUNCNAME:-main}" '0' "Generating scripts for ${_project} ..."
 	fi
 	
-	if [ "${_sampleType}" == "DNA" ]
+	if [ "${_sampleType}" == "GAP" ]
 	then
-		_version="${NGS_DNA_VERSION}"
+		_version="${GAP_VERSION}"
 		module load "${_loadPipeline}/${_version}" || log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" ${?} "Failed to load ${_loadPipeline} module."
-		_pathToPipeline="${EBROOTNGS_DNA}"
-	elif [ "${_sampleType}" == "RNA" ]
-	then
-		_version="${NGS_RNA_VERSION}"
-		module load "${_loadPipeline}/${_version}" || log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" ${?} "Failed to load ${_loadPipeline} module."
-		_pathToPipeline="${EBROOTNGS_RNA}"
+		_pathToPipeline="${EBROOTNGS_GAP}"
 	else
 		log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Unknown _sampleType: ${_sampleType}."
 	fi
@@ -124,7 +119,7 @@ function generateScripts () {
 	echo "${_message}" >> "${_logFile}"
 	cp "${_pathToPipeline}/templates/generate_template.sh" "${_generateShScript}"
 	
-	if [ -f "${TMP_ROOT_DIR}/generatedscripts/${_project}/${_project}.${SAMPLESHEET_EXT}" ]
+	if [[ -e "${TMP_ROOT_DIR}/generatedscripts/${_project}/${_project}.${SAMPLESHEET_EXT}" ]]
 	then
 		_message="${TMP_ROOT_DIR}/generatedscripts/${_project}/${_project}.${SAMPLESHEET_EXT} already exists and will be removed ..."
 		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${_message}"
@@ -157,7 +152,7 @@ function generateScripts () {
 function submitPipeline () {
 	local _project="${1}"
 	local _run="${2}"
-	local _sampleType="${3}" ## DNA or RNA
+	local _sampleType="${3}" ## GAP
 	local _controlFileBase="${TMP_ROOT_DIR}/logs/${_project}/${_run}.pipeline"
 	local _logFile="${_controlFileBase}.log"
 	
@@ -184,19 +179,19 @@ function submitPipeline () {
 	#
 	# Track and Trace: log that we will start running jobs on the cluster.
 	#
-	local _url="https://${MOLGENISSERVER}/menu/track&trace/dataexplorer?entity=status_jobs&mod=data&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D=${_project}"
-	printf '%s\n' "project,run_id,pipeline,url,copy_results_prm,date"  > "${_controlFileBase}.trackAndTrace.csv"
-	printf '%s\n' "${_project},${_project},${_sampleType},${_url},,"  >> "${_controlFileBase}.trackAndTrace.csv"
-	trackAndTracePostFromFile 'status_projects' 'add'                    "${_controlFileBase}.trackAndTrace.csv"
+	#local _url="https://${MOLGENISSERVER}/menu/track&trace/dataexplorer?entity=status_jobs&mod=data&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D=${_project}"
+	#printf '%s\n' "project,run_id,pipeline,url,copy_results_prm,date"  > "${_controlFileBase}.trackAndTrace.csv"
+	#printf '%s\n' "${_project},${_project},${_sampleType},${_url},,"  >> "${_controlFileBase}.trackAndTrace.csv"
+	#trackAndTracePostFromFile 'status_projects' 'add'                    "${_controlFileBase}.trackAndTrace.csv"
 	
-	_url="https://${MOLGENISSERVER}/menu/track&trace/dataexplorer?entity=status_samples&hideselect=true&mod=data&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D=${_project}"
-	printf '%s\n' "project_job,job,project,started_date,finished_date,status,url,step"  > "${_controlFileBase}.trackAndTrace.csv"
-	grep '^processJob' submit.sh | tr '"' ' ' | awk -v pro=${_project} -v url=${_url} '{OFS=","} {print pro"_"$2,$2,pro,"","","",url}' \
-		>> "${_controlFileBase}.trackAndTrace.csv"
-	awk '{FS=","}{if (NR==1){print $0}else{split($2,a,"_"); print $0","a[1]"_"a[2]}}' "${_controlFileBase}.trackAndTrace.csv"\
-		> "${_controlFileBase}.trackAndTrace.csv.tmp"
-	mv "${_controlFileBase}.trackAndTrace.csv.tmp" "${_controlFileBase}.trackAndTrace.csv"
-	trackAndTracePostFromFile 'status_jobs' 'add' "${_controlFileBase}.trackAndTrace.csv"
+	#_url="https://${MOLGENISSERVER}/menu/track&trace/dataexplorer?entity=status_samples&hideselect=true&mod=data&query%5Bq%5D%5B0%5D%5Boperator%5D=SEARCH&query%5Bq%5D%5B0%5D%5Bvalue%5D=${_project}"
+	#printf '%s\n' "project_job,job,project,started_date,finished_date,status,url,step"  > "${_controlFileBase}.trackAndTrace.csv"
+	#grep '^processJob' submit.sh | tr '"' ' ' | awk -v pro=${_project} -v url=${_url} '{OFS=","} {print pro"_"$2,$2,pro,"","","",url}' \
+	#	>> "${_controlFileBase}.trackAndTrace.csv"
+	#awk '{FS=","}{if (NR==1){print $0}else{split($2,a,"_"); print $0","a[1]"_"a[2]}}' "${_controlFileBase}.trackAndTrace.csv"\
+	#	> "${_controlFileBase}.trackAndTrace.csv.tmp"
+	#mv "${_controlFileBase}.trackAndTrace.csv.tmp" "${_controlFileBase}.trackAndTrace.csv"
+	#trackAndTracePostFromFile 'status_jobs' 'add' "${_controlFileBase}.trackAndTrace.csv"
 	
 	#
 	# Submit jobs to scheduler.
@@ -206,16 +201,16 @@ function submitPipeline () {
 	then
 		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Using submit option: --qos=dev."
 		sh submit.sh --qos=dev >> "${_logFile}" 2>&1 \
-                || {
-                        echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
-                        return
-                }
+			|| {
+					echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
+					return
+				}
 	else
 		sh submit.sh >> "${_logFile}" 2>&1 \
-                || {
-                        echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
-                        return
-                }
+			|| {
+					echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
+					return
+				}
 	fi
 	touch "${_controlFileBase}.started"
 	local _message="Jobs were submitted to the scheduler on ${HOSTNAME_SHORT} by ${ROLE_USER} for ${_project}/${_run} on $(date '+%Y-%m-%d-T%H%M')."
@@ -348,7 +343,7 @@ do
 	#
 	declare -a sampleSheetColumnNames=()
 	declare -A sampleSheetColumnOffsets=()
-	declare    sampleType='DNA' # Default when not specified in sample sheet.
+	declare    sampleType='GAP' # Default when not specified in sample sheet.
 	declare    sampleTypeFieldIndex
 	IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${sampleSheet}"))
 	for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
