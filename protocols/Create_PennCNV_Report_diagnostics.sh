@@ -4,7 +4,7 @@
 
 #string pythonVersion
 #string beadArrayVersion
-#string GSA
+#string gapVersion
 #string bpmFile
 #string rawfileDir
 #string intermediateDir
@@ -18,6 +18,7 @@ set -u
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
+module load "${gapVersion}"
 module list
 
-python "${GSA}/Scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${rawfileDir}" "${intermediateDir}"
+python "${EBROOTGAP}/Scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${rawfileDir}" "${intermediateDir}"
