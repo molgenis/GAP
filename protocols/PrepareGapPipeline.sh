@@ -8,10 +8,13 @@
 #string projectJobsDir
 #string projectRawTmpDataDir
 #string genScripts
+#string gapVersion
+#string pipeline
 
 umask 0007
 
 module load ${computeVersion}
+module load ${gapVersion}
 module list
 
 
@@ -26,7 +29,6 @@ mkdir -p "${projectRawTmpDataDir}"
 
 rocketPoint=$(pwd)
 host=$(hostname -s)
-EBROOT_GAP=/home/umcg-mbenjamins/Github/GAP/
 
 cd "${projectRawTmpDataDir}"
 
@@ -38,7 +40,6 @@ do
 	do
 		ln -sf "../../../../../rawdata/array/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc" \
 		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
-
 
 		ln -sf "../../../../../rawdata/array/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
 		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5"
@@ -52,8 +53,8 @@ done
 cd "${rocketPoint}"
 
 
-perl "${EBROOT_GAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOT_GAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
-perl "${EBROOT_GAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOT_GAP}/parameters.csv" > "${rocketPoint}/parameters_converted.csv"
+perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
+perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${rocketPoint}/parameters_converted.csv"
 
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
@@ -61,7 +62,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${genScripts}/${Project}.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOT_GAP}/GAP_workflow.csv" \
+-w "${EBROOTGAP}/diagnostiek_workflow.csv" \
 -b slurm \
 -g \
 -weave \

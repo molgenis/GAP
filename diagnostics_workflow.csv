@@ -1,0 +1,4 @@
+step,protocol,dependencies
+s01_Create_Callrate_file,protocols/Create_Callrate_file.sh,
+s02_Make_Final_PennCNV_report,protocols/Make_Final_PennCNV_report.sh,s01_Create_Callrate_file
+s03_CopyToResultsDir,protocols/CopyToResultsDir.sh,s01_Create_Callrate_file;s02_Make_Final_PennCNV_report
