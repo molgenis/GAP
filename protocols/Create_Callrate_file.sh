@@ -7,14 +7,15 @@
 #string beadArrayVersion
 #string intermediateDir
 #string bpmFile
-#string rawfileDir
-#string GSA
+#string projectRawTmpDataDir
+#string gapVersion
 #list Sample_ID
 #list SentrixBarcode_A
 #list SentrixPosition_A
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
+module load "${gapVersion}"
 module list
 
 
@@ -22,7 +23,7 @@ module list
 set -e
 set -u
 
-python "${GSA}/Scripts/Make_Callrate_Report.py" "${bpmFile}" "${rawfileDir}" "${intermediateDir}/callratedata_project.txt"
+python "${EBROOTGAP}/Scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}/callratedata_project.txt"
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${intermediateDir}/callrate_header.txt"
