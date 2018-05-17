@@ -72,7 +72,3 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 outputdir="scripts/jobs;mainParameters=${genScripts}/parameters_converted.csv;pipeline=${pipeline}"\
 -weave \
 --generate
-
-
-cd ${genScripts}/scripts"
-sh submit.sh

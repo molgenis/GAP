@@ -8,7 +8,7 @@ max_index=${#SentrixPosition_A[@]}-1
 
 for i in ${SentrixBarcode_A[@]}
 do
-	mkdir -vp "${tmpDataDir}/${i}"
+	mkdir -vp "${GTCtmpDataDir}/${i}"
 	for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 	do
 		GTC_FILE="${GTCprmDataDir}/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
