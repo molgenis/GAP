@@ -5,7 +5,7 @@ computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
 gapVersion,GAP/v1.0.0
 
 #references
-bpmFile,/groups/umcg-gaf/tmp03/umcg-mbenjamins/Test_GSA_Data/GSA_Illumina_files/GSA-24v1-0_A6.bpm
+bpmFile,/apps/data/GSAarray/GSA-24v1-0_A6.bpm
 
 
 #paths
@@ -16,11 +16,12 @@ tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}
 projectDir,${workDir}/${tmpName}/projects/
-resultDir,${projectDir}/${Project}/run${runID}/results/
-prmDataDir,${workDir}/${prmName}/rawdata/array/
-tmpDataDir,${workDir}/${tmpName}/rawdata/array/
-projectRawTmpDataDir,${projectDir}/${Project}/run${runID}/rawdata/array/
-projectJobsDir,${projectDir}/${Project}/run${runID}/jobs/
+resultDir,${projectDir}/${Project}/${runID}/results/
+projectJobsDir,${projectDir}/${Project}/${runID}/jobs/
 genScripts,${tmpDir}/generatedscripts/${Project}
-rawfileDir,${projectDir}/${Project}/run${runID}/rawdata/array/
 diagnosticOutputFolder,${tmpDir}/DiagnosticOutput
+projectRawTmpDataDir,${projectDir}/${Project}/${runID}/rawdata/array/
+IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
+GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
+IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
+GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/

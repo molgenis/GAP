@@ -38,10 +38,10 @@ for i in ${SentrixBarcode_A[@]}
 do
 	for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 	do
-		ln -sf "../../../../../rawdata/array/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc" \
+		ln -sf "../../../../../rawdata/array/GTC/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc" \
 		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
 
-		ln -sf "../../../../../rawdata/array/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
+		ln -sf "../../../../../rawdata/array/GTC/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
 		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5"
 	done
 done
@@ -62,8 +62,11 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${genScripts}/${Project}.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOTGAP}/diagnostiek_workflow.csv" \
+-w "${EBROOTGAP}/diagnostics_workflow.csv" \
 -b slurm \
 -g \
 -weave \
--runID "run${runid}"
+-runid "${runID}"
+
+cd projectDir=/groups/umcg-gap/tmp03/projects/${filePrefix}/${runID}/jobs/
+sh submit.sh

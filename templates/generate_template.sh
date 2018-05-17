@@ -19,7 +19,8 @@ Usage:
 Options:
 	-h   Show this help.
 	-a   sampleType (default=GAP)
-	-P   pipeline (default=diagnostics)
+	-l   pipeline (default=diagnostics)
+	-p   project
 	-g   group (default=basename of ../../../ )
 	-f   filePrefix (default=basename of this directory)
 	-r   runID (default=run01)
@@ -34,7 +35,7 @@ EOH
 
 while getopts "t:g:w:f:r:h" opt;
 do
-	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; r)runID="${OPTARG}";;p)pipeline="${OPTARG}";;
+	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";;l)pipeline="${OPTARG}";;
 	esac
 done
 
@@ -51,11 +52,11 @@ samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 host=$(hostname -s)
 echo ${host}
 
-projectDir=/groups/umcg-gaf/tmp03/projects/${filePrefix}/run${runID}/jobs/
+projectDir=/groups/umcg-gap/tmp03/projects/${filePrefix}/${runID}/jobs/
 
 mkdir -p ${projectDir}
 
-samplesheet="${genScripts}/${project}.csv" ; mac2unix "${samplesheet}"
+samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
@@ -64,10 +65,14 @@ perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pi
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
--p "${genScripts}/${project}.csv" \
+-p "${samplesheet}" \
 -w "${EBROOTGAP}/Prepare_${pipeline}_workflow.csv" \
 -rundir "${genScripts}/scripts" \
 --runid "${runID}" \
 outputdir="scripts/jobs;mainParameters=${genScripts}/parameters_converted.csv;pipeline=${pipeline}"\
 -weave \
 --generate
+
+
+cd ${genScripts}/scripts"
+sh submit.sh
