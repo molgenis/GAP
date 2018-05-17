@@ -10,6 +10,7 @@
 #string genScripts
 #string gapVersion
 #string pipeline
+#string runID
 
 umask 0007
 
