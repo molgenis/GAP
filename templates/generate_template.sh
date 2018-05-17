@@ -52,7 +52,7 @@ samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 host=$(hostname -s)
 echo ${host}
 
-projectDir=/groups/umcg-gap/tmp03/projects/${filePrefix}/${runID}/jobs/
+projectDir=${workDir}/projects/${filePrefix}/${runID}/jobs/
 
 mkdir -p ${projectDir}
 
