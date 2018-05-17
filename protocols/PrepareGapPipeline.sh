@@ -67,6 +67,3 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -g \
 -weave \
 -runid "${runID}"
-
-cd projectDir=/groups/umcg-gap/tmp03/projects/${filePrefix}/${runID}/jobs/
-sh submit.sh
