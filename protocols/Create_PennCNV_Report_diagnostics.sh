@@ -21,4 +21,4 @@ module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-python "${EBROOTGAP}/Scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
+python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
