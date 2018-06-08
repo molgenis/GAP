@@ -23,7 +23,7 @@ module list
 set -e
 set -u
 
-python "${EBROOTGAP}/Scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}/callratedata_project.txt"
+python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}/callratedata_project.txt"
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${intermediateDir}/callrate_header.txt"
