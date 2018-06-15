@@ -20,10 +20,10 @@ module list
 
 
 #Create ProjectDirs
-mkdir -p "${intermediateDir}"
-mkdir -p "${resultDir}"
-mkdir -p "${projectJobsDir}"
-mkdir -p "${projectRawTmpDataDir}"
+mkdir -p -m 2770"${intermediateDir}"
+mkdir -p -m 2770"${resultDir}"
+mkdir -p -m 2770"${projectJobsDir}"
+mkdir -p -m 2770"${projectRawTmpDataDir}"
 
 
 #Create Symlinks
