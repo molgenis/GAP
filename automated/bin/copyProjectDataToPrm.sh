@@ -321,7 +321,7 @@ function rsyncProjectRun() {
 	#else
 	#	log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' 'Ended up in unexpected state:'
 	#	log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Expected either ${_controlFileBase}.finished or ${_controlFileBase}.failed, but both are absent."
-	f#i
+	#fi
 }
 
 function archiveSampleSheet() {
