@@ -79,7 +79,7 @@ function generateScripts () {
 	local _run="${2}"
 	local _sampleType="${3}" ## GAP
 	local _loadPipeline="${_sampleType}"
-	local _generateShScript="${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh"
+	local _generateShScript="${TMP_ROOT_DIR}/generatedscripts/${run}/generate.sh"
 	local _controlFileBase="${TMP_ROOT_DIR}/logs/${_project}/${_run}.generateScripts"
 	local _logFile="${_controlFileBase}.log"
 	local _message

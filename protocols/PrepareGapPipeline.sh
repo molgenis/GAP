@@ -47,6 +47,11 @@ do
 	done
 done
 
+
+#Copying samplesheet to project jobs folder
+
+cp "${genScripts}/${Project}.csv" "${projectJobsDir}/${Project}.csv"
+
 #
 # Execute MOLGENIS/compute to create job scripts to analyse this project.
 #
