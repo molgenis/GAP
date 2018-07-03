@@ -20,10 +20,10 @@ module list
 
 
 #Create ProjectDirs
-mkdir -p -m 2770"${intermediateDir}"
-mkdir -p -m 2770"${resultDir}"
-mkdir -p -m 2770"${projectJobsDir}"
-mkdir -p -m 2770"${projectRawTmpDataDir}"
+mkdir -p -m 2770 "${intermediateDir}"
+mkdir -p -m 2770 "${resultDir}"
+mkdir -p -m 2770 "${projectJobsDir}"
+mkdir -p -m 2770 "${projectRawTmpDataDir}"
 
 
 #Create Symlinks
@@ -59,8 +59,8 @@ cp "${genScripts}/${Project}.csv" "${projectJobsDir}/${Project}.csv"
 cd "${rocketPoint}"
 
 
-perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
-perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${rocketPoint}/parameters_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${rocketPoint}/parameters_converted.csv"
 
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
