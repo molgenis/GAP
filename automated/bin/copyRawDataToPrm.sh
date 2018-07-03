@@ -264,7 +264,7 @@ function splitSamplesheetPerProject() {
 	#
 	rsync -av --chmod=Dg-w,g+rsX,o-rwx,Fg-wsx,g+r,o-rwx ${dryrun:-} \
 		"${DATA_MANAGER}@${sourceServerFQDN}:${SCR_ROOT_DIR}/Samplesheets/${_run}.${SAMPLESHEET_EXT}" \
-		"${PRM_ROOT_DIR}/Samplesheets/archive/" \
+		"${PRM_ROOT_DIR}/Samplesheets/" \
 		>> "${_logFile}" 2>&1 \
 	|| {
 		log4Bash 'ERROR' ${LINENO} "${FUNCNAME:-main}" ${?} "Failed to rsync ${SCR_ROOT_DIR}/Samplesheets/${_run}.${SAMPLESHEET_EXT}. See ${_logFile} for details."
@@ -272,7 +272,7 @@ function splitSamplesheetPerProject() {
 			>> "${_controlFileBase}.failed"
 	}
 		
-	local _sampleSheet="${PRM_ROOT_DIR}/Samplesheets/archive/${_run}.${SAMPLESHEET_EXT}"
+	local _sampleSheet="${PRM_ROOT_DIR}/Samplesheets/${_run}.${SAMPLESHEET_EXT}"
 	#
 	# ToDo: change location of job control files back to ${TMP_ROOT_DIR} once we have a 
 	#       proper prm mount on the GD clusters and this script can run a GD cluster

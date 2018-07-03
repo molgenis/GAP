@@ -2,7 +2,8 @@
 #list SentrixPosition_A
 #string GTCprmDataDir
 #string GTCtmpDataDir
-
+#string prmHost
+#string ateambotUser
 
 max_index=${#SentrixPosition_A[@]}-1
 
@@ -13,7 +14,7 @@ do
 	do
 		GTC_FILE="${GTCprmDataDir}/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
 		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
-		"${GTC_FILE}"* \
-		"${GTCtmpDataDir}/${i}/"
+		"${ateambotUser}@${prmHost}:${GTC_FILE}"* \
+		${GTCtmpDataDir}/${i}/"
 	done
 done
