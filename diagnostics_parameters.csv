@@ -26,3 +26,4 @@ GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,umcg-gap-ateambot
+logsDir,${workDir}/${tmpName}/logs/

@@ -6,6 +6,8 @@
 #string resultDir
 #string Project
 #string diagnosticOutputFolder
+#string logsDir
+#string runID
 
 set -e
 set -u
@@ -32,16 +34,16 @@ touch "${diagnosticOutputFolder}/${Project}".finished
 
 if [ -f "${logsDir}//${Project}/${runID}.pipeline.started" ]
 then
-	mv "${logsDir}/${project}/${runID}.pipeline".{started,finished}
+	mv "${logsDir}/${Project}/${runID}.pipeline".{started,finished}
 else
-	touch "${logsDir}/${project}/${runID}.pipeline.finished"
+	touch "${logsDir}/${Project}/${runID}.pipeline.finished"
 fi
-rm -f "${logsDir}/${project}/${runID}.pipeline.failed"
-echo "${logsDir}/${project}/${runID}.pipeline.finished is created"
+rm -f "${logsDir}/${Project}/${runID}.pipeline.failed"
+echo "${logsDir}/${Project}/${runID}.pipeline.finished is created"
 
-if [ ! -d "${logsDir}/${project}/" ]
+if [ ! -d "${logsDir}/${Project}/" ]
 then
-	mkdir -p "${logsDir}/${project}/"
+	mkdir -p "${logsDir}/${Project}/"
 fi
 
 touch pipeline.finished
