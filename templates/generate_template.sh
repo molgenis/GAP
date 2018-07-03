@@ -58,8 +58,8 @@ mkdir -p ${projectDir}
 
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
-perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
-perl "${EBROOTGAP}/Scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
 
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
