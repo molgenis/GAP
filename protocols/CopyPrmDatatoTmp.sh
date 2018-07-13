@@ -15,6 +15,6 @@ do
 		GTC_FILE="${GTCprmDataDir}/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
 		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
 		"${ateambotUser}@${prmHost}:${GTC_FILE}"* \
-		${GTCtmpDataDir}/${i}/"
+		"${GTCtmpDataDir}/${i}/"
 	done
 done
