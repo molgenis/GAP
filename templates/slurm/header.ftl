@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=${project}_${taskId}
+#SBATCH --job-name=${Project}_${taskId}
 #SBATCH --output=${taskId}.out
 #SBATCH --error=${taskId}.err
 #SBATCH --time=${walltime}
@@ -26,7 +26,7 @@ declare MC_jobScriptSTDOUT="${taskId}.out"
 # a central location for log files for all projects.
 #
 
-logsDirectory="${logsDir}/${project}/"
+logsDirectory="${logsDir}/${Project}/"
 
 <#noparse>
 runName=$(basename $(cd ../ && pwd ))
