@@ -69,7 +69,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/${Project}.csv" \
 -rundir "${projectJobsDir}" \
 -w "${EBROOTGAP}/diagnostics_workflow.csv" \
--- header "${EBROOTGAP}/templates/slurm/header.ftl" \
+--header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
 -b slurm \
