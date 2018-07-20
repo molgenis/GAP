@@ -7,6 +7,7 @@
 #list SentrixPosition_A
 #string intermediateDir
 #string Project
+#string logsDir
 
 set -e
 set -u

@@ -12,6 +12,7 @@
 #list Sample_ID
 #list SentrixBarcode_A
 #list SentrixPosition_A
+#string logsDir
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"

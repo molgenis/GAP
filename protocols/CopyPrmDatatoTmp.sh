@@ -4,6 +4,8 @@
 #string GTCtmpDataDir
 #string prmHost
 #string ateambotUser
+#string Project
+#string logsDir
 
 max_index=${#SentrixPosition_A[@]}-1
 
