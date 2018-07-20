@@ -12,6 +12,8 @@
 #string tmpDir
 #string workDir
 #string tmpName
+#string Project
+#string logsDir
 
 set -e
 set -u

@@ -11,6 +11,7 @@
 #string gapVersion
 #string pipeline
 #string runID
+#string logsDir
 
 umask 0007
 
