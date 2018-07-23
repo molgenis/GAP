@@ -54,7 +54,7 @@ echo ${host}
 
 projectDir=${workDir}/projects/${filePrefix}/${runID}/jobs/
 
-mkdir -p ${projectDir}
+mkdir -p -m 2770 ${projectDir}
 
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
