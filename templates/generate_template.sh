@@ -50,11 +50,11 @@ genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 host=$(hostname -s)
-echo ${host}
+echo "${host}"
 
-projectDir=${workDir}/projects/${filePrefix}/${runID}/jobs/
+projectDir="${workDir}/projects/${filePrefix}/${runID}/jobs/"
 
-mkdir -p -m 2770 ${projectDir}
+mkdir -p -m 2770 "${projectDir}"
 
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
