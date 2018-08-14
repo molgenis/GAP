@@ -30,13 +30,12 @@ for gtc_file in samples:
 	index += 1
 
 	names = manifest.names
-	output = open(os.path.join(args.output_directory, os.path.basename(gtc_file + ".txt")), "w")
-	
-    output.write("[Header]\n")
-    output.write(delim.join(["Processing Date", datetime.now().strftime("%m/%d/%Y %I:%M %p")])+ "\n")
-    output.write(delim.join(["Content", os.path.basename(args.manifest)]) + "\n")
-    output.write(delim.join(["Num SNPs", str(len(names))]) + "\n")
-    output.write(delim.join(["Total SNPs", str(len(names))]) + "\n")
+	output = open(os.path.join(args.output_directory, os.path.basename("concordance_" + gtc_file + ".txt")), "w")
+    	output.write("[Header]\n")
+    	output.write(delim.join(["Processing Date", datetime.now().strftime("%m/%d/%Y %I:%M %p")])+ "\n")
+    	output.write(delim.join(["Content", os.path.basename(args.manifest)]) + "\n")
+    	output.write(delim.join(["Num SNPs", str(len(names))]) + "\n")
+    	output.write(delim.join(["Total SNPs", str(len(names))]) + "\n")
 	output.write("[Data]\n")
     
 	output.write(delim.join(["SNP Name", "Sample Index", "Allele1 - Forward", "Allele2 - Forward", "GC Score", "Chr", "Position"]) + "\n")
