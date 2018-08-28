@@ -51,7 +51,7 @@ do
 		if  [[ "${sd}" < 0.2 && "${_barcode}" == "${_sentrix_barcode}" && "${_position}" == "${_sentrix_position}" ]]
 		then
 			echo "mv ${intermediateDir}/concordance_${input_file} ${concordanceInputDir}"
-                        mv "${intermediateDir}/concordance_${input_file}" "${concordanceInputDir}/${_sample_id}"
+                        mv "${intermediateDir}/concordance_${input_file}" "${concordanceInputDir}/concordance_${_sample_id}.txt"
 		fi
 
 	done
