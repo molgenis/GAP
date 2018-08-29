@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
 #string beadArrayVersion
@@ -7,10 +8,13 @@
 #string bpmFile
 #string projectRawTmpDataDir
 #string intermediateDir
+#list SentrixBarcode_A
+#list SentrixPosition_A
 #string concordanceInputDir
-#string Sample_ID
-#string SentrixBarcode_A
-#string SentrixPosition_A
+#list Sample_ID
+#string logsDir
+#string Project
+
 
 set -e
 set -u
@@ -32,26 +36,26 @@ done
 
 for input_file in "${intermediateDir}/"*".gtc.txt"
 do
-	_barcode_position="${input_file%%.*}"
-	_barcode="${barcode_position%_*}"
-	_position="${barcode_position##_*}"
+	barcode_position="${input_file%%.*}"
+	barcode="${barcode_position%_*}"
+	position="${barcode_position##_*}"
 
-	_log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
-	_sd=$(echo "${_log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
+	log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
+	sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 
-        echo "$(basename ${input_file}): ${_sd}"
+        echo "$(basename ${input_file}): ${sd}"
 
 
 	for barcode_combined in ${barcodelist[@]}
 	do
-		_sample_id=$(echo "${barcode_combined}" | awk 'BEGIN {FS=":"}{print $1}')
-		_sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
-		_sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
+		sample_id=$(echo "${barcode_combined}" | awk 'BEGIN {FS=":"}{print $1}')
+		sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
+		sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
 
-		if  [[ "${sd}" < 0.2 && "${_barcode}" == "${_sentrix_barcode}" && "${_position}" == "${_sentrix_position}" ]]
+		if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
 		then
 			echo "mv ${intermediateDir}/concordance_${input_file} ${concordanceInputDir}"
-                        mv "${intermediateDir}/concordance_${input_file}" "${concordanceInputDir}/concordance_${_sample_id}.txt"
+                        mv "${intermediateDir}/concordance_${input_file}" "${concordanceInputDir}/concordance_${sample_id}.txt"
 		fi
 
 	done
