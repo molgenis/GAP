@@ -12,6 +12,7 @@
 #list SentrixPosition_A
 #string concordanceInputDir
 #list Sample_ID
+#string tmpName
 #string logsDir
 #string Project
 
@@ -57,8 +58,8 @@ do
 
                 if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
                 then
-                        echo "mv /groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file} /groups/umcg-gd/tmpName/Concordance/array/"
-			mv "/groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file}" "/groups/umcg-gd/tmpName/Concordance/array//concordance_${sample_id}.txt"
+                        echo "mv /groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file} /groups/umcg-gd/${tmpName}/Concordance/array/concordance_${sample_id}.txt"
+			mv "/groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${filename}" "/groups/umcg-gd/${tmpName}/Concordance/array//concordance_${sample_id}.txt"
                 fi
         done
 done
