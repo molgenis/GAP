@@ -27,4 +27,4 @@ IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,umcg-gap-ateambot
 logsDir,${workDir}/${tmpName}/logs/
-concordanceInputDir,/groups/umcg-gd/tmpName/Concordance/array/
+concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
