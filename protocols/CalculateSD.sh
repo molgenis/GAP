@@ -34,29 +34,31 @@ do
 done
 
 
-for input_file in "${intermediateDir}/"*".gtc.txt"
+for input_file in $(find "/groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539"/[0-9]*_R*.gtc.txt)
 do
-	barcode_position="${input_file%%.*}"
-	barcode="${barcode_position%_*}"
-	position="${barcode_position##_*}"
 
-	log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
-	sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
+        log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
+        sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 
         echo "$(basename ${input_file}): ${sd}"
 
+        for sample_barcode in ${barcodelist[@]}
+        do
+		filename=$(basename ${input_file})
+		barcode_position=${filename%%.*}
+		barcode=${barcode_position%_*}
+		position=${barcode_position##*_}
 
-	for barcode_combined in ${barcodelist[@]}
-	do
-		sample_id=$(echo "${barcode_combined}" | awk 'BEGIN {FS=":"}{print $1}')
-		sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
-		sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
+                sample_id=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"}{print $1}')
+                barcode_combined=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"} {print $2}')
+                sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
+                sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
 
-		if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
-		then
-			echo "mv ${intermediateDir}/concordance_${input_file} ${concordanceInputDir}"
-                        mv "${intermediateDir}/concordance_${input_file}" "${concordanceInputDir}/concordance_${sample_id}.txt"
-		fi
 
-	done
+                if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
+                then
+                        echo "mv /groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file} /groups/umcg-gd/tmpName/Concordance/array/"
+			mv "/groups/umcg-gap//tmp03//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file}" "/groups/umcg-gd/tmpName/Concordance/array//concordance_${sample_id}.txt"
+                fi
+        done
 done
