@@ -28,7 +28,7 @@ rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder
 
 
 #Touch file for DARWIN so they know pipeline is finished and can start proceeding step to put data in SNP Module...
-touch "${diagnosticOutputFolder}/${Project}".finished
+touch "${diagnosticOutputFolder}/${Project}/${Project}".finished
 
 # Touch log file for GAP_Automated for starting copying project data to PRM
 
