@@ -23,7 +23,7 @@ module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-python ${EBROOTGAP}/scripts/gtc_final_report_v2.py \
+python ${EBROOTGAP}/scripts/gtc_final_report.py \
 --manifest "${bpmFile}" \
 --samplesheet "${samplesheet}" \
 --gtc_directory "${projectRawTmpDataDir}" \
