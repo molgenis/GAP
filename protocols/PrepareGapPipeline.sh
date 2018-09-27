@@ -43,8 +43,8 @@ do
 		ln -sf "../../../../../rawdata/array/GTC/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc" \
 		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
 
-		ln -sf "../../../../../rawdata/array/GTC/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
-		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.gtc.md5"
+		ln -sf "../../../../../rawdata/array/GTC/${i}/${i}_${SentrixPosition_A[samplenumber]}.md5" \
+		"${projectRawTmpDataDir}/${i}_${SentrixPosition_A[samplenumber]}.md5"
 	done
 done
 
@@ -68,12 +68,13 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${genScripts}/${Project}.csv" \
+-p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOTGAP}/diagnostics_workflow.csv" \
+-w "${EBROOTGAP}/${pipeline}_workflow.csv" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
 -b slurm \
 -g \
 -weave \
--runid "${runID}"
+-runid "${runid}"
