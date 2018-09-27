@@ -1,0 +1,3 @@
+step,protocol,dependencies
+CopyPrmDatatoTmp,protocols/CopyPrmDatatoTmp.sh,
+PrepareGapPipeline,protocols/PrepareGapPipeline.sh,

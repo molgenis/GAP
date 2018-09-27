@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module load Molgenis-Compute/v17.08.1-Java-1.8.0_74
-module load GAP/v2.0.0
+module load GAP/v2.1.0-beta
 module list
 
 host=$(hostname -s)
@@ -33,7 +33,7 @@ EOH
 	exit 0
 }
 
-while getopts "t:g:w:f:r:h" opt;
+while getopts "t:g:w:f:r:l:h" opt;
 do
 	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";;l)pipeline="${OPTARG}";;
 	esac

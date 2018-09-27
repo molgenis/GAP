@@ -24,8 +24,11 @@ SAMPLESHEET_SEP="\t"
 declare -a sampleSheetColumnNames=()
 declare -A sampleSheetColumnOffsets=()
 
+headerNumber=$(( $(grep -n "\[Data\]" "${input}" | grep -Eo '^[^:]+')+1))
+echo ${headerNumber}
+
 #get header, columnNames, and columnNumbers
-IFS=$'\t' sampleSheetColumnNames=($(awk '{if(NR==9){print $0}}' "${input}"))
+IFS=$'\t' sampleSheetColumnNames=($(awk -v headerNumber="$headerNumber" '{if(NR==headerNumber){print $0}}' "${input}"))
 for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 do
 	columnName="${sampleSheetColumnNames[${offset}]}"
@@ -34,8 +37,9 @@ done
 
 # map ColumnHeader to correct variable
 my_snp=$(( ${sampleSheetColumnOffsets['SNP Name']} +1 ))
-alleles=$(( ${sampleSheetColumnOffsets['Snp']} +1 ))
+alleles=$(( ${sampleSheetColumnOffsets['SNP']} +1 ))
 coor=$(( ${sampleSheetColumnOffsets['MapInfo']} +1 ))
+#coor=$(( ${sampleSheetColumnOffsets['Position']} +1 ))
 chr=$(( ${sampleSheetColumnOffsets['Chr']} +1 ))
 intA=$(( ${sampleSheetColumnOffsets['X']} +1 ))
 intB=$(( ${sampleSheetColumnOffsets['Y']} +1 ))
@@ -56,7 +60,7 @@ for a in *tmp;
 # keep intensities per sample
     else
         echo $sid
-        less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v al=$alleles -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print  name "A" "\t" name "B" }{ print  $A "\t" $B}' > "$a".tmp2
+        less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v al=$alleles -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print name "A" "\t" name "B" }{ print $A "\t" $B}' > "$a".tmp2
     fi
 done
 # Paste all intensities and paste snp info with the merged intensities
@@ -74,7 +78,13 @@ for z in *tmp3;
     cut -f2- "chr_tmp_"$sid2 > "chr_"$sid2
 done
 # Remove temp files.
+
+cd ${output}
+
+#for i in {0..22};do
+#	rm _tmp_${i}*
+#done
+
 rm *tmp*
 rm info
-
 cd -
