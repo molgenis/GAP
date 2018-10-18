@@ -1,4 +1,4 @@
-#MOLGENIS walltime=01:59:00 mem=2gb ppn=6
+#MOLGENIS walltime=23:59:00 mem=8gb ppn=2
 
 #string gapVersion
 #string Project

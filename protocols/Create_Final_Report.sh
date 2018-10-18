@@ -1,4 +1,4 @@
-#MOLGENIS walltime=01:59:00 mem=1gb ppn=1
+#MOLGENIS walltime=7-00:00:00 mem=2gb ppn=1
 
 #string pythonVersion
 #string beadArrayVersion
@@ -22,6 +22,8 @@ module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
+
+rm -f "${finalReport}"
 
 python ${EBROOTGAP}/scripts/gtc_final_report.py \
 --manifest "${bpmFile}" \

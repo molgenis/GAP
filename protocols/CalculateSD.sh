@@ -35,7 +35,7 @@ do
 done
 
 
-for input_file in $(find "/groups/umcg-gap//${tmpName}//tmp//GSA-24+v1.0-MD_000539"/[0-9]*_R*.gtc.txt)
+for input_file in $(find "${intermediateDir}"/[0-9]*_R*.gtc.txt)
 do
 
         log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
@@ -58,8 +58,8 @@ do
 
                 if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
                 then
-                        echo "mv /groups/umcg-gap//${tmpName}//tmp//GSA-24+v1.0-MD_000539/concordance_${input_file} /groups/umcg-gd/${tmpName}/Concordance/array/concordance_${sample_id}.txt"
-			mv "/groups/umcg-gap//${tmpName}//tmp//GSA-24+v1.0-MD_000539/concordance_${filename}" "/groups/umcg-gd/${tmpName}/Concordance/array//concordance_${sample_id}.txt"
+                        echo "${intermediateDir}/${input_file} ${concordanceInputDir}/concordance_${sample_id}.txt"
+			mv "${intermediateDir}/${filename}" "${concordanceInputDir}/concordance_${sample_id}.txt"
                 fi
         done
 done

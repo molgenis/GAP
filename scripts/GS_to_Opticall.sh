@@ -24,11 +24,11 @@ SAMPLESHEET_SEP="\t"
 declare -a sampleSheetColumnNames=()
 declare -A sampleSheetColumnOffsets=()
 
-headerNumber=$(( $(grep -n "\[Data\]" "${input}" | grep -Eo '^[^:]+')+1))
+headerNumber=$(( $(head -30 "${input}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+1))
 echo ${headerNumber}
 
 #get header, columnNames, and columnNumbers
-IFS=$'\t' sampleSheetColumnNames=($(awk -v headerNumber="$headerNumber" '{if(NR==headerNumber){print $0}}' "${input}"))
+IFS=$'\t' sampleSheetColumnNames=($(head -30 "${input}" | awk -v headerNumber="$headerNumber" '{if(NR==headerNumber){print $0}}'))
 for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 do
 	columnName="${sampleSheetColumnNames[${offset}]}"
@@ -44,7 +44,7 @@ chr=$(( ${sampleSheetColumnOffsets['Chr']} +1 ))
 intA=$(( ${sampleSheetColumnOffsets['X']} +1 ))
 intB=$(( ${sampleSheetColumnOffsets['Y']} +1 ))
 
-headerNumber=$(( $(grep -n "\[Data\]" "${input}" | grep -Eo '^[^:]+')+1))
+headerNumber=$(( $(head -30 "${input}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+1))
 
 # Split file per sample id, in this case: second column (first 10 columns is a header)
 cd "${output}"

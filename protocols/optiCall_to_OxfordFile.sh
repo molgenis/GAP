@@ -12,13 +12,13 @@ set -u
 
 inputFolder="${optiCallDir}"
 outputFolder="${genSampleDir}"
+mkdir -p "${outputFolder}"
 
 if [[ -z "$inputFolder" ]]
 then
     echo "Error: set input"
     exit
 fi
-
 
 if [[ -z "$outputFolder" ]]
 then
@@ -32,7 +32,7 @@ fi
     output="${outputFolder}/chr_${chrNr}"
 
     sampleFile="${output}.sample"
-    
+
     if [ -e $input ]
     then
 

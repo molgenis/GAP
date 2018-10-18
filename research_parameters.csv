@@ -3,11 +3,14 @@ pythonVersion,Python/2.7.11-foss-2015b
 beadArrayVersion,BeadArrayFiles/1.3.1-foss-2015b-Python-2.7.11
 computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
 gapVersion,GAP/v2.1.0-beta
+pennCNVVersion,PennCNV/1.0.4-foss-2015b
 optiCallVersion,opticall/0.7.0-foss-2015b
+zCallVersion,opticall/0.7.0-foss-2015b
 
 #references
 bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
-
+hmmFile,hhall.hmm
+pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
 
 #paths
 root,/
@@ -32,4 +35,7 @@ concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 finalReport,${intermediateDir}/${Project}_finalreport.txt
 samplesheet,${projectJobsDir}/${Project}.csv
 optiCallDir,${intermediateDir}/opticall
+zCallDir,${intermediateDir}/zCall
+pennCNVInputDir,${intermediateDir}/PennCNV/inputfiles/
+pennCNVDir,${intermediateDir}/PennCNV/
 genSampleDir,${intermediateDir}/gensamplefiles
