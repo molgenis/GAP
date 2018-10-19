@@ -1,19 +1,7 @@
 #MOLGENIS walltime=01:59:00 mem=10gb ppn=1
 
-#string pythonVersion
-#string beadArrayVersion
-#string gapVersion
-#string bpmFile
-#string projectRawTmpDataDir
-#string intermediateDir
-#string tmpTmpdir
-#string tmpDir
-#string workDir
-#string tmpName
 #string Project
 #string logsDir
-#string finalReport
-#string samplesheet
 #string optiCallDir
 #string genSampleDir
 #string optiCallVersion
@@ -24,13 +12,13 @@ set -u
 
 inputFolder="${optiCallDir}"
 outputFolder="${genSampleDir}"
+mkdir -p "${outputFolder}"
 
 if [[ -z "$inputFolder" ]]
 then
     echo "Error: set input"
     exit
 fi
-
 
 if [[ -z "$outputFolder" ]]
 then
@@ -44,7 +32,7 @@ fi
     output="${outputFolder}/chr_${chrNr}"
 
     sampleFile="${output}.sample"
-    
+
     if [ -e $input ]
     then
 

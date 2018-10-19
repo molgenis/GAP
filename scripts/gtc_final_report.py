@@ -62,9 +62,9 @@ if args.samplesheet:
            sampleDict[row['SentrixBarcode_A'] + "_" + row['SentrixPosition_A'].upper()] =  row['Sample_ID']
     f1.close()
 
+excludeIDArray={}
 if args.excludeGTCFileIDs:
     file = open(args.excludeGTCFileIDs,"r")
-    excludeIDArray={}
 
     for line in file:
         excludeIDArray[line.rstrip('\n')+'.gtc']=line.rstrip('\n')+'.gtc'
@@ -129,7 +129,10 @@ with open(args.output_file, "w") as output_handle:
                new_snp=snp
             # if samplesheet is given, replace Barcode_positions with sampleID.
             if args.samplesheet:
-                sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
+                if os.path.basename(gtc_file)[:-4] in sampleDict:
+		    sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
+                else:
+                    sampleName = os.path.basename(gtc_file)[:-4]
             else:
                 sampleName = os.path.basename(gtc_file)[:-4]
 

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=59:59:00 mem=20gb ppn=6
 
 #string pythonVersion
@@ -24,9 +22,9 @@ set -u
 module load "${gapVersion}"
 module list
 
-mkdir -p "${optiCallDir}"
+mkdir -p "${zCallDir}"
 
 cd "${optiCallDir}"
-bash ${EBROOTGAP}/scripts/GS_to_Opticall.sh -i "${finalReport}" -o "${optiCallDir}"
+bash ${EBROOTGAP}/scripts/GS_to_zCall.sh -i "${finalReport}" -o "${zCallDir}"
 cd -
 
