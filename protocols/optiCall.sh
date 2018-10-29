@@ -1,19 +1,8 @@
-#MOLGENIS walltime=01:59:00 mem=2gb ppn=6
+#MOLGENIS walltime=23:59:00 mem=8gb ppn=2
 
-#string pythonVersion
-#string beadArrayVersion
 #string gapVersion
-#string bpmFile
-#string projectRawTmpDataDir
-#string intermediateDir
-#string tmpTmpdir
-#string tmpDir
-#string workDir
-#string tmpName
 #string Project
 #string logsDir
-#string finalReport
-#string samplesheet
 #string optiCallDir
 #string optiCallVersion
 #string chr

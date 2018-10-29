@@ -78,6 +78,7 @@ function generateScripts () {
 	local _project="${1}"
 	local _run="${2}"
 	local _sampleType="${3}" ## GAP
+	local _pipeline="${4}" ## diagnostiek || research
 	local _loadPipeline="${_sampleType}"
 	local _generateShScript="${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh"
 	local _controlFileBase="${TMP_ROOT_DIR}/logs/${_project}/${_run}.generateScripts"
@@ -135,9 +136,9 @@ function generateScripts () {
 	cd "${TMP_ROOT_DIR}/generatedscripts/${_project}/"
 	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Navigated to $(pwd)."
 	
-	_message="Running: sh ${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh -p ${_project} -g ${group}>> ${_logFile}"
+	_message="Running: sh ${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh -p ${_project} -g ${group} -l ${_pipeline}>> ${_logFile}"
 	log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "${_message}"
-	sh "${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh" -p "${_project}" -g ${group} >> "${_logFile}" 2>&1
+	sh "${TMP_ROOT_DIR}/generatedscripts/${_project}/generate.sh" -p "${_project}" -g ${group} -l ${_pipeline} >> "${_logFile}" 2>&1
 	touch "${_controlFileBase}.started"
 	cd scripts
 	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Navigated to $(pwd)."
@@ -344,34 +345,32 @@ do
 	declare -a sampleSheetColumnNames=()
 	declare -A sampleSheetColumnOffsets=()
 	declare    sampleType='GAP' # Default when not specified in sample sheet.
+	declare    pipeline='diagnostics' #Default
 	declare    sampleTypeFieldIndex
+
 	IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${sampleSheet}"))
 	for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 	do
-		#
-		# Backwards compatibility for "Sample Type" including - the horror - a space and optionally quotes :o.
-		#
-		regex='Sample Type'
-		if [[ "${sampleSheetColumnNames[${offset}]}" =~ ${regex} ]]
-		then
-			columnName='sampleType'
-		else
-			columnName="${sampleSheetColumnNames[${offset}]}"
-		fi
+		columnName="${sampleSheetColumnNames[${offset}]}"
 		sampleSheetColumnOffsets["${columnName}"]="${offset}"
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "${columnName} and sampleSheetColumnOffsets["${columnName}"] offset ${offset} "
 	done
-	
+
 	if [[ ! -z "${sampleSheetColumnOffsets['sampleType']+isset}" ]]; then
 		#
 		# Get sampleType from sample sheet and check if all samples are of the same type.
 		#
 		sampleTypeFieldIndex=$((${sampleSheetColumnOffsets['sampleType']} + 1))
+		pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
 		sampleTypesCount=$(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sampleTypeFieldIndex} | sort | uniq | wc -l)
-		if [[ "${sampleTypesCount}" -eq '1' ]]
+		pipelineCount=$(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex} | sort | uniq | wc -l)
+		if [[ "${sampleTypesCount}" -eq '1' ]] && [[ "${pipelineCount}" -eq '1' ]]
 		then
 			sampleType=$(tail -n 1 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sampleTypeFieldIndex})
 			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found sampleType: ${sampleType}."
+			pipeline=$(tail -n 1 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex})
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found pipeline: ${pipeline}."
+
 		else
 			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "${sampleSheet} contains multiple different sampleType values."
 			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping ${project} due to error in sample sheet."
@@ -380,9 +379,9 @@ do
 	else
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "sampleType column missing in sample sheet; will use default value: ${sampleType}."
 	fi
-	
-	generateScripts "${project}" "${run}" "${sampleType}"
-	
+	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "generateScripts "${project}" "${run}" "${sampleType}" "${pipeline}""
+	generateScripts "${project}" "${run}" "${sampleType}" "${pipeline}"
+
 	#
 	# Submit generated job scripts (per project).
 	#
