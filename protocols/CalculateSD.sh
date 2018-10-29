@@ -15,11 +15,11 @@
 #string tmpName
 #string logsDir
 #string Project
-#string GTCtoVCF
+#string GTCtoVCFVersion
 #string fastaFile
 #string GTCtmpDataDir
 #string tmpTmpdir
-#string HTSlib
+#string HTSlibVersion
 
 set -e
 set -u
@@ -28,18 +28,18 @@ set -u
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
-module load "${GTCtoVCF}"
-module load "${HTSlib}"
+module load "${GTCtoVCFVersion}"
+module load "${HTSlibVersion}"
 
 python "${EBROOTGAP}/scripts/gtc_final_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
 
-python "${EBROOTGTCTOVCF}"/gtc_to_vcf.py \
---gtc-paths "${GTCtmpDataDir}"/"${SentrixBarcode_A}"/ \
---output-vcf-path "${intermediateDir}"/ \
+python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
+--gtc-paths "${GTCtmpDataDir}/${SentrixBarcode_A}"/ \
+--output-vcf-path "${intermediateDir}/" \
 --manifest-file "${bpmFile}" \
 --genome-fasta-file "${fastaFile}" \
 --skip-indels \
---log-file "${tmpTmpdir}"/"${SentrixBarcode_A}"_GTCtoVCF.log.txt
+--log-file "${tmpTmpdir}/${SentrixBarcode_A}_GTCtoVCF.log.txt"
 
 #Replace barcode with sampleid
 
@@ -60,24 +60,24 @@ do
 
         for sample_barcode in ${barcodelist[@]}
         do
-        filename=$(basename ${input_file})
-        barcode_position=${filename%%.*}
-        barcode=${barcode_position%_*}
-        position=${barcode_position##*_}
+            filename=$(basename ${input_file})
+            barcode_position=${filename%%.*}
+            barcode=${barcode_position%_*}
+            position=${barcode_position##*_}
 
-                sample_id=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"}{print $1}')
-                barcode_combined=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"} {print $2}')
-                sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
-                sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
+            sample_id=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"}{print $1}')
+            barcode_combined=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"} {print $2}')
+            sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
+            sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
 
 
-                if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
-                then
-                    echo "${intermediateDir}/${input_file} ${concordanceInputDir}/${sample_id}.vcf"
-                    mv "${intermediateDir}/${filename}.vcf" "${concordanceInputDir}/${sample_id}.vcf"
-                    awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'$sample_id'"} else {print $0}}' "${concordanceInputDir}/${sample_id}.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf"
-                    bgzip -c "${concordanceInputDir}/${sample_id}.FINAL.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
-                    tabix -p vcf "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
-                fi
+            if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
+            then
+                echo "${intermediateDir}/${input_file} ${concordanceInputDir}/${sample_id}.vcf"
+                mv "${intermediateDir}/${filename}.vcf" "${concordanceInputDir}/${sample_id}.vcf"
+                awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'$sample_id'"} else {print $0}}' "${concordanceInputDir}/${sample_id}.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf"
+                bgzip -c "${concordanceInputDir}/${sample_id}.FINAL.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
+                tabix -p vcf "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
+            fi
         done
 done
