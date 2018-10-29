@@ -19,6 +19,7 @@
 #string fastaFile
 #string GTCtmpDataDir
 #string tmpTmpdir
+#string HTSlib
 
 set -e
 set -u
@@ -28,6 +29,7 @@ module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module load "${GTCtoVCF}"
+module load "${HTSlib}"
 
 python "${EBROOTGAP}/scripts/gtc_final_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
 
