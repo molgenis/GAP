@@ -75,7 +75,7 @@ if [[ -z "${outputdir-}" ]]; then
         outputdir="/groups/umcg-gd/tmp05/Concordance/output/"
 fi
 if [[ -z "${tempdir-}" ]]; then
-        tempdir="groups/umcg-gd/tmp05/Concordance/temp/"
+        tempdir="/groups/umcg-gd/tmp05/Concordance/temp/"
 fi
 
 
@@ -129,6 +129,7 @@ do
 
         arrayid=($(basename ${arrayfile} .FINAL.vcf ))
         echo "arrayID: ${arrayid}"
+        touch ${tempdir}/${arrayid}.sampleId.txt
         echo -e "data1Id\tdata2Id\n${arrayid}\t${patientno}" >> ${tempdir}/${arrayid}.sampleId.txt
 
         bedtools intersect -a "${arrayfile}" -b "${bedfile}" -header  >"${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf"
