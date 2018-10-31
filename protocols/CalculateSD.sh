@@ -76,8 +76,6 @@ do
             echo "${intermediateDir}/${input_file} ${concordanceInputDir}/${sample_id}.vcf"
             mv "${intermediateDir}/${filename}.vcf" "${concordanceInputDir}/${sample_id}.vcf"
             awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'$sample_id'"} else {print $0}}' "${concordanceInputDir}/${sample_id}.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf"
-            bgzip -c "${concordanceInputDir}/${sample_id}.FINAL.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
-            tabix -p vcf "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
         fi
     done
 done
