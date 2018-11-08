@@ -35,6 +35,8 @@ cd "${projectRawTmpDataDir}"
 
 max_index=${#SentrixPosition_A[@]}-1
 
+if [ ${pipeline} == 'diagnostiek' ]
+then
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
 	ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
@@ -43,6 +45,19 @@ do
 	ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
 	"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
 done
+else
+
+for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
+do
+	mkdir -p ${SentrixBarcode_A[samplenumber]}
+	ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
+        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
+
+        ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
+        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
+done
+
+fi
 
 #Copying samplesheet to project jobs folder
 
