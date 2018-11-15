@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#MOLGENIS walltime=05:59:00 mem=30gb ppn=6
+#MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
 #string beadArrayVersion
@@ -31,7 +31,7 @@ module load "${gapVersion}"
 module load "${GTCtoVCFVersion}"
 module load "${HTSlibVersion}"
 
-# python "${EBROOTGAP}/scripts/gtc_final_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
+#Convert gtc file to a VCF
 
 python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
 --gtc-paths "${GTCtmpDataDir}/${SentrixBarcode_A}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc" \
@@ -46,10 +46,17 @@ sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/
 
 echo "${Sample_ID}": "${sd}"
 
+mv "${intermediateDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${intermediateDir}/${Sample_ID}.vcf"
+awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}'"} else {print $0}}' "${intermediateDir}/${Sample_ID}.vcf" > "${intermediateDir}/${Sample_ID}.FINAL.vcf"
+
+#Copy VCF to resultsdir
+
+mkdir -p "${resultDir}/VCF/"
+
+rsync -av ${intermediateDir}/${Sample_ID}.FINAL.vcf "${resultDir}/VCF/"
+
 if  [[ "${sd}" < 0.2 ]]
 	then
 	echo "move VCF to concordancedir when standard deviation <0.20 ."
-	mv "${intermediateDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${intermediateDir}/${Sample_ID}.vcf"
-	awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}'"} else {print $0}}' "${intermediateDir}/${Sample_ID}.vcf" > "${intermediateDir}/${Sample_ID}.FINAL.vcf"
 #	cp "${intermediateDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
 fi

@@ -13,6 +13,8 @@
 #list SentrixBarcode_A
 #list SentrixPosition_A
 #string logsDir
+#string diagnosticOutputFolder
+#string resultDir
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
@@ -20,6 +22,8 @@ module load "${gapVersion}"
 module list
 
 
+
+mkdir -p "${diagnosticOutputFolder}/${Project}"
 
 set -e
 set -u
@@ -53,3 +57,7 @@ echo "	perl -pi -e \"s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[sam
 	perl -pi -e "s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|" "${intermediateDir}/Callrates_${Project}.txt"
 done
 
+#Put results in resultsfolder
+
+rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${resultDir}"
+rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}"
