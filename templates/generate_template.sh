@@ -23,7 +23,7 @@ Options:
 	-p   project
 	-g   group (default=basename of ../../../ )
 	-f   filePrefix (default=basename of this directory)
-	-r   RUNID (default=run01)
+	-r   runID (default=run01)
 	-t   tmpDirectory (default=basename of ../../ )
 	-x   excludeGTCFiles
 	-w   workdir (default=/groups/\${group}/\${tmpDirectory})
@@ -34,9 +34,9 @@ EOH
 	exit 0
 }
 
-while getopts "t:g:w:f:r:l:h:p:" opt;
+while getopts "t:g:w:f:r:l:h:x:" opt;
 do
-	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)RUNID="${OPTARG}";;l)pipeline="${OPTARG}";;x)excludeGTCsFile="${OPTARG}";;
+	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; l)pipeline="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
 	esac
 done
 
@@ -44,22 +44,23 @@ if [[ -z "${tmpDirectory:-}" ]]; then tmpDirectory=$(basename $(cd ../../ && pwd
 if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../ && pwd )) ; fi ; echo "group=${group}"
 if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi ; echo "workDir=${workDir}"
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
-if [[ -z "${RUNID:-}" ]]; then RUNID="run01" ; fi ; echo "RUNID=${RUNID}"
+if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
 if [[ -z "${pipeline:-}" ]]; then pipeline="diagnostics" ; fi ; echo "pipeline=${pipeline}"
+if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
 genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 host=$(hostname -s)
 echo "${host}"
 
-projectDir="${workDir}/projects/${filePrefix}/${RUNID}/jobs/"
+projectDir="${workDir}/projects/${filePrefix}/${runID}/jobs/"
 
 mkdir -p -m 2770 "${workDir}/projects/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
-mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${RUNID}/"
-mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${RUNID}/jobs/"
+mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/"
+mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/jobs/"
 
-samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
+#samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
@@ -68,9 +69,15 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${samplesheet}" \
--rundir "${genScripts}/scripts" \
---runid "${RUNID}" \
 -w "${EBROOTGAP}/Prepare_${pipeline}_workflow.csv" \
--o "RUNID=${RUNID};pipeline=${pipeline}" \
 -weave \
---generate
+--generate \
+-rundir "${genScripts}/scripts" \
+--runid "${runID}" \
+-o "outputdir=scripts/jobs;\
+mainParameters=${genScripts}/parameters_converted.csv;\
+samplesheet=${samplesheet};\
+Project=${filePrefix};\
+pipeline=${pipeline};\
+runID=${runID};\
+excludeGTCsFile=${excludeGTCsFile:-};"

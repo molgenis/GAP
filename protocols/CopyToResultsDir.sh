@@ -8,16 +8,22 @@
 #string diagnosticOutputFolder
 #string logsDir
 #string runID
+#string vcfDir
 
 set -e
 set -u
 
+
+#Making VCF resultsdir
+mkdir -p "${resultDir}/VCF/"
 
 #Copying Diagnostics outputfiles to resultsDir
 
 
 rsync -a "${intermediateDir}/${Project}_PennCNV.txt" "${resultDir}"
 rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${resultDir}"
+rsync -a "${intermediateDir}/{sample_id}.FINAL.vcf" " "${vcfDir}"
+
 
 #Copying files to Diagnostics output folder so DARWIN can further process the output files
 
