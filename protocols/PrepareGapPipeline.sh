@@ -35,7 +35,7 @@ cd "${projectRawTmpDataDir}"
 
 max_index=${#SentrixPosition_A[@]}-1
 
-if [ ${pipeline} == 'diagnostiek' ]
+if [ ${pipeline} == 'diagnostics' ]
 then
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
@@ -82,7 +82,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
--o "runID=${runID}"\
+-o "runID=${runID}" \
 -b slurm \
 -g \
 -weave \

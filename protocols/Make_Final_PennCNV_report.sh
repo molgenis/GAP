@@ -8,6 +8,8 @@
 #string intermediateDir
 #string Project
 #string logsDir
+#string diagnosticOutputFolder
+#string resultDir
 
 set -e
 set -u
@@ -68,3 +70,10 @@ done
 
 (cat "${intermediateDir}/header.txt"; printf "\n"; cat "${intermediateDir}/bron.txt") > "${intermediateDir}/${Project}_PennCNV.txt"
 
+#Copy results to resultDir
+
+rsync -a "${intermediateDir}/${Project}_PennCNV.txt" "${resultDir}"
+rsync -a "${intermediateDir}/${Project}_PennCNV.txt" "${diagnosticOutputFolder}/${Project}"
+
+#Touch file for DARWIN so they know pipeline is finished and can start proceeding step to put data in SNP Module...
+touch "${diagnosticOutputFolder}/${Project}/${Project}".finished
