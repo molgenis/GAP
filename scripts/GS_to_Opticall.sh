@@ -48,6 +48,8 @@ headerNumber=$(( $(head -30 "${input}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+
 
 # Split file per sample id, in this case: second column (first 10 columns is a header)
 cd "${output}"
+rm -f *tmp*
+rm -f info
 awk -v headerNumber="$headerNumber" '{if(NR>headerNumber){print >> $2".tmp"}}' "${input}"
 # Extract info of all snps in the first condition + intensities of first sample
 for a in *tmp;
