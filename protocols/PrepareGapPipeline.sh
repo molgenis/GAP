@@ -1,5 +1,5 @@
-#list SentrixBarcode_A
-#list SentrixPosition_A
+#MOLGENIS walltime=02:00:00 mem=4gb
+#list SentrixBarcode_A,SentrixPosition_A
 #string projectRawTmpDataDir
 #string intermediateDir
 #string resultDir
@@ -12,6 +12,7 @@
 #string pipeline
 #string runID
 #string logsDir
+#string perlVersion
 
 umask 0007
 
@@ -87,3 +88,12 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -g \
 -weave \
 -runid "${runID}"
+
+ sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
+
+if [ ${pipeline} == 'research' ] && [ $sampleSize -gt 1000 ]
+then
+	echo "Samplesize is ${sampleSize}"
+	ml "${perlVersion}"
+	perl ${EBROOTGAP}/scripts/RemoveDuplicatesCompute.pl "${projectJobsDir}/"*"_mergeFinalReports_0.sh"
+ fi

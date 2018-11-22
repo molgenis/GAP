@@ -1,4 +1,4 @@
-#MOLGENIS walltime=7-00:00:00 mem=2gb ppn=1
+#MOLGENIS walltime=02:00:00 mem=2gb ppn=1
 
 #string pythonVersion
 #string beadArrayVersion
@@ -12,8 +12,9 @@
 #string tmpName
 #string Project
 #string logsDir
-#string finalReport
+#string arrayFinalReport
 #string samplesheet
+#string SentrixBarcode_A
 
 set -e
 set -u
@@ -23,10 +24,15 @@ module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-rm -f "${finalReport}"
+makeTmpDir "${arrayFinalReport}"
+tmpArrayFinalReport="${MC_tmpFile}"
 
 python ${EBROOTGAP}/scripts/gtc_final_report.py \
 --manifest "${bpmFile}" \
 --samplesheet "${samplesheet}" \
---gtc_directory "${projectRawTmpDataDir}" \
---output_file "${finalReport}"
+--gtc_directory "${projectRawTmpDataDir}/${SentrixBarcode_A}/" \
+--output_file "${tmpArrayFinalReport}"
+
+
+echo "mv ${tmpArrayFinalReport} ${arrayFinalReport}"
+mv "${tmpArrayFinalReport}" "${arrayFinalReport}"

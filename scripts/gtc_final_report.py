@@ -72,9 +72,9 @@ elif not args.samplesheet:
 
 
 #If there is gtc files to be excluded, read from given file and create exlcuding dictionary
+excludeIDArray={}
 if args.excludeGTCFileIDs:
     file = open(args.excludeGTCFileIDs,"r")
-    excludeIDArray={}
     for line in file:
        #if IDs in file include the .gtc extension, create the without modifyingthe IDs, else add the extension.
         if '.gtc' in line:

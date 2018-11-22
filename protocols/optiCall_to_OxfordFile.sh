@@ -3,6 +3,7 @@
 #string Project
 #string logsDir
 #string optiCallDir
+#string intermediateDir
 #string genSampleDir
 #string optiCallVersion
 #string chrNr
@@ -13,6 +14,10 @@ set -u
 inputFolder="${optiCallDir}"
 outputFolder="${genSampleDir}"
 mkdir -p "${outputFolder}"
+
+makeTmpDir "${outputFolder}"
+tmpOutputFolder="${MC_tmpFile}"
+
 
 if [[ -z "$inputFolder" ]]
 then
@@ -29,7 +34,7 @@ fi
     echo "${chrNr}"
 
     input="${inputFolder}/chr_${chrNr}.probs"
-    output="${outputFolder}/chr_${chrNr}"
+    output="${tmpOutputFolder}/chr_${chrNr}"
 
     sampleFile="${output}.sample"
 
@@ -61,3 +66,9 @@ fi
                 }
         ' < ${input} > ${output}.gen
 fi
+
+echo "mv ${tmpOutputFolder}/chr_${chrNr}.gen ${outputFolder}/"
+echo "mv ${tmpOutputFolder}/chr_${chrNr}.sample ${outputFolder}/"
+
+mv "${tmpOutputFolder}/chr_${chrNr}.gen" "${outputFolder}/"
+mv "${tmpOutputFolder}/chr_${chrNr}.sample" "${outputFolder}/"
