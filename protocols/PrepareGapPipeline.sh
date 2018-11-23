@@ -1,5 +1,4 @@
-#list SentrixBarcode_A
-#list SentrixPosition_A
+#list SentrixBarcode_A,SentrixPosition_A
 #string projectRawTmpDataDir
 #string intermediateDir
 #string resultDir

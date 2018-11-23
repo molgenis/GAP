@@ -20,6 +20,7 @@
 #string GTCtmpDataDir
 #string tmpTmpdir
 #string HTSlibVersion
+#string resultDir
 
 set -e
 set -u
@@ -58,5 +59,5 @@ rsync -av ${intermediateDir}/${Sample_ID}.FINAL.vcf "${resultDir}/VCF/"
 if  [[ "${sd}" < 0.2 ]]
 	then
 	echo "move VCF to concordancedir when standard deviation <0.20 ."
-#	cp "${intermediateDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
+	cp "${intermediateDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
 fi
