@@ -16,13 +16,13 @@ appsDir,${root}/apps/
 workDir,/groups/umcg-gap/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
-intermediateDir,${tmpTmpdir}/${Project}
+intermediateDir,${tmpTmpdir}/${Project}/${runid}/
 projectDir,${workDir}/${tmpName}/projects/
-resultDir,${projectDir}/${Project}/${runID}/results/
-projectJobsDir,${projectDir}/${Project}/${runID}/jobs/
+resultDir,${projectDir}/${Project}/${runid}/results/
+projectJobsDir,${projectDir}/${Project}/${runid}/jobs/
 genScripts,${tmpDir}/generatedscripts/${Project}
 diagnosticOutputFolder,${tmpDir}/DiagnosticOutput
-projectRawTmpDataDir,${projectDir}/${Project}/${runID}/rawdata/array/
+projectRawTmpDataDir,${projectDir}/${Project}/${runid}/rawdata/array/
 IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
 GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
@@ -31,3 +31,7 @@ ateambotUser,umcg-gap-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 vcfDir,${resultDir}/VCF/
+PennCNV_reportDir,${intermediateDir}/PennCNV_reports/
+CallrateDir,${intermediateDir}/Callrate/
+FinalReportDir,${intermediateDir}/FinalReport/
+CalculateSDDir,${intermediateDir}/CalculateSD/

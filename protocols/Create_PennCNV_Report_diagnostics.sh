@@ -14,6 +14,9 @@
 #string tmpName
 #string Project
 #string logsDir
+#list SentrixBarcode_A
+#list SentrixPosition_A
+#string PennCNV_reportDir
 
 set -e
 set -u
@@ -23,4 +26,14 @@ module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
+
+mkdir -p "${PennCNV_reportDir}"
+
+makeTmpDir "${PennCNV_reportDir}"
+tmpPennCNV_reportDir="${MC_tmpFile}"
+
+
+python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}"
+
+echo "mv ${tmpPennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt ${PennCNV_reportDir}/"
+mv "${tmpPennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt" "${PennCNV_reportDir}/"

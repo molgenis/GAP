@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module load Molgenis-Compute/v17.08.1-Java-1.8.0_74
-module load GAP/v2.1.0-beta
+module load GAP/v2.2.0
 module list
 
 host=$(hostname -s)
