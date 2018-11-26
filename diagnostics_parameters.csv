@@ -16,7 +16,7 @@ appsDir,${root}/apps/
 workDir,/groups/umcg-gap/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
-intermediateDir,${tmpTmpdir}/${Project}/${runID}}/
+intermediateDir,${tmpTmpdir}/${Project}/${runID}/
 projectDir,${workDir}/${tmpName}/projects/
 resultDir,${projectDir}/${Project}/${runid}/results/
 projectJobsDir,${projectDir}/${Project}/${runid}/jobs/
