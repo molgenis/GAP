@@ -15,35 +15,39 @@
 #string logsDir
 #string diagnosticOutputFolder
 #string resultDir
+#string CallrateDir
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-
-
-mkdir -p "${diagnosticOutputFolder}/${Project}"
-
 set -e
 set -u
 
-python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}/callratedata_project.txt"
+mkdir -p "${CallrateDir}/"
+
+makeTmpDir "${CallrateDir}/"
+tmpCallrateDir="${MC_tmpFile}"
+
+mkdir -p "${diagnosticOutputFolder}/${Project}"
+
+python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpCallrateDir}/callratedata_project.txt"
 
 #Create header for callrate report
-echo -en "Sample ID\tCall Rate\tGender" > "${intermediateDir}/callrate_header.txt"
+echo -en "Sample ID\tCall Rate\tGender" > "${tmpCallrateDir}/callrate_header.txt"
 
 
 #Add header to callrate report to create final results
 #(cat ${intermediateDir}/callrate_header.txt; printf '\n'; cat ${intermediateDir}/callratedata_project.txt > "${intermediateDir}/Callrates_${Project}.txt")
 
-printf "\n" | cat "${intermediateDir}/callrate_header.txt" - "${intermediateDir}/callratedata_project.txt" > "${intermediateDir}/Callrates_${Project}.txt"
+printf "\n" | cat "${tmpCallrateDir}/callrate_header.txt" - "${tmpCallrateDir}/callratedata_project.txt" > "${tmpCallrateDir}/Callrates_${Project}.txt"
 
 #add gender [replace M/F/U with Male/Female/Unknown ]
 
-perl -pi -e 's|M|Male|g' "${intermediateDir}/Callrates_${Project}.txt"
-perl -pi -e 's|F|Female|g' "${intermediateDir}/Callrates_${Project}.txt"
-perl -pi -e 's|U|Unknown|g' "${intermediateDir}/Callrates_${Project}.txt"
+perl -pi -e 's|M|Male|g' "${tmpCallrateDir}/Callrates_${Project}.txt"
+perl -pi -e 's|F|Female|g' "${tmpCallrateDir}/Callrates_${Project}.txt"
+perl -pi -e 's|U|Unknown|g' "${tmpCallrateDir}/Callrates_${Project}.txt"
 
 #Replace barcode with sampleid
 
@@ -53,11 +57,18 @@ n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
-echo "	perl -pi -e \"s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|\" \"${intermediateDir}/Callrates_${Project}.txt\""
-	perl -pi -e "s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|" "${intermediateDir}/Callrates_${Project}.txt"
+echo "	perl -pi -e \"s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|\" \"${tmpCallrateDir}/Callrates_${Project}.txt\""
+	perl -pi -e "s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|" "${tmpCallrateDir}/Callrates_${Project}.txt"
 done
+
+# Move results from tmp to intermediateDir
+
+
+echo "mv ${tmpCallrateDir}/Callrates_${Project}.txt ${CallrateDir}/Callrates_${Project}.txt"
+mv "${tmpCallrateDir}/Callrates_${Project}.txt" "${CallrateDir}/Callrates_${Project}.txt"
+
 
 #Put results in resultsfolder
 
-rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${resultDir}"
-rsync -a "${intermediateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}"
+rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${resultDir}"
+rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}"
