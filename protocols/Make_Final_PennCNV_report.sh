@@ -79,7 +79,7 @@ done
 
 #Move PennCNV report to Intermediate dir
 echo "mv ${tmpFinalReportDir}/${Project}_PennCNV.txt ${FinalReportDir}/${Project}_PennCNV.txt"
-mv "${tmpFinalReportDir}/${Project}_PennCNV.txt ${FinalReportDir}/${Project}_PennCNV.txt"
+mv "${tmpFinalReportDir}/${Project}_PennCNV.txt" "${FinalReportDir}/${Project}_PennCNV.txt"
 
 
 #Copy results to resultDir

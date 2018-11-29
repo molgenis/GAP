@@ -22,6 +22,7 @@
 #string HTSlibVersion
 #string resultDir
 #string CalculateSDDir
+#string PennCNV_reportDir
 
 set -e
 set -u
@@ -47,10 +48,10 @@ python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
 --skip-indels \
 --log-file "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}_GTCtoVCF.log.txt"
 
-log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${intermediateDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
+log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${PennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
 sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 
-echo "${Sample_ID}": "${sd}" > "${tmpCalculateSDDir}/{Sample_ID}_SD.txt"
+echo "${Sample_ID}": "${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_SD.txt"
 
 mv "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${tmpCalculateSDDir}/${Sample_ID}.vcf"
 awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf"
@@ -58,12 +59,12 @@ awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample
 
 #Move VCF to intermediateDir
 
-echo "mv ${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf ${intermediateDir}/${Sample_ID}.FINAL.vcf"
-mv "${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf" "${intermediateDir}/${Sample_ID}.FINAL.vcf"
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf $CalculateSDDir}/${Sample_ID}.FINAL.vcf"
+mv "${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf" "${CalculateSDDir}/${Sample_ID}.FINAL.vcf"
 
 #Move SD values to intermediateDir
-echo "mv ${tmpCalculateSDDir}/{Sample_ID}_SD.txt ${CalculateSDDir}/{Sample_ID}_SD.txt"
-mv "${tmpCalculateSDDir}/{Sample_ID}_SD.txt" "${CalculateSDDir}/{Sample_ID}_SD.txt"
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}_SD.txt ${CalculateSDDir}/${Sample_ID}_SD.txt"
+mv "${tmpCalculateSDDir}/${Sample_ID}_SD.txt" "${CalculateSDDir}/${Sample_ID}_SD.txt"
 
 
 
@@ -79,5 +80,5 @@ rsync -av "${CalculateSDDir}/${Sample_ID}_SD.txt" "${resultDir}/SD/"
 if  [[ "${sd}" < 0.2 ]]
 	then
 	echo "move VCF to concordancedir when standard deviation <0.20 ."
-#	cp "${intermediateDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
+	cp "${CalculateSDDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
 fi

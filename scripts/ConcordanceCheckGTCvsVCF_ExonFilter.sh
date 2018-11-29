@@ -12,7 +12,7 @@ set -e
 set -u
 
 
-PARSED_OPTIONS=$(getopt -n "$0"  -o w:a:n:o:t: --long "workdir:arrayvcfdir:ngsvcfdir:outputdir:tmpdir:"  -- "$@")
+PARSED_OPTIONS=$(getopt -n "$0"  -o w:a:n:o:t: --long "workdir:arrayvcfdir:ngsvcfdir:outputdir:tempdir:prmdir:"  -- "$@")
 
 #
 # Bad arguments, something has gone wrong with the getopt command.
@@ -52,6 +52,10 @@ while true; do
                 case "$2" in
                 *) tempdir=$2 ; shift 2 ;;
             esac ;;
+    -p|--prmdir)
+                case "$2" in
+                *) tempdir=$2 ; shift 2 ;;
+            esac ;;
          --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -63,7 +67,7 @@ empty=""
 # Check required options were provided.
 #
 if [[ -z "${workdir-}" ]]; then
-        workdir="/groups/umcg-gd/tmp05/Concordance/" 
+        workdir="/groups/umcg-gd/tmp05/Concordance/"
 fi
 if [[ -z "${arrayvcfdir-}" ]]; then
         arrayvcfdir="/groups/umcg-gd/tmp05/Concordance/array/"
@@ -77,12 +81,15 @@ fi
 if [[ -z "${tempdir-}" ]]; then
         tempdir="/groups/umcg-gd/tmp05/Concordance/temp/"
 fi
-
+if [[ -z "${prmdir-}" ]]; then
+        tempdir="/groups/umcg-gd/prm03/Concordance/"
+fi
 
 module load HTSlib
 module load CompareGenotypeCalls/1.8.1-Java-1.8.0_74
 module load BEDTools/2.25.0-foss-2015b
 
+module list
 
 for vcffile in $(ls "${ngsvcfdir}"*"final.vcf")
 do
@@ -92,34 +99,34 @@ do
     echo "beddir: ${beddir}"
     bedfile="${beddir}/captured.merged.bed"
     echo "${bedfile}"
-    
+
     ngsvcfid=$(basename "${vcffile}" .final.vcf)
-    
+
     grep '^#' ${vcffile} > ${ngsvcfid}.FINAL.vcf
     grep -v '^#' ${vcffile} | awk '{if (length($4)<2 && length($5)<2 ){print $0}}' >> ${ngsvcfid}.FINAL.vcf
 
     bgzip -c ${ngsvcfid}.FINAL.vcf > ${ngsvcfid}.FINAL.vcf.gz
     tabix -p vcf ${ngsvcfid}.FINAL.vcf.gz
-    
+
     patientlist=()
     dnalist=()
-        
-        ##remove indel-calls from ngs-vcf
+
+    ##remove indel-calls from ngs-vcf
     patientlist+=($(grep '#CHROM' ${vcffile} | awk '{for(i=10;i<=NF;++i)print $i}'))
     dnalist+=($(grep '#CHROM' ${vcffile} | awk '{for(i=10;i<=NF;++i)print $i}' | awk ' {FS="_"}{if (NR>1){print substr($3,4)}}')) 
-        
+
         ##find with DNA number the right NGS and array vcf file
     for patientno in ${patientlist[@]}
-    do    
-        dnano=$(echo ${patientno} | awk 'BEGIN {FS="_"}{print substr($3,4)}' )
+    do
+	dnano=$(echo ${patientno} | awk 'BEGIN {FS="_"}{print substr($3,4)}' )
         declare -a arrayfile=($(ls -1 "${arrayvcfdir}/DNA-${dnano}_"*".FINAL.vcf" 2> /dev/null ))
         echo "DNAno: ${dnano}"
         echo "arrayfile: ${arrayfile}"
             ##################
-            ### mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer 
+            ### mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer
             ##################
-        
-        if [[ ${#arrayfile[@]:-0} != 1 ]]
+
+	if [[ ${#arrayfile[@]:-0} != 1 ]]
         then
             echo "more than 1 file or file ${dnancdo} does not exist "
             messageGCC="Dear GCC helpdesk,\n\nThere is more than 1 array sample with id:${dnano}. \nPlease check if there is some think wrong with the concordance check.\nKind regards\nGCC"
@@ -152,19 +159,22 @@ do
         --sampleMap "${tempdir}/${arrayid}.sampleId.txt" \
         -o "${outputdir}/${arrayid}" \
         -sva
-        
-        
-        mv "${vcffile}" "${ngsvcfdir}/archive"
+
+	mv "${vcffile}" "${ngsvcfdir}/archive"
         mv "${ngsvcfid}.FINAL.vcf" "${ngsvcfdir}/archive"
         mv "${ngsvcfid}.FINAL.vcf.gz" "${ngsvcfdir}/archive"
         mv "${ngsvcfid}.FINAL.vcf.gz.tbi" "${ngsvcfdir}/archive"
         mv "${arrayvcfdir}/${arrayid}.vcf" "${arrayvcfdir}/archive"
-        mv "${arrayvcfdir}/${arrayid}.FINAL.vcf" "${arrayvcfdir}/archive"  
-        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf" "${arrayvcfdir}/archive"  
-        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz" "${arrayvcfdir}/archive"  
-        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz.tbi" "${arrayvcfdir}/archive"  
+        mv "${arrayvcfdir}/${arrayid}.FINAL.vcf" "${arrayvcfdir}/archive"
+        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf" "${arrayvcfdir}/archive"
+        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz" "${arrayvcfdir}/archive"
+        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz.tbi" "${arrayvcfdir}/archive"
         mv "${tempdir}/${arrayid}.sampleId.txt" "${tempdir}/archive"
-    done
+
+	#rsync final results to PRM
+#	rsync -av  "" "umcg-gd-dm@boxy.hpc.rug.nl:${}"
+	# ${DATA_MANAGER}@${sourceServerFQDN}:${SCR_ROOT_DIR}/Samplesheets/${_run}.${SAMPLESHEET_EXT}
+	done
 done
 
 
