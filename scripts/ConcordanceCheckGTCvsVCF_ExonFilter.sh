@@ -92,7 +92,7 @@ do
     bedFile="${bedDir}/captured.merged.bed"
     echo "${bedFile}"
 
-    ngsVcfId=$(basename "${vcfFile}" .final.vcf)
+    ngsVcfId="$(basename "${vcfFile}" .final.vcf)"
 
     mkdir -p "${tempDir}/${ngsVcfId}/"
     echo "${ngsVcfId}"
@@ -132,7 +132,7 @@ do
             next # exit 1
         fi
 
-        arrayId=$(basename "${arrayFile}" .FINAL.vcf)
+        arrayId="$(basename "${arrayFile}" .FINAL.vcf)"
         echo "arrayID: ${arrayId}"
         touch "${tempDir}/${ngsVcfId}/${arrayId}.sampleId.txt"
         echo -e "data1Id\tdata2Id\n${arrayId}\t${patientNo}" >> "${tempDir}/${ngsVcfId}/${arrayId}.sampleId.txt"
