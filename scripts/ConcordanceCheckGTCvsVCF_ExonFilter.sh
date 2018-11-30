@@ -159,14 +159,8 @@ do
         -sva
 
 	mv "${vcfFile}" "${ngsVcfDir}/archive"
-#        mv "${ngsvcfid}.FINAL.vcf" "${ngsvcfdir}/archive"
-#        mv "${ngsvcfid}.FINAL.vcf.gz" "${ngsvcfdir}/archive"
-#        mv "${ngsvcfid}.FINAL.vcf.gz.tbi" "${ngsvcfdir}/archive"
         mv "${arrayVcfDir}/${arrayId}.FINAL.vcf" "${arrayVcfDir}/archive"
-#        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf" "${arrayvcfdir}/archive"
-#        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz" "${arrayvcfdir}/archive"
-#        mv "${arrayvcfdir}/${arrayid}.FINAL.ExonFiltered.vcf.gz.tbi" "${arrayvcfdir}/archive"
-#        mv "${tempdir}/${arrayid}.sampleId.txt" "${tempdir}/archive"
+	mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
 	done
 done
 
