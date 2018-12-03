@@ -16,7 +16,12 @@ then
 else
 	touch "${logsDir}/${Project}/${runID}.pipeline.finished"
 fi
-rm -f "${logsDir}/${Project}/${runID}.pipeline.failed"
+
+if [ -f "${logsDir}/${Project}/${runID}.pipeline.failed" ]
+then
+	rm -f "${logsDir}/${Project}/${runID}.pipeline.failed"
+fi
+
 echo "${logsDir}/${Project}/${runID}.pipeline.finished is created"
 
 if [ ! -d "${logsDir}/${Project}/" ]
