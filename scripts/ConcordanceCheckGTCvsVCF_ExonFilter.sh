@@ -107,14 +107,12 @@ do
     declare -a patientList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}'))
     declare -a dnaList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}' | awk 'BEGIN {FS="_"}{if (NR>0){print substr($3,4)}}'))
 
-	echo "hoi ik kom tot stap 1.1"
 	echo "${patientList[@]}"
 	echo "${dnaList[@]}"
 
     ##find with DNA number the right NGS and array vcf file
     for patientNo in ${patientList[@]}
     do
-	echo "hoi ik kom bij stap 1.2"
 	dnaNo="$(echo "${patientNo}" | awk 'BEGIN {FS="_"}{print substr($3,4)}')"
         declare -a arrayFile=($(ls -1 "${arrayVcfDir}/DNA-${dnaNo}_"*".FINAL.vcf"))
 
