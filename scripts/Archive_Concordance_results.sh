@@ -78,7 +78,7 @@ if [[ -z "${sourceServer-}" ]]; then
 fi
 
 #Copying output to PRM
-for resultsFile in $(ls "${tmpDir}/output/"*"sample")
+for resultsFile in $(ssh ${dataManager}@${sourceServer} ls ${tmpDir}/output/'*'sample)
 do
 	file="$(basename ${resultsFile})"
 	sampleID="$(echo "${file}" | awk 'BEGIN {FS="."}{print $1}')"
