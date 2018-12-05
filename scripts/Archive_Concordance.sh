@@ -12,7 +12,7 @@ set -e
 set -u
 
 
-PARSED_OPTIONS=$(getopt -n "$0"  -o t:p:a:d:s: --long "tmpDir:prmDir:archiveTime:dataManager:sourceServer"  -- "$@")
+PARSED_OPTIONS=$(getopt -n "$0"  -o t:a: --long "tmpDir:archiveTime"  -- "$@")
 
 #
 # Bad arguments, something has gone wrong with the getopt command.
@@ -36,22 +36,10 @@ while true; do
                 case "$2" in
                 *) tmpDir=$2 ; shift 2 ;;
             esac ;;
-    -p|--prmDir)
-                case "$2" in
-                *) prmDir=$2 ; shift 2 ;;
-            esac ;;
     -a|--archiveTime)
                 case "$2" in
                 *) archiveTime=$2 ; shift 2 ;;
             esac ;;
-    -d|--dataManager)
-                case "$2" in
-                *) dataManager=$2 ; shift 2 ;;
-            esac ;;
-    -s|--sourceServer)
-                case "$2" in
-                *) sourceServer=$2 ; shift 2 ;;
-       esac ;;
          --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
