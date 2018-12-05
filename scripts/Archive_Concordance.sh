@@ -19,7 +19,7 @@ PARSED_OPTIONS=$(getopt -n "$0"  -o t:p:a:d:s: --long "tmpDir:prmDir:archiveTime
 #
 if [ $? -ne 0 ]; then
         usage
-        echo "FATAL: Wrong arguments."
+	echo "FATAL: Wrong arguments."
         exit 1
 fi
 
@@ -76,26 +76,6 @@ fi
 if [[ -z "${sourceServer-}" ]]; then
         sourceServer="zinc-finger.gcc.rug.nl"
 fi
-
-#Copying output to PRM
-for resultsFile in $(ssh ${dataManager}@${sourceServer} ls ${tmpDir}/output/'*'sample)
-do
-	file="$(basename ${resultsFile})"
-	sampleID="$(echo "${file}" | awk 'BEGIN {FS="."}{print $1}')"
-	echo ${resultsFile}
-	echo ${file}
-	if [[ ! -f "${prmDir}/output/${sampleID}.sample" || ! -f "${prmDir}/output/${sampleID}.variants" ]]
-	then
-		#rsyncing results to PRM
-		echo "rsync -av ${dataManager}@${sourceServer}:${resultsFile} ${prmDir}/output/"
-		rsync -av "${dataManager}@${sourceServer}:${resultsFile}" "${prmDir}/output/"
-
-		echo "rsync -av ${dataManager}@${sourceServer}:${tmpDir}/output/${sampleID}.variants ${prmDir}/output/"
-		rsync -av "${dataManager}@${sourceServer}:${tmpDir}/output/${sampleID}.variants" "${prmDir}/output/"
-	else
-		echo "there are no new results to copy to prm"
-	fi
-done
 
 #Checking if VCF File array is older then ArchiveTime and archive file if this is the case
 
