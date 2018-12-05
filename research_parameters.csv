@@ -6,6 +6,9 @@ computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
 gapVersion,GAP/v2.2.0
 pennCNVVersion,PennCNV/1.0.4-foss-2015b
 optiCallVersion,opticall/0.7.0-foss-2015b
+RPlusVersion,RPlus/3.4.4-foss-2015b-v18.10.1
+plinkVersion,plink/1.9-foss-2015b
+
 zCallVersion,opticall/0.7.0-foss-2015b
 GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
 
@@ -13,6 +16,7 @@ GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
 bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
 hmmFile,hhall.hmm
 pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
+MAFref,/apps/data/1000G/phase3/20130502/eurMAF_1000g/
 
 #paths
 root,/
@@ -41,4 +45,10 @@ optiCallDir,${resultDir}/opticall
 zCallDir,${intermediateDir}/zCall
 pennCNVInputDir,${resultDir}/PennCNV/inputfiles/
 pennCNVDir,${resultDir}/PennCNV/
+CallrateDir,${intermediateDir}/Callrate/
 genSampleDir,${resultDir}/gensamplefiles
+AutosomeQCDir,${resultDir}/AutosomeQC
+output80,${AutosomeQCDir}/1_CR80
+output95,${AutosomeQCDir}/2_CR95
+outputMH,${AutosomeQCDir}/3_MAF_HWE
+repout,${AutosomeQCDir}/plots
