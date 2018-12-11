@@ -8,10 +8,10 @@
 #string bpmFile
 #string projectRawTmpDataDir
 #string intermediateDir
-#list SentrixBarcode_A
-#list SentrixPosition_A
+#string SentrixBarcode_A
+#string SentrixPosition_A
 #string concordanceInputDir
-#list Sample_ID
+#string Sample_ID
 #string tmpName
 #string logsDir
 #string Project
@@ -20,10 +20,17 @@
 #string GTCtmpDataDir
 #string tmpTmpdir
 #string HTSlibVersion
+#string resultDir
+#string CalculateSDDir
+#string PennCNV_reportDir
 
 set -e
 set -u
 
+mkdir -p "${CalculateSDDir}/"
+
+makeTmpDir "${CalculateSDDir}/"
+tmpCalculateSDDir="${MC_tmpFile}"
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
@@ -31,53 +38,47 @@ module load "${gapVersion}"
 module load "${GTCtoVCFVersion}"
 module load "${HTSlibVersion}"
 
-python "${EBROOTGAP}/scripts/gtc_final_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
+#Convert gtc file to a VCF
 
 python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
---gtc-paths "${GTCtmpDataDir}/${SentrixBarcode_A}"/ \
---output-vcf-path "${intermediateDir}/" \
+--gtc-paths "${GTCtmpDataDir}/${SentrixBarcode_A}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc" \
+--output-vcf-path "${tmpCalculateSDDir}/" \
 --manifest-file "${bpmFile}" \
 --genome-fasta-file "${fastaFile}" \
 --skip-indels \
---log-file "${tmpTmpdir}/${SentrixBarcode_A}_GTCtoVCF.log.txt"
+--log-file "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}_GTCtoVCF.log.txt"
 
-#Replace barcode with sampleid
+log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${PennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
+sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 
+echo "${Sample_ID}": "${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_SD.txt"
 
-for ((i=0;i<${#Sample_ID[@]}-1;i++))
-do
-    barcodelist+=("${Sample_ID[${i}]}:${SentrixBarcode_A[${i}]}_${SentrixPosition_A[${i}]}")
-done
-
-
-for input_file in $(find "${intermediateDir}"/[0-9]*_R*.gtc.txt)
-do
-
-    log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${input_file}")
-    sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
-
-    echo "$(basename ${input_file}): ${sd}"
-
-    for sample_barcode in ${barcodelist[@]}
-    do
-        filename=$(basename ${input_file})
-        barcode_position=${filename%%.*}
-        barcode=${barcode_position%_*}
-        position=${barcode_position##*_}
-
-        sample_id=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"}{print $1}')
-        barcode_combined=$(echo "${sample_barcode}" | awk 'BEGIN {FS=":"} {print $2}')
-        sentrix_barcode=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $1}')
-        sentrix_position=$(echo "${barcode_combined}" | awk 'BEGIN {FS="_"}{print $2}')
+mv "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${tmpCalculateSDDir}/${Sample_ID}.vcf"
+awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf"
 
 
-        if  [[ "${sd}" < 0.2 && "${barcode}" == "${sentrix_barcode}" && "${position}" == "${sentrix_position}" ]]
-        then
-            echo "${intermediateDir}/${input_file} ${concordanceInputDir}/${sample_id}.vcf"
-            mv "${intermediateDir}/${filename}.vcf" "${concordanceInputDir}/${sample_id}.vcf"
-            awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'$sample_id'"} else {print $0}}' "${concordanceInputDir}/${sample_id}.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf"
-            bgzip -c "${concordanceInputDir}/${sample_id}.FINAL.vcf" > "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
-            tabix -p vcf "${concordanceInputDir}/${sample_id}.FINAL.vcf.gz"
-        fi
-    done
-done
+#Move VCF to intermediateDir
+
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf $CalculateSDDir}/${Sample_ID}.FINAL.vcf"
+mv "${tmpCalculateSDDir}/${Sample_ID}.FINAL.vcf" "${CalculateSDDir}/${Sample_ID}.FINAL.vcf"
+
+#Move SD values to intermediateDir
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}_SD.txt ${CalculateSDDir}/${Sample_ID}_SD.txt"
+mv "${tmpCalculateSDDir}/${Sample_ID}_SD.txt" "${CalculateSDDir}/${Sample_ID}_SD.txt"
+
+
+
+#Copy VCF to resultsdir
+
+mkdir -p "${resultDir}/VCF/"
+mkdir -p "${resultDir}/SD/"
+
+rsync -av "${CalculateSDDir}/${Sample_ID}.FINAL.vcf" "${resultDir}/VCF/"
+rsync -av "${CalculateSDDir}/${Sample_ID}_SD.txt" "${resultDir}/SD/"
+
+
+if  [[ "${sd}" < 0.2 ]]
+	then
+	echo "move VCF to concordancedir when standard deviation <0.20 ."
+	cp "${CalculateSDDir}/${Sample_ID}.FINAL.vcf" "${concordanceInputDir}/"
+fi

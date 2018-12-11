@@ -21,10 +21,15 @@ set -u
 module load "${pennCNVVersion}"
 module list
 
+makeTmpDir "${pennCNVInputDir}"
+tmpPennCNVInputDir="${MC_tmpFile}"
+
 mkdir -p "${pennCNVInputDir}"
 
 perl ${EBROOTPENNCNV}/split_illumina_report.pl \
---prefix "${pennCNVInputDir}" \
+--prefix "${tmpPennCNVInputDir}" \
 --suffix '.txt' \
 "${finalReport}"
 
+echo "mv ${tmpPennCNVInputDir} ${pennCNVInputDir}"
+mv "${tmpPennCNVInputDir}" "${pennCNVInputDir}"

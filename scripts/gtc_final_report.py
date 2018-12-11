@@ -14,7 +14,7 @@ delim = "\t"
 parser = argparse.ArgumentParser("Generate a final report from a directory of GTC files")
 parser.add_argument("--manifest", help="BPM manifest file",required=True)
 parser.add_argument("--samplesheet", help="Illumina sampleheet",required=False)
-parser.add_argument("--excludeGTCFileIDs", help="txt file with arrayIds",required=False)
+parser.add_argument("--excludeGTCFileIDs", help="txt file with the array IDs to be excluded (not need to add the '.gtc' extension)",required=False)
 parser.add_argument("--gtc_directory", help="Directory containing GTC files",required=True)
 parser.add_argument("--output_file", help="Location to write report",required=True)
 
@@ -62,14 +62,6 @@ if args.samplesheet:
            sampleDict[row['SentrixBarcode_A'] + "_" + row['SentrixPosition_A'].upper()] =  row['Sample_ID']
     f1.close()
 
-excludeIDArray={}
-if args.excludeGTCFileIDs:
-    file = open(args.excludeGTCFileIDs,"r")
-
-    for line in file:
-        excludeIDArray[line.rstrip('\n')+'.gtc']=line.rstrip('\n')+'.gtc'
-
-
     if not rowcount == len(sampleDict.keys()):
         print ("Rowcount in samplesheet does not match number of samples in sampleDict: " + str(rowcount) + " vs " + str(len(sampleDict.keys())))
         exit(1)
@@ -78,6 +70,20 @@ elif not args.samplesheet:
     print("No samplesheet given.")
     sampleDict="NULL"
 
+
+#If there is gtc files to be excluded, read from given file and create exlcuding dictionary
+excludeIDArray={}
+if args.excludeGTCFileIDs:
+    file = open(args.excludeGTCFileIDs,"r")
+    for line in file:
+       #if IDs in file include the .gtc extension, create the without modifyingthe IDs, else add the extension.
+        if '.gtc' in line:
+         excludeIDArray[line.rstrip('\n')]=line.rstrip('\n')
+        else:
+         excludeIDArray[line.rstrip('\n')+'.gtc']=line.rstrip('\n')+'.gtc'
+
+	
+	
 with open(args.output_file, "w") as output_handle:
     output_handle.write("[Header]\n")
     output_handle.write(delim.join(["Processing Date", datetime.now().strftime("%m/%d/%Y %I:%M %p")]) + "\n")

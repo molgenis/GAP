@@ -8,9 +8,18 @@
 #string intermediateDir
 #string Project
 #string logsDir
+#string diagnosticOutputFolder
+#string resultDir
+#string FinalReportDir
+#string PennCNV_reportDir
 
 set -e
 set -u
+
+
+mkdir -p "${FinalReportDir}/"
+makeTmpDir "${FinalReportDir}/"
+tmpFinalReportDir="${MC_tmpFile}"
 
 samples=()
 count=0
@@ -38,9 +47,9 @@ do
 	if [ $count == 0 ]
 	then
 		echo "count=0"
-                echo -en "Name\tChr\tPosition\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq\t${sampleName2}.GType\t${sampleName2}.Log R Ratio\t${sampleName2}.B Allele Freq" > ${intermediateDir}/header.txt
-		echo "join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7 ${intermediateDir}/${barcodeCombined} ${intermediateDir}/${barcodeCombined2} > ${intermediateDir}/bron.txt"
-		join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7  "${intermediateDir}/${barcodeCombined}.gtc.txt" "${intermediateDir}/${barcodeCombined2}.gtc.txt" > "${intermediateDir}/bron.txt"
+                echo -en "Name\tChr\tPosition\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq\t${sampleName2}.GType\t${sampleName2}.Log R Ratio\t${sampleName2}.B Allele Freq" > ${tmpFinalReportDir}/header.txt
+		echo "join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7 ${intermediateDir}/${barcodeCombined} ${intermediateDir}/${barcodeCombined2} > ${tmpFinalReportDir}/bron.txt"
+		join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7  "${PennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}/${barcodeCombined2}.gtc.txt" > "${tmpFinalReportDir}/bron.txt"
 	elif [[ $count -gt 1 ]]
 	then
 		echo "count>1"
@@ -53,18 +62,30 @@ do
 		format="${format}2.5,2.6,2.7"
 		echo ${format}
 		echo ${i}
-		echo "join -1 1 -2 2 -t $'\t' -o ${format}  ${intermediateDir}/bron.txt   ${intermediateDir}/${barcodeCombined}.gtc.txt >> ${intermediateDir}/output.txt"
+		echo "join -1 1 -2 2 -t $'\t' -o ${format}  ${tmpFinalReportDir}/bron.txt   ${PennCNV_reportDir}/${barcodeCombined}.gtc.txt >> ${tmpFinalReportDir}/output.txt"
 
-		join -1 1 -2 2 -t $'\t' -o "${format}" "${intermediateDir}/bron.txt" "${intermediateDir}/${barcodeCombined}.gtc.txt" >> "${intermediateDir}/output.txt"
+		join -1 1 -2 2 -t $'\t' -o "${format}" "${tmpFinalReportDir}/bron.txt" "${PennCNV_reportDir}/${barcodeCombined}.gtc.txt" >> "${tmpFinalReportDir}/output.txt"
 		columnCount=$columnCount+3
-		mv "${intermediateDir}/output.txt" "${intermediateDir}/bron.txt"
+		mv "${tmpFinalReportDir}/output.txt" "${tmpFinalReportDir}/bron.txt"
 
-		echo -en "\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq" >> ${intermediateDir}/header.txt
+		echo -en "\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq" >> ${tmpFinalReportDir}/header.txt
 
 	fi
 	echo "countonder: $count"
 	count=$((count+1))
 done
 
-(cat "${intermediateDir}/header.txt"; printf "\n"; cat "${intermediateDir}/bron.txt") > "${intermediateDir}/${Project}_PennCNV.txt"
+(cat "${tmpFinalReportDir}/header.txt"; printf "\n"; cat "${tmpFinalReportDir}/bron.txt") > "${tmpFinalReportDir}/${Project}_PennCNV.txt"
 
+#Move PennCNV report to Intermediate dir
+echo "mv ${tmpFinalReportDir}/${Project}_PennCNV.txt ${FinalReportDir}/${Project}_PennCNV.txt"
+mv "${tmpFinalReportDir}/${Project}_PennCNV.txt" "${FinalReportDir}/${Project}_PennCNV.txt"
+
+
+#Copy results to resultDir
+
+rsync -a "${FinalReportDir}/${Project}_PennCNV.txt" "${resultDir}"
+rsync -a "${FinalReportDir}/${Project}_PennCNV.txt" "${diagnosticOutputFolder}/${Project}"
+
+#Touch file for DARWIN so they know pipeline is finished and can start proceeding step to put data in SNP Module...
+touch "${diagnosticOutputFolder}/${Project}/${Project}".finished

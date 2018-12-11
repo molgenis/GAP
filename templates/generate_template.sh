@@ -1,7 +1,7 @@
 #!/bin/bash
 
 module load Molgenis-Compute/v17.08.1-Java-1.8.0_74
-module load GAP/v2.1.0-beta
+module load GAP/v2.2.0
 module list
 
 host=$(hostname -s)
@@ -34,9 +34,9 @@ EOH
 	exit 0
 }
 
-while getopts "t:g:w:f:r:l:h:p:" opt;
+while getopts "t:g:w:f:r:l:h:x:" opt;
 do
-	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";;l)pipeline="${OPTARG}";;x)excludeGTCsFile="${OPTARG}";;
+	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; l)pipeline="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
 	esac
 done
 
@@ -46,6 +46,7 @@ if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
 if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
 if [[ -z "${pipeline:-}" ]]; then pipeline="diagnostics" ; fi ; echo "pipeline=${pipeline}"
+if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
 genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
@@ -59,7 +60,7 @@ mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/jobs/"
 
-samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
+#samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
@@ -68,9 +69,15 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${samplesheet}" \
+-w "${EBROOTGAP}/Prepare_${pipeline}_workflow.csv" \
+-weave \
+--generate \
 -rundir "${genScripts}/scripts" \
 --runid "${runID}" \
--w "${EBROOTGAP}/Prepare_${pipeline}_workflow.csv" \
--o "runID=${runID};pipeline=${pipeline}" \
--weave \
---generate
+-o "outputdir=scripts/jobs;\
+mainParameters=${genScripts}/parameters_converted.csv;\
+samplesheet=${samplesheet};\
+Project=${filePrefix};\
+pipeline=${pipeline};\
+runID=${runID};\
+excludeGTCsFile=${excludeGTCsFile:-};"

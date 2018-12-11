@@ -14,6 +14,10 @@
 #string tmpName
 #string Project
 #string logsDir
+#list SentrixBarcode_A
+#list SentrixPosition_A
+#string PennCNV_reportDir
+#list Sample_ID
 
 set -e
 set -u
@@ -23,4 +27,29 @@ module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
-python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${intermediateDir}"
+
+mkdir -p "${PennCNV_reportDir}"
+
+makeTmpDir "${PennCNV_reportDir}"
+tmpPennCNV_reportDir="${MC_tmpFile}"
+
+
+python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}"
+
+barcodelist=()
+
+n_elements=${Sample_ID[@]}
+max_index=${#Sample_ID[@]}-1
+for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
+do
+	barcodelist+=("${Sample_ID[samplenumber]}:${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}")
+done
+
+for i in ${barcodelist[@]}
+do
+        echo "processing $i"
+        barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
+        echo "${barcodeCombined}"
+        echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
+        mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
+done
