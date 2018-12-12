@@ -27,9 +27,9 @@ tmpPennCNVInputDir="${MC_tmpFile}"
 mkdir -p "${pennCNVInputDir}"
 
 perl ${EBROOTPENNCNV}/split_illumina_report.pl \
---prefix "${tmpPennCNVInputDir}" \
+--prefix "${tmpPennCNVInputDir}/" \
 --suffix '.txt' \
 "${finalReport}"
 
-echo "mv ${tmpPennCNVInputDir} ${pennCNVInputDir}"
+echo "mv ${tmpPennCNVInputDir}/ ${pennCNVInputDir}"
 mv "${tmpPennCNVInputDir}" "${pennCNVInputDir}"

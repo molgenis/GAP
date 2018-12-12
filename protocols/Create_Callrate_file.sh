@@ -15,7 +15,22 @@
 #string logsDir
 #string diagnosticOutputFolder
 #string resultDir
+#string pipeline
 #string CallrateDir
+
+#Function to check if array contains value
+array_contains () {
+    local array="$1[@]"
+    local seeking=$2
+    local in=1
+    for element in "${!array-}"; do
+        if [[ "$element" == "$seeking" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
@@ -32,7 +47,31 @@ tmpCallrateDir="${MC_tmpFile}"
 
 mkdir -p "${diagnosticOutputFolder}/${Project}"
 
-python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpCallrateDir}/callratedata_project.txt"
+INPUTARRAYS=()
+
+for array in "${SentrixBarcode_A[@]}"
+do
+	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # If bamFile does not exist in array add it
+done
+
+
+if [ ${pipeline} == 'research' ]
+then
+	for i in ${INPUTARRAYS[@]}
+	do
+		python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}/${i}/" "${tmpCallrateDir}/${i}_callratedata_project.txt"
+	done
+
+
+	rm -f "${tmpCallrateDir}/callratedata_project.txt"
+	for j in ${INPUTARRAYS[@]}
+	do
+		echo "cat ${tmpCallrateDir}/${j}_callratedata_project.txt >> ${tmpCallrateDir}/callratedata_project.txt"
+		cat "${tmpCallrateDir}/${j}_callratedata_project.txt" >> "${tmpCallrateDir}/callratedata_project.txt"
+	done
+else
+	python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpCallrateDir}/callratedata_project.txt"
+fi
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${tmpCallrateDir}/callrate_header.txt"
