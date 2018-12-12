@@ -172,7 +172,7 @@ sed -i 's/.bim//g' ${Relatedness}/proc/allchr.list;
 #merge all chromosomes into one single genotype ...set of files (.fam, .bim, .bed)
 plink --merge-list ${Relatedness}/proc/allchr.list --out ${Relatedness}/proc/full_autosomal_rel.temp
 #perform identity by descent computation
-plink --genome --bfile ${Relatedness}/proc/full_autosomal_het.temp --min 0.05 --out ${Relatedness}/autosomal_rel
+plink --genome --bfile ${Relatedness}/proc/full_autosomal_rel.temp --min 0.05 --out ${Relatedness}/autosomal_rel
 
 #remove temp files
 rm ${Relatedness}/proc/*temp*
