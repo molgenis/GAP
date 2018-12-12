@@ -337,7 +337,7 @@ dev.off()
 ############### Plot of relatedness
 
 related.file <- file.path(opt$input, paste0("5_Relatedness/","autosomal_rel.genome"))
-reldata<-read.table(related.file, header = T)
+reldata1<-read.table(related.file, header = T)
 
 
 ##options for  plots Z1 vs Z0
