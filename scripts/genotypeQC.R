@@ -19,7 +19,6 @@
 #########################################################################################################
 
 library(tidyverse)
-library(ggsci)
 library(data.table)
 library(optparse)
 #library(ggridges)
@@ -332,6 +331,43 @@ tiff(maf.ref.cohort.file,  width = 1400, height = 2000, units = "px", res = 300,
 grid.arrange(maf.ref.cohort.scatter, maf.ref.cohort.scatter.dens, ncol=1)
 dev.off()
 ####Done
+
+
+############################################################
+############### Plot of relatedness
+
+related.file <- file.path(opt$input, paste0("5_Relatedness/","autosomal_rel.genome"))
+reldata1<-read.table(related.file, header = T)
+
+
+##options for  plots Z1 vs Z0
+z1vz0<- ggplot(reldata1,aes(x=Z0,y=Z1))+
+        stat_sum(aes(size = factor(..n..)), geom = "point")+
+        scale_size_discrete(range = c(2, 8))+
+        theme_bw()+
+        ggtitle("Sample relatedness")+
+        theme(text=element_text(size=10,family="Helvetica"))+
+        coord_cartesian(xlim = c(0, 1), ylim=c(0,0.6))
+
+
+##pi_hat vs expected plot
+obsvexp<- ggplot(reldata1,aes(x=PI_HAT,y=EZ))+
+          geom_point()+
+          theme_bw()+
+          ggtitle("Relatednes coefficient")+
+          theme(text=element_text(size=10,family="Helvetica"))+
+          coord_cartesian(xlim = c(0, 1), ylim=c(0,1))+
+          xlab("Observed R.C.")+
+          ylab("Expected R.C.")
+
+relatedness.file <- file.path(output, "relatedness.tiff")
+tiff(relatedness.file,  
+     width = 3000, height = 1500, 
+     units = "px", res = 300, compression = "lzw")
+grid.arrange(z1vz0, obsvexp, ncol=2)
+dev.off()
+
+
 
 cat("\n[INFO]\t Finished plotting QC report")
 

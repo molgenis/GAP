@@ -51,4 +51,6 @@ AutosomeQCDir,${resultDir}/AutosomeQC
 output80,${AutosomeQCDir}/1_CR80
 output95,${AutosomeQCDir}/2_CR95
 outputMH,${AutosomeQCDir}/3_MAF_HWE
+Het,${AutosomeQCDir}/4_Het
+Relatedness,${AutosomeQCDir}/5_Relatedness
 repout,${AutosomeQCDir}/plots
