@@ -6,7 +6,7 @@ computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
 gapVersion,GAP/v2.2.0
 pennCNVVersion,PennCNV/1.0.4-foss-2015b
 optiCallVersion,opticall/0.7.0-foss-2015b
-RPlusVersion,RPlus/3.4.4-foss-2015b-v18.10.1
+RPlusVersion,RPlus/3.4.4-foss-2015b-v18.12.1
 plinkVersion,plink/1.9-foss-2015b
 
 zCallVersion,opticall/0.7.0-foss-2015b
@@ -39,7 +39,7 @@ ateambotUser,umcg-gap-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 arrayFinalReport,${intermediateDir}/${Project}_${SentrixBarcode_A}_finalreport.txt
-finalReport,${intermediateDir}/${Project}_finalreport.txt
+finalReport,${resultDir}/${Project}_finalreport.txt
 samplesheet,${projectJobsDir}/${Project}.csv
 optiCallDir,${resultDir}/opticall
 zCallDir,${intermediateDir}/zCall

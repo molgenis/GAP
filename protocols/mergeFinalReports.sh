@@ -9,9 +9,6 @@
 set -e
 set -u
 
-#liswt SentrixBarcode_A
-#swtring Psroject
-
 #Function to check if array contains value
 array_contains () {
     local array="$1[@]"
@@ -42,12 +39,14 @@ for i in "${INPUTREPORTS[@]}"
 do
 	if [[ ${first} == "true" ]]
 	then
-		cat ${i}
+		cat ${i} > ${tmpFinalReport}
 		first='false'
+		headerNumber=$(( $(head -30 "${i}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+2))
+		echo "headerNumber:${headerNumber}"
 	else
-		cat ${i} | tail -n+10
+		cat ${i} | tail -n+${headerNumber} >> ${tmpFinalReport}
 	fi
-done > ${tmpFinalReport}
+done
 
 echo "mv ${tmpFinalReport} ${finalReport}"
 mv "${tmpFinalReport}" "${finalReport}"

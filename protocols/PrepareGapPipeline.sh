@@ -60,9 +60,10 @@ done
 
 fi
 
-#Copying samplesheet to project jobs folder
+#Copying samplesheet to project jobs,results folder
 
 cp "${genScripts}/${Project}.csv" "${projectJobsDir}/${Project}.csv"
+cp "${genScripts}/${Project}.csv" "${resultDir}/${Project}.csv"
 
 #
 # Execute MOLGENIS/compute to create job scripts to analyse this project.
