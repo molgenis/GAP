@@ -523,10 +523,9 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 #	1. loop over their analysis ("run") sub dirs and check if there are any we need to rsync.
 #	2. split the sample sheets per project and the data was rsynced.
 #
-IFS=$'\n' sampleSheetsFromSourceServer=($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "ls -1 ${SCR_ROOT_DIR}/Samplesheets/*.${SAMPLESHEET_EXT}"))
 barcodes=()
 barcodes2=()
-
+IFS=$'\n' declare -a sampleSheetsFromSourceServer=($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "find ${SCR_ROOT_DIR}/Samplesheets/ -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name *.${SAMPLESHEET_EXT}"))
 if [[ "${#sampleSheetsFromSourceServer[@]:-0}" -eq '0' ]]
 then
 	log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "No sample sheets found for ${DATA_MANAGER}@${sourceServerFQDN}:${SCR_ROOT_DIR}/Samplesheets/*.${SAMPLESHEET_EXT}."
@@ -556,7 +555,7 @@ else
 			mkdir -m 2770 -p "${PRM_ROOT_DIR}/logs/${barcode}/"
 			mkdir -m 2770 -p "${PRM_ROOT_DIR}/logs/${filePrefix}/"
 			mkdir -m 2750 -p "${PRM_ROOT_DIR}/Samplesheets/archive/"
-		
+			
 			rsyncDemultiplexedRuns "${barcode}"
 			splitSamplesheetPerProject "${filePrefix}"
 		done
