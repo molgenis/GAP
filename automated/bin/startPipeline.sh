@@ -408,7 +408,7 @@ do
 	#
 	if [[ ! -z "${sampleSheetColumnOffsets['SentrixBarcode_A']+isset}" ]]; then
 		sentrixBarcodeFieldIndex=$((${sampleSheetColumnOffsets['SentrixBarcode_A']} + 1))
-		declare -a sentrixBarcodes=($(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sentrixBarcodeFieldIndex} | sort | uniq))
+		IFS=$'\n' declare -a sentrixBarcodes=($(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sentrixBarcodeFieldIndex} | sort | uniq))
 		for sentrixBarcode in "${sentrixBarcodes[@]}"
 		do
 			if ssh ${ATEAMBOTUSER}@${HOSTNAME_PRM} test -e "${PRM_ROOT_DIR}/logs/${sentrixBarcode}/${sentrixBarcode}.copyRawDataToPrm.finished"
