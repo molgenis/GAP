@@ -328,26 +328,32 @@ fi
 sampleSheets=($(ls -1 "${TMP_ROOT_DIR}/Samplesheets/"*".${SAMPLESHEET_EXT}"))
 for sampleSheet in "${sampleSheets[@]}"
 do
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Processing sample sheet: ${sampleSheet} ..."
-	
 	project=$(basename "${sampleSheet}" ".${SAMPLESHEET_EXT}")
 	run='run01'
-	
-	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Processing: ${project} ..."
-	if [[ ! -e "${TMP_ROOT_DIR}/logs/${project}" ]]
-	then
-		mkdir -m 2770 "${TMP_ROOT_DIR}/logs/${project}"
-	fi
-	
+	controlFileBase="${TMP_ROOT_DIR}/logs/${project}/${project}"
+	export JOB_CONTROLE_FILE_BASE="${controlFileBase}.${SCRIPT_NAME}"
 	#
-	# Generate scripts (per sample sheet).
+	# ToDo: change location of log files back to ${TMP_ROOT_DIR} once we have a 
+	#       proper prm mount on the GD clusters and this script can run a GD cluster
+	#       instead of on a research cluster.
+	#
+	if [[ -e "${JOB_CONTROLE_FILE_BASE}.finished" ]]
+	then
+		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping already processed project ${project}."
+		continue
+	else
+		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "Processing project ${project}..."
+		mkdir -m 2770 -p "${TMP_ROOT_DIR}/logs/${project}/"
+		printf '' > "${JOB_CONTROLE_FILE_BASE}.started"
+	fi
+	#
+	# Check sample sheet before we can generate scripts (per sample sheet).
 	#
 	declare -a sampleSheetColumnNames=()
 	declare -A sampleSheetColumnOffsets=()
 	declare    sampleType='GAP' # Default when not specified in sample sheet.
 	declare    pipeline='diagnostics' #Default
 	declare    sampleTypeFieldIndex
-
 	IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${sampleSheet}"))
 	for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 	do
@@ -355,33 +361,76 @@ do
 		sampleSheetColumnOffsets["${columnName}"]="${offset}"
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "${columnName} and sampleSheetColumnOffsets["${columnName}"] offset ${offset} "
 	done
-
+	#
+	# Get sampleType from sample sheet and check if all samples are of the same type.
+	#
 	if [[ ! -z "${sampleSheetColumnOffsets['sampleType']+isset}" ]]; then
-		#
-		# Get sampleType from sample sheet and check if all samples are of the same type.
-		#
 		sampleTypeFieldIndex=$((${sampleSheetColumnOffsets['sampleType']} + 1))
-		pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
 		sampleTypesCount=$(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sampleTypeFieldIndex} | sort | uniq | wc -l)
-		pipelineCount=$(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex} | sort | uniq | wc -l)
-		if [[ "${sampleTypesCount}" -eq '1' ]] && [[ "${pipelineCount}" -eq '1' ]]
+		if [[ "${sampleTypesCount}" -eq '1' ]]
 		then
 			sampleType=$(tail -n 1 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sampleTypeFieldIndex})
 			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found sampleType: ${sampleType}."
-			pipeline=$(tail -n 1 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex})
-			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found pipeline: ${pipeline}."
-
 		else
-			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "${sampleSheet} contains multiple different sampleType values."
-			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping ${project} due to error in sample sheet."
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "${sampleSheet} contains multiple different sampleType values." \
+				2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping ${project} due to error in sample sheet." \
+				2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+			mv -v "${JOB_CONTROLE_FILE_BASE}."{started,failed}
 			continue
 		fi
 	else
 		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "sampleType column missing in sample sheet; will use default value: ${sampleType}."
 	fi
+	#
+	# Get pipeline from sample sheet and check if all samples require processing using the same pipeline.
+	#
+	if [[ ! -z "${sampleSheetColumnOffsets['pipeline']+isset}" ]]; then
+		pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
+		pipelineCount=$(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex} | sort | uniq | wc -l)
+		if [[ "${pipelineCount}" -eq '1' ]]
+		then
+			pipeline=$(tail -n 1 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex})
+			log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found pipeline: ${pipeline}."
+		else
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "${sampleSheet} contains multiple different pipeline values." \
+				2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+			log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping ${project} due to error in sample sheet." \
+				2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+			mv -v "${JOB_CONTROLE_FILE_BASE}."{started,failed}
+			continue
+		fi
+	else
+		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "pipeline column missing in sample sheet; will use default value: ${pipeline}."
+	fi
+	#
+	# Check if all raw data required for this project is already available on prm storage.
+	#
+	if [[ ! -z "${sampleSheetColumnOffsets['SentrixBarcode_A']+isset}" ]]; then
+		sentrixBarcodeFieldIndex=$((${sampleSheetColumnOffsets['SentrixBarcode_A']} + 1))
+		declare -a sentrixBarcodes=($(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${sentrixBarcodeFieldIndex} | sort | uniq))
+		for sentrixBarcode in "${sentrixBarcodes[@]}"
+		do
+			if ssh ${ATEAMBOTUSER}@${HOSTNAME_PRM} test -e "${PRM_ROOT_DIR}/logs/${sentrixBarcode}/${sentrixBarcode}.copyRawDataToPrm.finished"
+			then
+				log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${ATEAMBOTUSER}@${HOSTNAME_PRM}:${PRM_ROOT_DIR}/logs/${sentrixBarcode}/${sentrixBarcode}.copyRawDataToPrm.finished present."
+			else
+				log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${ATEAMBOTUSER}@${HOSTNAME_PRM}:${PRM_ROOT_DIR}/logs/${sentrixBarcode}/${sentrixBarcode}.copyRawDataToPrm.finished absent."
+				log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping ${project}, because raw data for ${sentrixBarcode} is not (yet complete) on prm." \
+					2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+				continue 2
+			fi
+		done
+	else
+		log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "Skipping project ${project}, because SentrixBarcode_A column is missing in the sample sheet." \
+			2>&1 | tee -a "${JOB_CONTROLE_FILE_BASE}.started"
+		mv -v "${JOB_CONTROLE_FILE_BASE}."{started,failed}
+	fi
+	#
+	# All checks Ok; let's generate scripts.
+	#
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "generateScripts "${project}" "${run}" "${sampleType}" "${pipeline}""
 	generateScripts "${project}" "${run}" "${sampleType}" "${pipeline}"
-
 	#
 	# Submit generated job scripts (per project).
 	#
