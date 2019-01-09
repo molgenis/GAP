@@ -523,8 +523,6 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 #	1. loop over their analysis ("run") sub dirs and check if there are any we need to rsync.
 #	2. split the sample sheets per project and the data was rsynced.
 #
-barcodes=()
-barcodes2=()
 IFS=$'\n' declare -a sampleSheetsFromSourceServer="($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "find ${SCR_ROOT_DIR}/Samplesheets/ -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name *.${SAMPLESHEET_EXT}"))"
 if [[ "${#sampleSheetsFromSourceServer[@]:-0}" -eq '0' ]]
 then
@@ -542,23 +540,18 @@ else
 		#       proper prm mount on the GD clusters and this script can run a GD cluster
 		#       instead of on a research cluster.
 		#
-		##forloop barcodes 
-		
-		f=${sampleSheet}; colnum=($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "head -1 ${f}| sed 's/,/\n/g'| nl | grep 'SentrixBarcode_A$'"))
-		[[ ${colnum} =~ (.+)([0-9]+)  ]]
-		barcodes=($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "cut -d , -f ${BASH_REMATCH[2]} ${sampleSheet} | sort | uniq"))
-		delete=SentrixBarcode_A
-		barcodes2=( "${barcodes[@]/$delete}" )
-		
-		for barcode in ${barcodes2[@]}
+		colnum="$(ssh ${DATA_MANAGER}@${sourceServerFQDN} "head -1 "${sampleSheet}" | sed 's/,/\n/g'| nl | grep 'SentrixBarcode_A$' | grep -o '[0-9][0-9]*'")"
+		log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Found SentrixBarcode_A in column number ${colnum}."
+		barcodes=($(ssh ${DATA_MANAGER}@${sourceServerFQDN} "tail -n +2 "${sampleSheet}" | cut -d , -f "${colnum}" | sort | uniq"))
+		for barcode in "${barcodes[@]}"
 		do
+			log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "Processing SentrixBarcode_A ${barcode}..."
 			mkdir -m 2770 -p "${PRM_ROOT_DIR}/logs/${barcode}/"
 			mkdir -m 2770 -p "${PRM_ROOT_DIR}/logs/${filePrefix}/"
 			mkdir -m 2750 -p "${PRM_ROOT_DIR}/Samplesheets/archive/"
-			
 			rsyncDemultiplexedRuns "${barcode}"
 			splitSamplesheetPerProject "${filePrefix}"
-		done
+		done	
 	done
 fi
 
