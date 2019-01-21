@@ -107,28 +107,37 @@ do
     declare -a patientList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}'))
     declare -a dnaList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}' | awk 'BEGIN {FS="_"}{if (NR>0){print substr($3,4)}}'))
 
-	echo "${patientList[@]}"
-	echo "${dnaList[@]}"
+    echo "${patientList[@]}"
+    echo "${dnaList[@]}"
 
     ##find with DNA number the right NGS and array vcf file
     for patientNo in ${patientList[@]}
     do
-	dnaNo="$(echo "${patientNo}" | awk 'BEGIN {FS="_"}{print substr($3,4)}')"
+        dnaNo="$(echo "${patientNo}" | awk 'BEGIN {FS="_"}{print substr($3,4)}')"
         declare -a arrayFile=($(ls -1 "${arrayVcfDir}/DNA-${dnaNo}_"*".FINAL.vcf"))
 
-	echo "DNAno: ${dnaNo}"
-        echo "arrayfile: ${arrayFile}"
-            ##################
-            ### mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer
-            ##################
+        echo "DNAno: ${dnaNo}"
 
-	if [[ "${#arrayFile[@]:-0}" != 1 ]]
-        then
-            echo "more than 1 file or file :"${dnaNo}" does not exist "
-            messageGCC="Dear GCC helpdesk,\n\nThere is more than 1 array sample with id:"${dnaNo}". \nPlease check if there is some think wrong with the concordance check.\nKind regards\nGCC"
-            #printf '%b\n' "${messageGCC}" | mail -s "Concordance check error" 'helpdesk.gcc.groningen@gmail.com'
-            next # exit 1
-        fi
+    if [ -e "${ngsVcfDir}/archive/"*"${dnaNo}"* ]
+    then
+        echo "NGS sample duplo with DNAno:${dnaNo}, concordance is already calculated"
+        mv "${vcfFile}" "${ngsVcfDir}/archive"
+        mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
+        continue
+    fi
+
+                #################
+                ## mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer
+                #################
+
+    if [[ "${#arrayFile[@]:-0}" != 1 ]]
+    then
+        echo "more than 1 file or file with DNAno:"${dnaNo}" does not exist "
+        messageGCC="Dear GCC helpdesk,\n\nThere is more than 1 array sample with id:"${dnaNo}". \nPlease check if there is some think wrong with the concordance check.\nKind regards\nGCC"
+        mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
+        #printf '%b\n' "${messageGCC}" | mail -s "Concordance check error" 'helpdesk@somemailadres.com'
+        continue  # exit 1
+    fi
 
         arrayId="$(basename "${arrayFile}" .FINAL.vcf)"
         echo "arrayID: ${arrayId}"
@@ -156,10 +165,11 @@ do
         -o "${outputDir}/${arrayId}" \
         -sva
 
-	mv "${vcfFile}" "${ngsVcfDir}/archive"
+        mv "${vcfFile}" "${ngsVcfDir}/archive"
         mv "${arrayVcfDir}/${arrayId}.FINAL.vcf" "${arrayVcfDir}/archive"
-	mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
-	done
+        mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
+
+    done
 done
 
 
