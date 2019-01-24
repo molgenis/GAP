@@ -95,8 +95,6 @@ do
 
     ngsVcfId="$(basename "${vcfFile}" .final.vcf)"
 
-
-
     ##remove indel-calls from ngs-vcf
     declare -a patientList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}'))
     declare -a dnaList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}' | awk 'BEGIN {FS="_"}{if (NR>0){print substr($3,4)}}'))
@@ -131,7 +129,6 @@ do
     then
         echo "more than 1 file or file with DNAno:"${dnaNo}" does not exist "
         messageGCC="Dear GCC helpdesk,\n\nThere is more than 1 array sample with id:"${dnaNo}". \nPlease check if there is some think wrong with the concordance check.\nKind regards\nGCC"
-        #mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
         #printf '%b\n' "${messageGCC}" | mail -s "Concordance check error" 'helpdesk@somemailadres.com'
         continue  # exit 1
     fi
@@ -144,7 +141,6 @@ do
 
     bgzip -c "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf" > "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
     tabix -p vcf "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
-
 
         arrayId="$(basename "${arrayFile}" .FINAL.vcf)"
         echo "arrayID: ${arrayId}"
