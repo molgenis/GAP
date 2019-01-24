@@ -85,6 +85,7 @@ module list
 
 for vcfFile in $(ls "${ngsVcfDir}"*"final.vcf")
 do
+
     bedType="$(grep -m 1 -o -P 'intervals=\[[^\]]*.bed\]' "${vcfFile}" | cut -d [ -f2 | cut -d ] -f1)"
     echo "bedType: ${bedType}"
     bedDir="$(dirname ${bedType})"
@@ -93,15 +94,6 @@ do
     echo "${bedFile}"
 
     ngsVcfId="$(basename "${vcfFile}" .final.vcf)"
-
-    mkdir -p "${tempDir}/${ngsVcfId}/"
-    echo "${ngsVcfId}"
-
-    grep '^#' "${vcfFile}" > "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf"
-    grep -v '^#' "${vcfFile}" | awk '{if (length($4)<2 && length($5)<2 ){print $0}}' >> "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf"
-
-    bgzip -c "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf" > "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
-    tabix -p vcf "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
 
     ##remove indel-calls from ngs-vcf
     declare -a patientList=($(grep '#CHROM' "${vcfFile}" | awk '{for(i=10;i<=NF;++i)print $i}'))
@@ -118,26 +110,37 @@ do
 
         echo "DNAno: ${dnaNo}"
 
+    #################
+    ## chech for duplo NGS vcf files.
+    #################
+
     if [ -e "${ngsVcfDir}/archive/"*"${dnaNo}"* ]
     then
         echo "NGS sample duplo with DNAno:${dnaNo}, concordance is already calculated"
         mv "${vcfFile}" "${ngsVcfDir}/archive"
-        mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
         continue
-    fi
+    fi        
 
-                #################
-                ## mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer
-                #################
+    #################
+    ## mail met notificatie als er meer dan 1 file is met hetzelfde DNA nummer
+    #################
 
     if [[ "${#arrayFile[@]:-0}" != 1 ]]
     then
         echo "more than 1 file or file with DNAno:"${dnaNo}" does not exist "
         messageGCC="Dear GCC helpdesk,\n\nThere is more than 1 array sample with id:"${dnaNo}". \nPlease check if there is some think wrong with the concordance check.\nKind regards\nGCC"
-        mv "${tempDir}/${ngsVcfId}/" "${tempDir}/archive/"
         #printf '%b\n' "${messageGCC}" | mail -s "Concordance check error" 'helpdesk@somemailadres.com'
         continue  # exit 1
     fi
+
+    mkdir -p "${tempDir}/${ngsVcfId}/"
+    echo "${ngsVcfId}"
+
+    grep '^#' "${vcfFile}" > "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf"
+    grep -v '^#' "${vcfFile}" | awk '{if (length($4)<2 && length($5)<2 ){print $0}}' >> "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf"
+
+    bgzip -c "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf" > "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
+    tabix -p vcf "${tempDir}/${ngsVcfId}/${ngsVcfId}.FINAL.vcf.gz"
 
         arrayId="$(basename "${arrayFile}" .FINAL.vcf)"
         echo "arrayID: ${arrayId}"
