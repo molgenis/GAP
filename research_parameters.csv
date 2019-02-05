@@ -16,7 +16,7 @@ GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
 bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
 hmmFile,hhall.hmm
 pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
-MAFref,/apps/data/1000G/phase3/20130502/eurMAF_1000g/
+MAFref,/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt
 
 #paths
 root,/
