@@ -1,12 +1,20 @@
 ###################################
 ### QC report for genotyping data
-### date: 11-01-2019
-### version: 0.01
+### date: 05-02-2019
+### version: 0.3
 ### authors: EL - RAG
 ###################################
 ### New
 ###################################
 
+##05-02-2019
+## Corrected refMAF bug that cuased the pipeline to stop
+## added percentajes tothe labels of the barplots
+## harmonized chromosome nomenclature on chromosome legends
+## Added proper format signatures to relatedness plots
+## Corrected header reading in snp and sample file
+
+##11-01-2019
 ## New arguents - project name, sample info sheet 
 ## New plot showing starting samples and plate numbers 
 
@@ -17,6 +25,12 @@
 
 ## changed geom_density -> stat_density using position = "identity" and geom = "line 
 ## typo on plot title.
+
+## 20180125
+## Usage full reference MAF table instead of calling each ref dataset independently
+## Changed density calculation of scatter plot - > geom_hex()
+## Added MAF comparison with EXaC and gnomAD reference cohort 
+
 ######################################################################
 ## example run  
 
@@ -39,37 +53,24 @@ library(optparse)
 library(gridExtra)
 library(MASS)
 library(viridis)
-# taken from https://slowkow.com/notes/ggplot2-color-by-density/
-# Get density of points in 2 dimensions.
-# @param x A numeric vector.
-# @param y A numeric vector.
-# @param n Create a square n by n grid to compute density.
-# @return The density within each square.
-get_density <- function(x, y, n = 100) {
-  dens <- MASS::kde2d(x = x, y = y, n = n)
-  ix <- findInterval(x, dens$x)
-  iy <- findInterval(y, dens$y)
-  ii <- cbind(ix, iy)
-  return(dens$z[ii])
-}
 
 ## Check ref and alt alleles are the same. 
 check.ref.alt.alleles <- function(query.alt, query.ref, ref.alt, ref.ref){
   res <-c()
   if(sum(is.na(c(query.alt, query.ref, ref.alt, ref.ref))) >= 1){
     res <- c(NA)
-    }
-    else if(query.alt == ref.alt & query.ref == ref.ref) {
-        res <- "same"
-        } else if(query.alt != ref.alt & query.ref != ref.ref & query.alt == ref.ref & query.ref == ref.alt){
-            res <- "flip"
-            } else if(sum(c(query.alt, query.ref) %in% c("A", "T")) == 2 | sum(c(query.alt, query.ref) %in% c("G", "C")) == 2){
-               res <- "ambiguous" 
-              } else if(nchar(paste0(query.alt, query.ref)) > 2){
-                res <- "more than 2 alleles"
-                }else{
-                 res <- "no match"
-               }
+  }
+  else if(query.alt == ref.alt & query.ref == ref.ref) {
+    res <- "same"
+  } else if(query.alt != ref.alt & query.ref != ref.ref & query.alt == ref.ref & query.ref == ref.alt){
+    res <- "flip"
+  } else if(sum(c(query.alt, query.ref) %in% c("A", "T")) == 2 | sum(c(query.alt, query.ref) %in% c("G", "C")) == 2){
+    res <- "ambiguous" 
+  } else if(nchar(paste0(query.alt, query.ref)) > 2){
+    res <- "more than 2 alleles"
+  }else{
+    res <- "no match"
+  }
   return(res)
 }
 
@@ -81,8 +82,7 @@ check.ref.alt.alleles <- function(query.alt, query.ref, ref.alt, ref.ref){
 # opt$out <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/qcPlots_test"
 # opt$name <- "test01"
 # opt$sampleinfo <- "/groups/umcg-aad/tmp04/projects/IBD_part/run01/jobs/IBD_part.csv"
-# opt$refMaf <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/eurMAF_1000g"
-# opt$goNLrefMaf <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/gonl_MAF/goNL_MAF.edR.INFO"
+# opt$ref <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt"
 
 #########################################################################################################
 option_list = list(
@@ -98,11 +98,8 @@ option_list = list(
   make_option(c("-s", "--sampleinfo"), type="character", default=NULL, 
               help="path to sample info spreadsheet", metavar="character"), 
   
-  make_option(c("-r", "--refMaf"), type="character", default=NULL, 
-              help="Path to the reference MAF of SNPs", metavar="character"),
-
-    make_option(c("-g", "--goNLrefMaf"), type="character", default=NULL, 
-              help="Path to the reference MAF of SNPs", metavar="character")
+  make_option(c("-r", "--ref"), type="character", default=NULL, 
+              help="Path to the reference Allelic Frequency of SNPs", metavar="character")
 ); 
 
 opt_parser  <- OptionParser(option_list=option_list)
@@ -127,16 +124,16 @@ output <- as.character(opt$out)
 # Cohort within freeze? 
 
 # testing
-# opt <- list(); opt$sampleinfo <- "/groups/umcg-aad/tmp04/projects/IBD_part/run01/jobs/IBD_part.csv"
+ #opt <- list(); opt$sampleinfo <- "/groups/umcg-aad/tmp04/projects/IBD_part/run01/jobs/IBD_part.csv"
 
 if(is.null(opt$sampleinfo) == FALSE){
   sample.info <- fread(as.character(opt$sampleinfo), data.table = FALSE)
   plates.in.analysis <- as.character(unique(sample.info$Sample_Plate))
   
-   if(length(plates.in.analysis) %% 2 == 1){
-     plates.in.analysis <-   c(plates.in.analysis, "")
-   }
-
+  if(length(plates.in.analysis) %% 2 == 1){
+    plates.in.analysis <-   c(plates.in.analysis, "")
+  }
+  
   plates.in.analysis.matrix <- as.data.frame(matrix(plates.in.analysis, ncol= 4))
   #plates.in.analysis.matrix <- as.data.frame( matrix(paste0("test", sample(1:200, size = 30, replace = FALSE)),nrow= 4))
   plate.table <- tableGrob(plates.in.analysis.matrix, ttheme_minimal(base_size= 8, base_family= "Helvetica"),
@@ -158,30 +155,36 @@ if(is.null(opt$sampleinfo) == FALSE){
 
 ## loading samples and SNPs
 samples_all.file <- file.path(opt$input,"full.ind")
-samples_all <- fread(samples_all.file, data.table = FALSE)
+samples_all <- fread(samples_all.file, data.table = FALSE, header=F)
 
 snps_all.file <- file.path(opt$input,"full.snps")
-snps_all <- fread(snps_all.file)
+snps_all <- fread(snps_all.file, header=F)
 
 
 samples_80.file <- file.path(opt$input, paste0("1_CR80/","incl80.samples"))
-samples_80 <- fread(samples_80.file, data.table = FALSE)
+samples_80 <- fread(samples_80.file, data.table = FALSE, header=F)
 
 snps_80.file <- file.path(opt$input, paste0("1_CR80/","incl80.vars"))
-snps_80 <- fread(snps_80.file)
+snps_80 <- fread(snps_80.file, header=F)
 
 samples_95.file <- file.path(opt$input, paste0("2_CR95/", "incl95.samples"))
-samples_95<-fread(samples_95.file, data.table = FALSE)
+samples_95<-fread(samples_95.file, data.table = FALSE, header=F)
 colnames(samples_95)<-c("IID")
 samples_95$IID<-as.character(samples_95$IID)
 
 snps_95.file <- file.path(opt$input, paste0("2_CR95/","incl95.vars"))
-snps_95 <- fread(snps_95.file, data.table = FALSE)
+snps_95 <- fread(snps_95.file, data.table = FALSE, header=F)
 
 ################################################
 ###group data to make the barplots
 samples <- c("All"=nrow(samples_all),"CR>80"=nrow(samples_80), "CR>95"=nrow(samples_95))
+samples_lab<-c(paste0(samples[1]," ","(100%)"),
+               paste0(samples[2]," ","(",round(samples[2]*100/samples[1],1),"%",")") ,
+               paste0(samples[3]," ","(",round(samples[3]*100/samples[1],1),"%",")"))
 snps <- c("All"=nrow(snps_all),"CR>80"=nrow(snps_80), "CR>95"=nrow(snps_95) )
+snps_lab<-c(paste0(snps[1]," ","(100%)"),
+               paste0(snps[2]," ","(",round(snps[2]*100/snps[1],1),"%",")") ,
+               paste0(snps[3]," ","(",round(snps[3]*100/snps[1],1),"%",")"))
 
 incl <- data.frame(samples, snps,"group"= names(snps))
 
@@ -194,8 +197,8 @@ barplot.samples <- ggplot(incl, aes(group,samples))+
   geom_bar(stat = "identity", aes(colour=group, fill=group), position = position_dodge(width = 0.5))+
   coord_cartesian(ylim = c(1.002*samples["All"]-3.5*z_samples,1.002*samples["All"] ))+ 
   ylab("Number of Samples")+
-  theme_bw()+
-  geom_text(aes(label=samples), vjust=0)+
+  theme_classic()+
+  geom_text(aes(label=samples_lab), vjust=0)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
 
 ##barplot for snps
@@ -204,13 +207,13 @@ barplot.snps <- ggplot(incl, aes(group,snps)) +
            position = position_dodge(width = 0.5))+
   coord_cartesian(ylim = c(1.002*snps["All"]-3.5*z_snps,1.002*snps["All"]))+
   ylab("Number of SNPs")+
-  theme_bw()+
-  geom_text(aes(label=snps), vjust=0)+
+  theme_classic()+
+  geom_text(aes(label=snps_lab), vjust=0)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
 
 
 samples.snps.barplot.file <- file.path(output, "02_samples.snps.barplot.tiff")
-samples.snps.barplot.title <- paste0("Number of samples and genotypes at multiple call rate thresholds", "\n",
+samples.snps.barplot.title <- paste0("Number of samples and markers at different call rate thresholds", "\n",
                                      "(from autosomal and pseudo-autosomal chromosomes)", "\n", 
                                      opt$name, " ", date())
 
@@ -254,16 +257,21 @@ cr.datG<-cr.dat %>% group_by(IID) %>%
 cr.dat$CHR <- gsub(cr.dat$CHR, pattern = "chr_", replacement ="" )
 cr.dat$CHR <- factor(cr.dat$CHR, levels=c(1:22, "XY"))
 
+chr.labels <- c(1:22,25)
+names(chr.labels) <-  c(1:22,'XY')
+
 #by chromosome 
 cr.by.chr.dens <- ggplot(cr.dat, aes(x=1-F_MISS))+
   stat_density(aes(colour= CHR),geom= "line", position= "identity")+
   facet_wrap(~CHR, scales = 'free')+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   xlab("Call rate")+
   theme_bw()+
   theme(text = element_text(size=10, family='Helvetica'), legend.position = "none")
 ##by chromosome merged
 cr.merged.chrs.dens <- ggplot(cr.dat, aes(x=1-F_MISS))+
   stat_density(aes(colour= CHR), geom= "line", position= "identity")+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   xlab("Call rate")+
   theme_bw()+
   theme(text = element_text(size=10, family='Helvetica'))
@@ -326,9 +334,12 @@ hw.dat$MAF <- maf.dat$MAF[match(hw.dat$SNP ,maf.dat$SNP)]
 hw.dat$CHR <- factor(hw.dat$CHR, levels= c(1:22, 25))
 maf.dat$CHR <- factor(maf.dat$CHR, levels= c(1:22, 25))
 
+
+
 maf.dist.plot.chr <- ggplot(maf.dat, aes(x=MAF))+
   stat_density(aes(color= CHR), position= "identity", geom= "line")+
   ggtitle("MAF distribution per chromosome")+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   theme_bw()+
   theme(text=element_text(size=10, family="Helvetica"))
 
@@ -341,6 +352,7 @@ maf.dist.plot.all <- ggplot(maf.dat, aes(x=MAF))+
 
 hw.dist.plot.chr <- ggplot(hw.dat, aes(x=-log10(P)))+
   stat_density(aes(color= CHR), position= "identity", geom= "line")+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   ggtitle("HW pVal distribution  \n per chromosome")+
   xlab("-log10(HW-P)")+
   xlim(c(0, 20))+
@@ -349,8 +361,9 @@ hw.dist.plot.chr <- ggplot(hw.dat, aes(x=-log10(P)))+
 
 hw.maf.dist.plot.chr <- ggplot(hw.dat[which(hw.dat$MAF > 0.01),], aes(x=-log10(P)))+
   stat_density(aes(color= CHR), position= "identity", geom= "line")+
-  geom_vline(xintercept = 4)+
+  geom_vline(xintercept = 6)+
   ggtitle("HW pVal distribution of \n SNPs with a MAF > 0.01")+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   xlim(c(0, 20))+
   xlab("-log10(HW-P)")+
   theme_bw()+
@@ -358,7 +371,7 @@ hw.maf.dist.plot.chr <- ggplot(hw.dat[which(hw.dat$MAF > 0.01),], aes(x=-log10(P
 
 hw.maf.dist.plot.all <- ggplot(hw.dat[which(hw.dat$MAF > 0.01),], aes(x=-log10(P)))+
   stat_density(position= "identity", geom= "line")+
-  geom_vline(xintercept = 4)+
+  geom_vline(xintercept = 6)+
   xlim(c(0, 20))+
   ggtitle("HW pVal distribution of \n SNPs with a MAF > 0.01")+
   xlab("-log10(HW-P)")+
@@ -382,11 +395,16 @@ grid.arrange(maf.dist.plot.chr, maf.dist.plot.all,
 dev.off()
 
 
-
+########################################################################################################################
 ############################################################
-############### Correlation of MAF with 1000G EUR populations
-############### Needs to be corrected for alleles 
+############### Concordance of cohort MAF with Allelic frequencies in different reference cohorts
 
+###
+# Read reference AF from pre-processed file
+
+ref.maf.dat <- fread(opt$ref ,data.table = FALSE)
+
+###
 # Read bim files from cohort 
 # opt <-list(); opt$input <- "/groups/umcg-aad/tmp04/umcg-elopera/plink_autosome_QC"
 cohort.bim.path <- file.path(opt$input, "2_CR95")
@@ -423,28 +441,14 @@ if (length(hw.index) >= 1){
 
 
 ################################ 1000G
-# Read 1000G info 
-#ref.maf.path <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/eurMAF_1000g/"
-ref.maf.path <- opt$refMaf
-ref.maf.files <- list.files(ref.maf.path, pattern = "_EURMAF_1000g.INFO$", full.names = TRUE)
-ref.maf.list <- lapply(ref.maf.files, fread, data.table=FALSE)
-ref.maf.dat <- bind_rows(ref.maf.list)
-rm(ref.maf.list)
-
-###eliminate the SNPs with more than two alleles????
-ref.maf.dat<-ref.maf.dat[!grepl("\\,",ref.maf.dat[,5]),]
-ref.maf.dat[,5]<-as.numeric(ref.maf.dat[,5])
-##
-
-# generate chr:pos IDs
-ref.maf.dat$id <- paste0(ref.maf.dat$CHROM, ":",ref.maf.dat$POS)
+snp.index <- match(cohort.bim.dat$id, ref.maf.dat$id)
 
 ### I would no longer remove markers that are not present in 1000G
 #cohort.bim.dat <- cohort.bim.dat[which(cohort.bim.dat$id %in% ref.maf.dat$id),]
 
-cohort.bim.dat$ref.alt.allele <- ref.maf.dat$ALT[match(cohort.bim.dat$id, ref.maf.dat$id)]
-cohort.bim.dat$ref.ref.allele <- ref.maf.dat$REF[match(cohort.bim.dat$id, ref.maf.dat$id)]
-cohort.bim.dat$ref.maf <- ref.maf.dat$EUR_AF[match(cohort.bim.dat$id, ref.maf.dat$id)]
+cohort.bim.dat$ref.alt.allele <- ref.maf.dat$ref.alt.allele[snp.index]
+cohort.bim.dat$ref.ref.allele <- ref.maf.dat$ref.ref.allele[snp.index]
+cohort.bim.dat$ref.maf <- ref.maf.dat$ref.maf[snp.index]
 
 ## check that the major and minor allele are the same. 
 # check allelic concordance 
@@ -462,91 +466,181 @@ cohort.bim.dat$cohort.maf <- as.numeric(cohort.bim.dat$cohort.maf)
 
 
 ################################ goNL 
-# Read goNL info 
-# opt$goNLrefMaf <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/gonl_MAF/goNL_MAF.edR.INFO"
+# opt$goNLref <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/gonl_MAF/goNL_MAF.edR.INFO"
 
-gonl.maf <- fread(opt$goNLrefMaf, data.table = FALSE)
-gonl.maf$id <- paste0(gonl.maf$CHROM, ":", gonl.maf$POS)
-
-cohort.bim.dat$goNl.maf <- gonl.maf$MAF[match(cohort.bim.dat$id, gonl.maf$id)]
-cohort.bim.dat$goNl.alt <- gonl.maf$ALT[match(cohort.bim.dat$id, gonl.maf$id)]
-cohort.bim.dat$goNl.ref <- gonl.maf$REF[match(cohort.bim.dat$id, gonl.maf$id)]
+cohort.bim.dat$goNl.maf <- ref.maf.dat$goNl.maf[snp.index]
+cohort.bim.dat$goNl.alt <- ref.maf.dat$goNl.alt[snp.index]
+cohort.bim.dat$goNl.ref <- ref.maf.dat$goNl.ref[snp.index]
 
 goNl.allele.matrix <- cbind(query.alt=cohort.bim.dat$A1, query.ref=cohort.bim.dat$A2, 
-                       ref.alt=cohort.bim.dat$goNl.alt, ref.ref=cohort.bim.dat$goNl.ref)
+                            ref.alt=cohort.bim.dat$goNl.alt, ref.ref=cohort.bim.dat$goNl.ref)
 
 cohort.bim.dat$goNl.allele.check <- apply(goNl.allele.matrix, 1, 
                                           FUN = function(x){check.ref.alt.alleles(
-                                              query.alt= x[1], query.ref= x[2],  ref.alt= x[3], ref.ref= x[4])
-                                            })
+                                            query.alt= x[1], query.ref= x[2],  ref.alt= x[3], ref.ref= x[4])
+                                          })
 
 cohort.bim.dat$goNl.maf.corrected <- cohort.bim.dat$goNl.maf
 cohort.bim.dat$goNl.maf.corrected[which(cohort.bim.dat$goNl.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$goNl.maf[which(cohort.bim.dat$goNl.allele.check == "flip")]))
 cohort.bim.dat$goNl.maf.corrected <- as.numeric(cohort.bim.dat$goNl.maf.corrected)
 
 
-#plots
-maf.ref.cohort.scatter <- ggplot(cohort.bim.dat[which(cohort.bim.dat$allele.check== "same"| cohort.bim.dat$allele.check== "flip"),], 
-                                 aes(x=ref.maf.corrected , y = cohort.maf))+
-  geom_point(size=0.5,alpha= 0.6, color="blue")+
-  ggtitle("MAF from EUR 1000g vs cohort MAF")+
-  ylab("MAF at cohort")+
-  xlab("MAF at EUR 1000G")+
-  theme_bw()+
-  theme(text=element_text(size=10, family="Helvetica"))
+################################ EXaC 
 
-# calculate density for scatter plot. 
-cohort.bim.dat.filter <- cohort.bim.dat[which(cohort.bim.dat$allele.check== "same" | cohort.bim.dat$allele.check== "flip"),]
-cohort.bim.dat.filter <- cohort.bim.dat.filter[!is.na(cohort.bim.dat.filter$ref.maf.corrected),]
-cohort.bim.dat.filter$density <- get_density(cohort.bim.dat.filter$ref.maf.corrected, cohort.bim.dat.filter$cohort.maf)
-maf.ref.cohort.scatter.dens <- ggplot(cohort.bim.dat.filter, aes(x=ref.maf.corrected , y = cohort.maf))+
-  geom_point(size=0.5, alpha= 0.6, aes(color=density))+
-  scale_color_viridis()+
-  ggtitle("MAF from EUR 1000g vs cohort MAF")+
+
+cohort.bim.dat$exac.maf <- ref.maf.dat$exac.af[snp.index]
+cohort.bim.dat$exac.maf.nfe <- ref.maf.dat$exac.af.NFE[snp.index]
+cohort.bim.dat$exac.alt <- ref.maf.dat$exac.alt[snp.index]
+cohort.bim.dat$exac.ref <- ref.maf.dat$exac.ref[snp.index]
+
+exac.allele.matrix <- cbind(query.alt=cohort.bim.dat$A1, query.ref=cohort.bim.dat$A2, 
+                            ref.alt=cohort.bim.dat$exac.alt, ref.ref=cohort.bim.dat$exac.ref)
+
+cohort.bim.dat$exac.allele.check <- apply(exac.allele.matrix, 1, 
+                                          FUN = function(x){check.ref.alt.alleles(
+                                            query.alt= x[1], query.ref= x[2],  ref.alt= x[3], ref.ref= x[4])
+                                          })
+
+cohort.bim.dat$exac.maf.corrected <- cohort.bim.dat$exac.maf
+cohort.bim.dat$exac.maf.corrected[which(cohort.bim.dat$exac.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$exac.maf[which(cohort.bim.dat$exac.allele.check == "flip")]))
+cohort.bim.dat$exac.maf.corrected <- as.numeric(cohort.bim.dat$exac.maf.corrected)
+
+cohort.bim.dat$exac.maf.corrected.nfe <- cohort.bim.dat$exac.maf.nfe
+cohort.bim.dat$exac.maf.corrected.nfe[which(cohort.bim.dat$exac.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$exac.maf.corrected.nfe[which(cohort.bim.dat$exac.allele.check == "flip")]))
+cohort.bim.dat$exac.maf.corrected.nfe <- as.numeric(cohort.bim.dat$exac.maf.corrected.nfe)
+
+################################ gnomad
+
+cohort.bim.dat$gnomad.maf <- ref.maf.dat$gnomad.af[snp.index]
+cohort.bim.dat$gnomad.maf.nfe <- ref.maf.dat$gnomad.af.NFE[snp.index]
+cohort.bim.dat$gnomad.alt <- ref.maf.dat$gnomad.alt[snp.index]
+cohort.bim.dat$gnomad.ref <- ref.maf.dat$gnomad.ref[snp.index]
+
+gnomad.allele.matrix <- cbind(query.alt=cohort.bim.dat$A1, query.ref=cohort.bim.dat$A2, 
+                              ref.alt=cohort.bim.dat$gnomad.alt, ref.ref=cohort.bim.dat$gnomad.ref)
+
+cohort.bim.dat$gnomad.allele.check <- apply(gnomad.allele.matrix, 1, 
+                                            FUN = function(x){check.ref.alt.alleles(
+                                              query.alt= x[1], query.ref= x[2],  ref.alt= x[3], ref.ref= x[4])
+                                            })
+
+cohort.bim.dat$gnomad.maf.corrected <- cohort.bim.dat$gnomad.maf
+cohort.bim.dat$gnomad.maf.corrected[which(cohort.bim.dat$gnomad.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$gnomad.maf[which(cohort.bim.dat$gnomad.allele.check == "flip")]))
+cohort.bim.dat$gnomad.maf.corrected <- as.numeric(cohort.bim.dat$gnomad.maf.corrected)
+
+
+cohort.bim.dat$gnomad.maf.corrected.nfe <- cohort.bim.dat$gnomad.maf.nfe
+cohort.bim.dat$gnomad.maf.corrected.nfe[which(cohort.bim.dat$gnomad.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$gnomad.maf.corrected.nfe[which(cohort.bim.dat$gnomad.allele.check == "flip")]))
+cohort.bim.dat$gnomad.maf.corrected.nfe <- as.numeric(cohort.bim.dat$gnomad.maf.corrected.nfe)
+
+############################################################################################################################### 
+############################################################################################################################### 
+#plots
+#1000G
+maf.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$allele.check== "same"| cohort.bim.dat$allele.check== "flip"),], 
+                             aes(x=ref.maf.corrected , y = cohort.maf))+
+  ggtitle("AF from EUR 1000g vs cohort MAF")+
   ylab("MAF at cohort")+
-  xlab("MAF at EUR 1000G")+
-  guides(colour=guide_colourbar(barheight = 0.5, barwidth = 4, title = "Density"))+
-  theme_bw()+
-  theme(text=element_text(size=10, family="Helvetica"), legend.position = "bottom")
+  xlab("AF at EUR 1000G")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
+
 
 ### goNL plots
-gonl.maf.ref.cohort.scatter <- ggplot(cohort.bim.dat[which(cohort.bim.dat$goNl.allele.check== "same"| cohort.bim.dat$goNl.allele.check== "flip"),], 
-                                 aes(x=goNl.maf.corrected , y = cohort.maf))+
-  geom_point(size=0.5, alpha= 0.6, color="orange")+
-  ggtitle("MAF from GoNL vs cohort MAF")+
+gonl.maf.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$goNl.allele.check== "same"| cohort.bim.dat$goNl.allele.check== "flip"),], 
+                                  aes(x=goNl.maf.corrected , y = cohort.maf))+
+  ggtitle("AF from GoNL vs cohort MAF")+
   ylab("MAF at cohort")+
-  xlab("MAF at GoNL")+
-  theme_bw()+
-  theme(text=element_text(size=10, family="Helvetica"))
+  xlab("AF at GoNL")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
 
-gonl.cohort.bim.dat.filter <- cohort.bim.dat[which(cohort.bim.dat$goNl.allele.check == "same" | cohort.bim.dat$goNl.allele.check== "flip"),]
-gonl.cohort.bim.dat.filter <- gonl.cohort.bim.dat.filter[!is.na(gonl.cohort.bim.dat.filter$goNl.maf.corrected),]
-gonl.cohort.bim.dat.filter$density <- get_density(gonl.cohort.bim.dat.filter$goNl.maf.corrected, gonl.cohort.bim.dat.filter$cohort.maf)
-gonl.maf.ref.cohort.scatter.dens <- ggplot(gonl.cohort.bim.dat.filter, aes(x=goNl.maf.corrected , y = cohort.maf))+
-  geom_point(size=0.5, alpha= 0.6, aes(color=density))+
-  scale_color_viridis()+
-  ggtitle("MAF from GoNL vs cohort MAF")+
+
+
+### exac ALL 
+exac.maf.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$exac.allele.check== "same"| cohort.bim.dat$exac.allele.check== "flip"),], 
+                                  aes(x=exac.maf.corrected , y = cohort.maf))+
+  ggtitle("AF from EXaC vs cohort MAF")+
   ylab("MAF at cohort")+
-  xlab("MAF at GoNL")+
-  guides(colour=guide_colourbar(barheight = 0.5, barwidth = 4, title = "Density"))+
-  theme_bw()+
-  theme(text=element_text(size=10, family="Helvetica"), legend.position = "bottom")
+  xlab("AF at EXaC")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
+
+### exac NFE
+exac.maf.NFE.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$exac.allele.check== "same"| cohort.bim.dat$exac.allele.check== "flip"),], 
+                                      aes(x=exac.maf.corrected.nfe , y = cohort.maf))+
+  ggtitle("AF from EXaC vs cohort MAF")+
+  ylab("MAF at cohort")+
+  xlab("AF at EXaC (NFE popoulation)")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
+
+
+### gnomad 
+gnomad.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$gnomad.allele.check== "same"| cohort.bim.dat$gnomad.allele.check== "flip"),], 
+                                aes(x=gnomad.maf.corrected , y = cohort.maf))+
+  ggtitle("AF from EXaC vs cohort MAF")+
+  ylab("MAF at cohort")+
+  xlab("AF at gnomAD")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
+
+### gnomad NFE
+gnomad.NFE.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$gnomad.allele.check== "same"| cohort.bim.dat$gnomad.allele.check== "flip"),], 
+                                    aes(x=gnomad.maf.corrected.nfe , y = cohort.maf))+
+  ggtitle("AF from gnomAD vs cohort MAF")+
+  ylab("MAF at cohort")+
+  xlab("AF at gnomAD (NFE popoulation) ")+
+  geom_hex(alpha= 1, bins= 150)+
+  scale_fill_viridis(breaks= c(1,10,100,1000,10000), limits=c(1, 10000), 
+                     labels=c(1, expression(10^1), expression(10^2), expression(10^3), expression(10^4)),
+                     name="Counts", trans="log10")+
+  theme_classic()+
+  guides(fill=guide_colorbar(barheight = 0.5, barwidth = 5))+
+  theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
 
 
 ### saving out plots. 
-combine.plot.title <- paste0("MAF correlation with reference genomes (1000G and GoNL)", "\n", opt$name, " ", date())
+combine.plot.title <- paste0("MAF comparison with reference sets AF", "\n", opt$name, " ", date())
 maf.ref.cohort.file <- file.path(output, "05_maf.ref.cohort.scatter.tiff")
 
 #plotting
-tiff(maf.ref.cohort.file,  width = 2000, height = 2000, units = "px", res = 300, compression = "lzw")
-grid.arrange(maf.ref.cohort.scatter, gonl.maf.ref.cohort.scatter, 
-             maf.ref.cohort.scatter.dens, gonl.maf.ref.cohort.scatter.dens,
+tiff(maf.ref.cohort.file,  width = 2000, height = 4000, units = "px", res = 300, compression = "lzw")
+grid.arrange(maf.ref.cohort.hex, 
              top=combine.plot.title,
+             maf.ref.cohort.hex,
+             gonl.maf.ref.cohort.hex,
+             exac.maf.ref.cohort.hex,
+             exac.maf.NFE.ref.cohort.hex,
+             gnomad.ref.cohort.hex,
+             gnomad.NFE.ref.cohort.hex,
              ncol=2)
 dev.off()
-####Done
-
-
 
 ############################################################
 ############### Plot of relatedness
@@ -554,16 +648,16 @@ dev.off()
 related.file <- file.path(opt$input, paste0("5_Relatedness/","autosomal_rel.genome"))
 reldata1<-read.table(related.file, header = T)
 
-
 ##options for  plots Z1 vs Z0
 z1vz0<- ggplot(reldata1,aes(x=Z0,y=Z1))+
   stat_sum(aes(size = factor(..n..)), geom = "point")+
-  scale_size_discrete(range = c(2, 8))+
+  scale_size_discrete(range = c(2, 8),name="Pairs of Samples")+
   theme_bw()+
   ggtitle("Sample relatedness")+
   theme(text=element_text(size=10,family="Helvetica"))+
-  coord_cartesian(xlim = c(0, 1), ylim=c(0,0.6))
-
+  coord_cartesian(xlim = c(0, 1), ylim=c(0,0.6))+
+  xlab(paste0("Z0","\n","P(IBD=0)"))+
+  ylab(paste0("Z1","\n","P(IBD=1)"))
 
 ##pi_hat vs expected plot
 obsvexp<- ggplot(reldata1,aes(x=PI_HAT,y=EZ))+
@@ -575,12 +669,18 @@ obsvexp<- ggplot(reldata1,aes(x=PI_HAT,y=EZ))+
   xlab("Observed R.C.")+
   ylab("Expected R.C.")
 
-relatedness.file <- file.path(output, "relatedness.tiff")
-tiff(relatedness.file,  
+combine.plot.title <- paste0("Relatedness check", "\n", opt$name, " ", date())
+relatedness.file <- file.path(output, "06_relatedness.tiff")
+tiff(relatedness.file,
      width = 3000, height = 1500, 
-     units = "px", res = 300, compression = "lzw")
-grid.arrange(z1vz0, obsvexp, ncol=2)
+     units = "px", 
+     res = 300, 
+     compression = "lzw")
+grid.arrange(z1vz0, obsvexp, ncol=2, top=combine.plot.title)
 dev.off()
 
 ############################################################
 cat("\n[INFO]\t Finished plotting QC report")
+####Done
+  
+  
