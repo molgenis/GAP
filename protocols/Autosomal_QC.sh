@@ -14,6 +14,7 @@
 #string MAFref
 #string logsDir
 #string intermediateDir
+#strinf samplesheet
 
 
 module load "${plinkVersion}"
@@ -178,9 +179,12 @@ plink --genome --bfile ${Relatedness}/proc/full_autosomal_rel.temp --min 0.05 --
 rm ${Relatedness}/proc/*temp*
 
 
-Rscript ${EBROOTGAP}/scripts/genotypeQC.R -i ${AutosomeQCDir} \
-  -o ${repout} \
-  -r ${MAFref}
+##Call the Rscript to plot
+Rscript genotypeQC.R -i ${AutosomeQCDir} \
+ -o ${repout} \
+ -n "test01" \
+ --sampleinfo ${samplesheet} \
+ -r ${MAFref}
 
 
 
