@@ -191,15 +191,11 @@ snps_lab<-c(paste0(snps[1]," ","(100%)"),
 
 incl <- data.frame(samples, snps,"group"= names(snps))
 
-#variables to calculate the ylim of the barplots
-z_samples <- mean(c(samples["All"]-samples["CR>80"], samples["CR>80"]-samples["CR>95"]))+1
-z_snps <- mean(c(snps["All"]-snps["CR>80"], snps["CR>80"]-snps["CR>95"]))+1
-
 ##barplot for samples
 barplot.samples <- ggplot(incl, aes(group,samples))+
   geom_bar(stat = "identity", aes(colour=group, fill=group), position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(round(samples["All"]-4*z_samples-4,digits=0),
-                           round(1.002*samples["All"],digits=0 )))+ 
+  coord_cartesian(ylim = c(round(samples["CR>95"]-samples["All"]*0.014,decimal=0),
+                           round(samples["All"]*1.0007,decimal=0)))+
   ylab("Number of Samples")+
   theme_classic()+
   geom_text(aes(label=samples_lab), vjust=0,size=3.5)+
@@ -209,7 +205,8 @@ barplot.samples <- ggplot(incl, aes(group,samples))+
 barplot.snps <- ggplot(incl, aes(group,snps)) +
   geom_bar(stat = "identity", aes(colour=group, fill=group), 
            position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(round(snps["All"]-4*z_snps),round(1.002*snps["All"])))+
+  coord_cartesian(ylim = c(round(snps["CR>95"]-snps["All"]*0.014,decimal=0),
+                           round(snps["All"]*1.0007,decimal=0)))+
   ylab("Number of SNPs")+
   theme_classic()+
   geom_text(aes(label=snps_lab), vjust=0,size=3.5)+
