@@ -200,7 +200,6 @@ barplot.samples <- ggplot(incl, aes(group,samples))+
   geom_bar(stat = "identity", aes(colour=group, fill=group), position = position_dodge(width = 0.5))+
   coord_cartesian(ylim = c(round(samples["CR>95"]-z_samples-4,digits=0),
                            round(samples["All"]*1.0007,digits=0)))+
-  ylab("Number of SNPs")+
   ylab("Number of Samples")+
   theme_classic()+
   geom_text(aes(label=samples_lab), vjust=0,size=3.5)+
