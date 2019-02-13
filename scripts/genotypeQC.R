@@ -7,12 +7,15 @@
 ### New
 ###################################
 
+## recalibrated sizing of the Y-axis of the bar plots
+
 ##05-02-2019
 ## Corrected refMAF bug that cuased the pipeline to stop
 ## added percentajes tothe labels of the barplots
 ## harmonized chromosome nomenclature on chromosome legends
 ## Added proper format signatures to relatedness plots
 ## Corrected header reading in snp and sample file
+
 
 ##11-01-2019
 ## New arguents - project name, sample info sheet 
@@ -187,30 +190,31 @@ snps_lab<-c(paste0(snps[1]," ","(100%)"),
                paste0(snps[3]," ","(",round(snps[3]*100/snps[1],1),"%",")"))
 
 incl <- data.frame(samples, snps,"group"= names(snps))
-
+  
 #variables to calculate the ylim of the barplots
-z_samples <- mean(samples["All"]-samples["CR>80"], samples["CR>80"]-samples["CR>95"])
-z_snps <- mean(snps["All"]-snps["CR>80"], snps["CR>80"]-snps["CR>95"])
+z_samples <- mean(c(samples["All"]-samples["CR>80"], samples["CR>80"]-samples["CR>95"]))+1
+z_snps <- mean(c(snps["All"]-snps["CR>80"], snps["CR>80"]-snps["CR>95"]))+1
 
 ##barplot for samples
 barplot.samples <- ggplot(incl, aes(group,samples))+
   geom_bar(stat = "identity", aes(colour=group, fill=group), position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(1.002*samples["All"]-3.5*z_samples,1.002*samples["All"] ))+ 
+  coord_cartesian(ylim = c(round(samples["CR>95"]-z_samples-4,digits=0),
+                           round(samples["All"]*1.0007,digits=0)))+
   ylab("Number of Samples")+
   theme_classic()+
-  geom_text(aes(label=samples_lab), vjust=0)+
+  geom_text(aes(label=samples_lab), vjust=0,size=3.5)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
 
 ##barplot for snps
 barplot.snps <- ggplot(incl, aes(group,snps)) +
   geom_bar(stat = "identity", aes(colour=group, fill=group), 
            position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(1.002*snps["All"]-3.5*z_snps,1.002*snps["All"]))+
+  coord_cartesian(ylim = c(round(snps["CR>95"]-z_snps-400,digits=0),
+                           round(snps["All"]*1.0007,digits=0)))+
   ylab("Number of SNPs")+
   theme_classic()+
-  geom_text(aes(label=snps_lab), vjust=0)+
+  geom_text(aes(label=snps_lab), vjust=0,size=3.5)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
-
 
 samples.snps.barplot.file <- file.path(output, "02_samples.snps.barplot.tiff")
 samples.snps.barplot.title <- paste0("Number of samples and markers at different call rate thresholds", "\n",
