@@ -1,6 +1,6 @@
 ###################################
 ### QC report for genotyping data
-### date: 11-02-2019
+### date: 21-02-2019
 ### version: 0.5 (unnoficcial)
 ### authors: EL - RAG
 ###################################
@@ -711,8 +711,8 @@ dev.off()
 PCA.file <- file.path(opt$input, paste0("6_PCA/","PCA_1000G.eigenvec"))
 G_eigenvec_table<-read.table(PCA.file, header = T)
 
-####make reference file in the clsuter
-G_pops<-read_excel('/groups/umcg-aad/tmp04/umcg-elopera/thgref/20130606_sample_info_pop_superpop.xlsx')
+####take reference file from the cluster
+G_pops<-read_excel('/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx')
 
 ##preparing data
 colnames(G_eigenvec_table)<-c('FID','Sample ID',paste("PC",1:20))
