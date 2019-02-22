@@ -44,6 +44,7 @@ mkdir -p "${Het}/proc/"
 mkdir -p "${Relatedness}/"
 mkdir -p "${Relatedness}/proc/"
 mkdir -p "${AutosomeQCDir}/6_PCA"
+mkdir -p "${AutosomeQCDir}/6_PCA/proc"
 mkdir -p "${AutosomeQCDir}/6_PCA/proc2"
 
  for chr in {1..22} "XY"
@@ -253,15 +254,15 @@ rm ${Relatedness}/proc/*temp*
 plink --bfile ${ref1000G}/1000G_all \
       --extract  ${CR_high}/inclhigh.vars \
       --make-bed \
-      --out ${thg}/thg
+      --out ${PCA}/proc/
 
-awk '{print $2}' ${thg}/thg.bim > ${PCA}/proc2/common.snps
+awk '{print $2}' ${PCA}/proc/thg.bim > ${PCA}/proc2/common.snps
 
 
 #create list to merge
  find ${Het}/ -name "*.bim" > ${PCA}/proc2/allfiles.list;
  sed -i 's/.bim//g' ${PCA}/proc2/allfiles.list;
- echo "${thg}/thg" >> ${PCA}/proc2/allfiles.list
+ echo "${PCA}/proc/thg" >> ${PCA}/proc2/allfiles.list
 
 ###merge all data
 plink --merge-list ${PCA}/proc2/allfiles.list \
@@ -269,7 +270,7 @@ plink --merge-list ${PCA}/proc2/allfiles.list \
 
 if [ -e ${PCA}/proc2/full_data.missnp ];
   then
-      plink --bfile ${thg}/thg \
+      plink --bfile ${PCA}/proc/thg \
             --exclude ${PCA}/proc2/full_data.missnp \
             --make-bed \
             --out ${PCA}/proc2/allg.temp
