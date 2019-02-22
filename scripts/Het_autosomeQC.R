@@ -93,7 +93,7 @@ ROH.het<-ggplot(hetdata, aes(x=KB,y=OHET))+
          theme(text=element_text(size=10, family="Helvetica"))
 
 ###print plots
-hetero.density.file <- file.path(output, "hetero.density.tiff")
+hetero.density.file <- file.path(output, "04_heterozygosity.tiff")
 tiff(hetero.density.file,  
      width = 2500, height = 1500, 
      units = "px", res = 300, compression = "lzw")
