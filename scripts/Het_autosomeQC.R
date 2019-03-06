@@ -21,6 +21,7 @@
 library(ggplot2)
 library(optparse)
 library(gridExtra)
+library(dplyr)
 
 ##Arguments
 #########################################################################################################
@@ -41,38 +42,65 @@ if (is.null(opt$input)){
 }
 
 output <- as.character(opt$out)
-
+#opt<-list()
+#opt$input<-"C:/VirtualM/Analysis2_QC"
 #########################################################################################################
 ### Main
 #########################################################################################################
-
+##get files
 het.file <- file.path(opt$input,"autosomal.het")
-
+roh.file<-file.path(opt$input,"autosomal.hom.indiv")
+cr.file<-file.path(opt$input,"CR.samples")
+##Organize data
 hetdata<-read.table(het.file, header = T)
 hetdata$OHET<-(hetdata$N.NM.- hetdata$O.HOM.)
+rohdata<-read.table(roh.file, header=T)
+crdata<-read.table(cr.file,header=F)
+colnames(crdata)<-c("IID", "FID","F_MISS")
+crdata<-crdata%>% group_by(IID,FID)%>%summarise(F_miss=mean(F_MISS))
 
+##unify data in a  single database
+hetdata<-right_join(hetdata,rohdata,by=c("IID","FID"))
+hetdata<-inner_join(hetdata,crdata,by=c("IID","FID"))
+##make filters to exclude and include data
 Excluded<-hetdata[abs(hetdata$OHET-mean(hetdata$OHET))>4*sd(hetdata$OHET),c(1,2)]
 Included<-hetdata[abs(hetdata$OHET-mean(hetdata$OHET))<=4*sd(hetdata$OHET),c(1,2)]
-
-
+##make files for included/excluded individuals
 excl.file <- file.path(opt$input,"Excluded.het")
 incl.file <- file.path(opt$input,"Included.het")
-
 write.table(Excluded,excl.file, quote=F,row.names = F)
 write.table(Included,incl.file, quote=F,row.names = F)
 
-density.het<-ggplot(hetdata, aes(x=OHET))+
-             geom_density()+
-             ggtitle("Heterozigosity distribution by sample")+
+###plotting
+excluded<-nrow(Excluded)
+plot.conclude<-paste0(excluded," ","Samples excluded")
+CR.het<-ggplot(hetdata, aes(x=log(F_miss),y=OHET))+
+             geom_point(alpha=0.4, size=2)+
+             ggtitle("Heterozygosity distribution by sample")+
              theme_bw()+
-             xlab("Heterozygosity")+
-             geom_vline(xintercept=mean(hetdata$OHET)-4*sd(hetdata$OHET))+
-             geom_vline(xintercept=mean(hetdata$OHET)+4*sd(hetdata$OHET))+
+             xlab("log(missing)")+ylab("Heterozygosity")+
+             geom_hline(yintercept=mean(hetdata$OHET)-4*sd(hetdata$OHET),color="red")+
+             geom_hline(yintercept=mean(hetdata$OHET)+4*sd(hetdata$OHET),color="red")+
              theme(text=element_text(size=10, family="Helvetica"))
 
-hetero.density.file <- file.path(output, "hetero.density.tiff")
+ROH.het<-ggplot(hetdata, aes(x=KB,y=OHET))+
+         geom_point(alpha=0.4, size=2)+
+         ggtitle(paste0("Heterozygosity vs long runs","\n", "of homozygosity (ROH)"))+
+         theme_bw()+
+         xlab("Total length of ROH (kb)")+ylab("Heterozygosity")+
+         geom_hline(yintercept=mean(hetdata$OHET)-4*sd(hetdata$OHET),color="red")+
+         geom_hline(yintercept=mean(hetdata$OHET)+4*sd(hetdata$OHET),color="red")+
+         theme(text=element_text(size=10, family="Helvetica"))
+
+###print plots
+hetero.density.file <- file.path(output, "04_heterozygosity.tiff")
 tiff(hetero.density.file,  
-     width = 1500, height = 1500, 
+     width = 2500, height = 1500, 
      units = "px", res = 300, compression = "lzw")
-grid.arrange(density.het, ncol=1)
+grid.arrange(CR.het, ROH.het, ncol=2, bottom=plot.conclude)
 dev.off()
+
+
+
+
+
