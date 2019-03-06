@@ -6,7 +6,7 @@ computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
 gapVersion,GAP/v2.2.0
 pennCNVVersion,PennCNV/1.0.4-foss-2015b
 optiCallVersion,opticall/0.7.0-foss-2015b
-RPlusVersion,RPlus/3.4.4-foss-2015b-v18.12.1
+RPlusVersion,RPlus/3.4.4-foss-2015b-v19.01.1
 plinkVersion,plink/1.9-foss-2015b
 
 zCallVersion,opticall/0.7.0-foss-2015b
@@ -17,6 +17,8 @@ bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
 hmmFile,hhall.hmm
 pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
 MAFref,/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt
+ref1000G,/apps/data/1000G/phase3
+pops1000G,/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx
 
 #paths
 root,/
@@ -54,3 +56,4 @@ outputMH,${AutosomeQCDir}/3_MAF_HWE
 Het,${AutosomeQCDir}/4_Het
 Relatedness,${AutosomeQCDir}/5_Relatedness
 repout,${AutosomeQCDir}/plots
+PCA,${AutosomeQCDir}/6_PCA
