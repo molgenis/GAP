@@ -1,13 +1,19 @@
 ###################################
 ### QC report for genotyping data
-### date: 05-02-2019
-### version: 0.3
+### date: 21-02-2019
+### version: 0.5 (unnoficcial)
 ### authors: EL - RAG
 ###################################
 ### New
 ###################################
-
-## recalibrated sizing of the Y-axis of the bar plots
+##21-02-2019
+## added duplicate SNPs comment
+## corrected fread bugg that caused to misread columns on snps files
+## changed input so " >95%" call rate is now just "high"
+## smoothed chr density plots
+## adapted reading for parsimonius bash script 
+## 11-02-2019
+## Added PCA plots
 
 ##05-02-2019
 ## Corrected refMAF bug that cuased the pipeline to stop
@@ -15,7 +21,6 @@
 ## harmonized chromosome nomenclature on chromosome legends
 ## Added proper format signatures to relatedness plots
 ## Corrected header reading in snp and sample file
-
 
 ##11-01-2019
 ## New arguents - project name, sample info sheet 
@@ -51,11 +56,13 @@
 library(tidyverse)
 #library(ggsci)
 library(data.table)
+library(grid)
 library(optparse)
 #library(ggridges)
 library(gridExtra)
 library(MASS)
 library(viridis)
+library(readxl)
 
 ## Check ref and alt alleles are the same. 
 check.ref.alt.alleles <- function(query.alt, query.ref, ref.alt, ref.ref){
@@ -161,71 +168,81 @@ samples_all.file <- file.path(opt$input,"full.ind")
 samples_all <- fread(samples_all.file, data.table = FALSE, header=F)
 
 snps_all.file <- file.path(opt$input,"full.snps")
-snps_all <- fread(snps_all.file, header=F)
+snps_all <- fread(snps_all.file, sep=" ", header=F)
 
 
 samples_80.file <- file.path(opt$input, paste0("1_CR80/","incl80.samples"))
 samples_80 <- fread(samples_80.file, data.table = FALSE, header=F)
 
 snps_80.file <- file.path(opt$input, paste0("1_CR80/","incl80.vars"))
-snps_80 <- fread(snps_80.file, header=F)
+snps_80 <- fread(snps_80.file,sep=" ", header=F)
 
-samples_95.file <- file.path(opt$input, paste0("2_CR95/", "incl95.samples"))
-samples_95<-fread(samples_95.file, data.table = FALSE, header=F)
-colnames(samples_95)<-c("IID")
-samples_95$IID<-as.character(samples_95$IID)
+samples_high.file <- file.path(opt$input, paste0("2_CR_high/", "inclhigh.samples"))
+samples_high<-fread(samples_high.file, data.table = FALSE, header=F)
+colnames(samples_high)<-c("IID")
+samples_high$IID<-as.character(samples_high$IID)
 
-snps_95.file <- file.path(opt$input, paste0("2_CR95/","incl95.vars"))
-snps_95 <- fread(snps_95.file, data.table = FALSE, header=F)
+snps_high.file <- file.path(opt$input, paste0("2_CR_high/","inclhigh.vars"))
+snps_high <- fread(snps_high.file, data.table = FALSE,sep=" ", header=F)
 
+dups.file<- file.path(opt$input, "extr.dups")
+dups<-fread(dups.file, data.table = FALSE,sep=" ", header=F)
 ################################################
 ###group data to make the barplots
-samples <- c("All"=nrow(samples_all),"CR>80"=nrow(samples_80), "CR>95"=nrow(samples_95))
-samples_lab<-c(paste0(samples[1]," ","(100%)"),
-               paste0(samples[2]," ","(",round(samples[2]*100/samples[1],1),"%",")") ,
-               paste0(samples[3]," ","(",round(samples[3]*100/samples[1],1),"%",")"))
-snps <- c("All"=nrow(snps_all),"CR>80"=nrow(snps_80), "CR>95"=nrow(snps_95) )
-snps_lab<-c(paste0(snps[1]," ","(100%)"),
-               paste0(snps[2]," ","(",round(snps[2]*100/snps[1],1),"%",")") ,
-               paste0(snps[3]," ","(",round(snps[3]*100/snps[1],1),"%",")"))
+samples <- c("All"=nrow(samples_all),"CR>80"=nrow(samples_80), "CR>99"=nrow(samples_high))
+samples_lab<-c(paste0(samples[1],"\n","(100%)"),
+               paste0(samples[2],"\n","(",round(samples[2]*100/samples[1],1),"%",")") ,
+               paste0(samples[3],"\n","(",round(samples[3]*100/samples[1],1),"%",")"))
+snps <- c("All"=nrow(snps_all),"CR>80"=nrow(snps_80), "CR>99"=nrow(snps_high) )
+snps_lab<-c(paste0(snps[1],"\n","(100%)"),
+               paste0(snps[2],"\n","(",round(snps[2]*100/snps[1],1),"%",")") ,
+               paste0(snps[3],"\n","(",round(snps[3]*100/snps[1],1),"%",")"))
+
+
 
 incl <- data.frame(samples, snps,"group"= names(snps))
-  
+
 #variables to calculate the ylim of the barplots
-z_samples <- mean(c(samples["All"]-samples["CR>80"], samples["CR>80"]-samples["CR>95"]))+1
-z_snps <- mean(c(snps["All"]-snps["CR>80"], snps["CR>80"]-snps["CR>95"]))+1
+z_samples <- mean(c(samples["All"]-samples["CR>80"], samples["CR>80"]-samples["CR>99"]))+1
+z_snps <- mean(c(snps["All"]-snps["CR>80"], snps["CR>80"]-snps["CR>99"]))+1
 
 ##barplot for samples
 barplot.samples <- ggplot(incl, aes(group,samples))+
   geom_bar(stat = "identity", aes(colour=group, fill=group), position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(round(samples["CR>95"]-z_samples-4,digits=0),
-                           round(samples["All"]*1.0007,digits=0)))+
+  coord_cartesian(ylim = c(round(samples["CR>99"]-z_samples-4,digits=0),
+                           round(samples["All"]*1.001,digits=0)))+
+  ylab("Number of SNPs")+
   ylab("Number of Samples")+
   theme_classic()+
-  geom_text(aes(label=samples_lab), vjust=0,size=3.5)+
+  geom_text(aes(label=samples_lab), vjust=0, size=2.5)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
 
 ##barplot for snps
 barplot.snps <- ggplot(incl, aes(group,snps)) +
   geom_bar(stat = "identity", aes(colour=group, fill=group), 
            position = position_dodge(width = 0.5))+
-  coord_cartesian(ylim = c(round(snps["CR>95"]-z_snps-400,digits=0),
-                           round(snps["All"]*1.0007,digits=0)))+
+  coord_cartesian(ylim = c(round(snps["CR>99"]-z_snps-400,digits=0),
+                           round(snps["All"]*1.0025,digits=0)))+
   ylab("Number of SNPs")+
   theme_classic()+
-  geom_text(aes(label=snps_lab), vjust=0,size=3.5)+
+  geom_text(aes(label=snps_lab), vjust=0,size=2.5)+
   theme(text=element_text(size=10, family = 'Helvetica'), legend.position = "none")
+
 
 samples.snps.barplot.file <- file.path(output, "02_samples.snps.barplot.tiff")
 samples.snps.barplot.title <- paste0("Number of samples and markers at different call rate thresholds", "\n",
                                      "(from autosomal and pseudo-autosomal chromosomes)", "\n", 
                                      opt$name, " ", date())
+dups.comment<-paste0("*Y axis not starting from zero","\n", 
+                     "*Showing remaining markers after removing ", nrow(dups),
+                     " position duplicates")
 
 tiff(samples.snps.barplot.file,  
-     width = 1500, height = 1000, 
+     width = 1500, height = 1300, 
      units = "px", res = 300, compression = "lzw")
 grid.arrange(barplot.samples, barplot.snps, 
-             ncol=2, top=samples.snps.barplot.title)
+             ncol=2, top=textGrob(samples.snps.barplot.title, gp=gpar(fontsize=10,font=8)),
+             bottom=textGrob(dups.comment, gp=gpar(fontsize=6,font=8)))
 dev.off()
 
 
@@ -233,7 +250,7 @@ dev.off()
 ###look for filepath of CR80####
 #create list of filenames
 cr.files.path <- file.path(opt$input, "1_CR80/")
-cr.files <- list.files(cr.files.path, pattern = ".imiss", full.names = TRUE)
+cr.files <- list.files(cr.files.path, pattern = "\\.2\\.imiss$", full.names = TRUE)
 
 #create list of files
 cr.dat.list <- lapply(cr.files, fread, data.table=FALSE)
@@ -248,8 +265,8 @@ cr.dat.list <- lapply(cr.dat.list, function(df){mutate_at(df, .vars = c("IID","C
 cr.dat.list <- lapply(cr.dat.list, function(df){mutate_at(df, .vars = c("N_MISS", "N_GENO","F_MISS"), as.numeric)})
 ##merge chr files into one database (per chromosome database)
 cr.dat <- bind_rows(cr.dat.list)
-#extract the samples below 95 CR
-cr.dat <-semi_join(cr.dat,samples_95,by="IID")
+#extract the samples below high CR
+cr.dat <-semi_join(cr.dat,samples_high,by="IID")
 ##get the genomic CR data base
 cr.datG<-cr.dat %>% group_by(IID) %>%
   summarise(N_MISST=sum(N_MISS),
@@ -259,6 +276,7 @@ cr.datG<-cr.dat %>% group_by(IID) %>%
 ##Plot CR distribution
 # define levels of CHR to plot CHRs in order. 
 cr.dat$CHR <- gsub(cr.dat$CHR, pattern = "chr_", replacement ="" )
+cr.dat$CHR <- gsub(cr.dat$CHR, pattern = "\\..*", replacement ="" )
 cr.dat$CHR <- factor(cr.dat$CHR, levels=c(1:22, "XY"))
 
 chr.labels <- c(1:22,25)
@@ -266,7 +284,7 @@ names(chr.labels) <-  c(1:22,'XY')
 
 #by chromosome 
 cr.by.chr.dens <- ggplot(cr.dat, aes(x=1-F_MISS))+
-  stat_density(aes(colour= CHR),geom= "line", position= "identity")+
+  stat_density(aes(colour= CHR),geom= "line", position= "identity",adjust=5)+
   facet_wrap(~CHR, scales = 'free')+
   scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   xlab("Call rate")+
@@ -274,7 +292,7 @@ cr.by.chr.dens <- ggplot(cr.dat, aes(x=1-F_MISS))+
   theme(text = element_text(size=10, family='Helvetica'), legend.position = "none")
 ##by chromosome merged
 cr.merged.chrs.dens <- ggplot(cr.dat, aes(x=1-F_MISS))+
-  stat_density(aes(colour= CHR), geom= "line", position= "identity")+
+  stat_density(aes(colour= CHR), geom= "line", position= "identity",adjust=5)+
   scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   xlab("Call rate")+
   theme_bw()+
@@ -307,7 +325,7 @@ dev.off()
 
 ###########################################################################
 ############### MAF and HW distributions across all chromosomes 
-### output95
+### outputhigh
 maf.hw.path <- file.path(opt$input, "/3_MAF_HWE/")
 #maf.hw.path <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/genotype"
 #maf.hw.path <- "/Users/raulaguirre/PLN_UGLI/Data/testGenotypeData"
@@ -411,7 +429,7 @@ ref.maf.dat <- fread(opt$ref ,data.table = FALSE)
 ###
 # Read bim files from cohort 
 # opt <-list(); opt$input <- "/groups/umcg-aad/tmp04/umcg-elopera/plink_autosome_QC"
-cohort.bim.path <- file.path(opt$input, "2_CR95")
+cohort.bim.path <- file.path(opt$input, "2_CR_high")
 cohort.bim.files <- list.files(cohort.bim.path, pattern = ".bim$", full.names = TRUE)
 cohort.bim.list <- lapply(cohort.bim.files, fread, data.table=FALSE)
 cohort.bim.dat <- bind_rows(cohort.bim.list)
@@ -603,7 +621,7 @@ exac.maf.NFE.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$exac.a
 ### gnomad 
 gnomad.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$gnomad.allele.check== "same"| cohort.bim.dat$gnomad.allele.check== "flip"),], 
                                 aes(x=gnomad.maf.corrected , y = cohort.maf))+
-  ggtitle("AF from EXaC vs cohort MAF")+
+  ggtitle("AF from Gnomad vs cohort MAF")+
   ylab("MAF at cohort")+
   xlab("AF at gnomAD")+
   geom_hex(alpha= 1, bins= 150)+
@@ -683,8 +701,117 @@ tiff(relatedness.file,
 grid.arrange(z1vz0, obsvexp, ncol=2, top=combine.plot.title)
 dev.off()
 
+
+############################################################
+############### PCA
+
+###processing for 1000G
+
+#loading data
+PCA.file <- file.path(opt$input, paste0("6_PCA/","PCA_1000G.eigenvec"))
+G_eigenvec_table<-read.table(PCA.file, header = T)
+
+####take reference file from the cluster
+G_pops<-read_excel('/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx')
+
+##preparing data
+colnames(G_eigenvec_table)<-c('FID','Sample ID',paste("PC",1:20))
+G_eigenvec<-left_join(G_eigenvec_table,G_pops, by='Sample ID')
+levels(G_eigenvec$Population)<-c(levels(G_eigenvec$Population),"Cohort")
+G_eigenvec$Population[is.na(G_eigenvec$Population)] <- "Cohort"    
+levels(G_eigenvec$superpop)<-c(levels(G_eigenvec$superpop),"Cohort") 
+G_eigenvec$superpop[is.na(G_eigenvec$superpop)] <- "Cohort"
+
+#### second PCA Plot ####
+eurtable<-G_eigenvec[(G_eigenvec$Population=="TSI") | 
+                   (G_eigenvec$Population=="FIN") |
+                   (G_eigenvec$Population== "GBR") | 
+                   (G_eigenvec$Population== "IBS") |
+                   (G_eigenvec$Population=="CEU") | 
+                   ( G_eigenvec$Population== "Cohort"),c(1,2,3,4,28)]
+
+pc2filt<-G_eigenvec[(G_eigenvec$Population=="TSI") | 
+                      (G_eigenvec$Population=="FIN") |
+                      (G_eigenvec$Population== "GBR") | 
+                      (G_eigenvec$Population== "IBS") |
+                      (G_eigenvec$Population=="CEU"),c(1,2,3,4,28)]
+##PCA European population definitions
+pc1min<-min(pc2filt[,3])-3*abs(sd(pc2filt[,3]))
+pc1max<-max(pc2filt[,3])+3*abs(sd(pc2filt[,3]))
+pc2min<-min(pc2filt[,4])-3*abs(sd(pc2filt[,4]))
+pc2max<-max(pc2filt[,4])+3*abs(sd(pc2filt[,4]))
+
+##PCA 1000G scale limits
+xlimmin<-min(G_eigenvec[,3])
+xlimmax<-max(G_eigenvec[,3])
+ylimmin<-min(G_eigenvec[,4])
+ylimmax<-max(G_eigenvec[,4])
+
+sample.list<-G_eigenvec[(G_eigenvec$`PC 1`< pc1max) &
+                          (G_eigenvec$`PC 1`> pc1min) &
+                          (G_eigenvec$Population=="Cohort") &
+                          (G_eigenvec$`PC 2`< pc2max) &
+                          (G_eigenvec$`PC 2`> pc2min),c(1,2)]
+
+sample.list.file <- file.path(opt$input, paste0("6_PCA/","Sample.list"))
+write.table(sample.list,sample.list.file, row.names = F, quote=F)
+
+##plotting
+pops.plot<- ggplot(G_eigenvec,aes(x=G_eigenvec$`PC 1`, y=G_eigenvec$`PC 2`))+
+  geom_point(aes(colour=Population, shape=Population),alpha=0.6,size=2)+
+  theme_bw()+
+  scale_colour_manual(values=c(viridis(8),"brown",rainbow(18))) +
+  scale_shape_manual(values=c(rep(16,8),17,rep(16,18)))+
+  xlab("PC 1")+
+  ylab("PC 2")+
+  ggtitle("1000G Populations")+
+  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))+
+  scale_y_continuous(breaks = c(seq(-0.04,0.04, 0.005)))
+
+##aesthetics
+ELcolor<-c("chartreuse3",  "plum3", "brown",  "cyan1", "blue", "darkgreen")
+included<-nrow(sample.list)
+
+superpops.plot<-ggplot(G_eigenvec,aes(x=G_eigenvec$`PC 1`, y=G_eigenvec$`PC 2`))+
+  geom_point(aes(colour=superpop, shape=superpop),alpha=0.6, size=2)+
+  theme_bw()+
+  scale_colour_manual(values=ELcolor)+
+  scale_shape_manual(values=c(rep(16,2),17,rep(16,3)))+
+  xlab("PC 1")+ylab("PC 2")+
+  ggtitle("1000G Superpopulations")+
+  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))
+
+eurpops.plot<-ggplot(eurtable,aes(x=eurtable$`PC 1`, y=eurtable$`PC 2`))+
+  coord_cartesian(xlim = c(xlimmin,xlimmax), ylim = c(ylimmin,ylimmax))+
+  geom_rect(aes(xmin = pc1min, ymin = pc2min,
+                xmax= pc1max,ymax = pc2max ),fill="khaki1", alpha=0.01, linetype=2)+
+  geom_point(aes(colour=Population, shape=Population),alpha=0.6,size=2)+
+  theme_bw()+
+  scale_colour_manual(values=ELcolor[c(1,3,2,4,5,6)])+
+  scale_shape_manual(values=c(16,17,rep(16,4)))+
+  xlab("PC 1")+ylab("PC 2")+
+  ggtitle("1000G European populations")+
+  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))
+
+
+### saving out plots. 
+combine.plot.title <- paste0("PCA analysys with 1000G", "\n", opt$name, " ", date())
+PCA.plot.file <- file.path(output, "07_PCA.1000G.plot.tiff")
+plot.conclude<-paste0(included,"\n","European samples")
+#plotting
+tiff(PCA.plot.file,  width = 2000, height = 4000, 
+     units = "px", res = 300, compression = "lzw")
+grid.arrange(superpops.plot,
+             pops.plot, 
+             eurpops.plot,
+             top=combine.plot.title,
+             bottom=plot.conclude,
+             ncol=1)
+dev.off()
+
+
+
 ############################################################
 cat("\n[INFO]\t Finished plotting QC report")
+
 ####Done
-  
-  
