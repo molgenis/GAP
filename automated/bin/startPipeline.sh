@@ -207,7 +207,7 @@ function submitPipeline () {
 					return
 				}
 	else
-		sh submit.sh >> "${_logFile}" 2>&1 \
+		sh submit.sh --qos=priority >> "${_logFile}" 2>&1 \
 			|| {
 					echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
 					return
@@ -309,7 +309,7 @@ log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Log files will be written 
 #       that created the sample sheet per project can run a GD cluster
 #       instead of on a research cluster to create them directly on tmp.
 #
-IFS=$'\n' declare -a sampleSheets="($(ssh ${HOSTNAME_PRM} "find ${PRM_ROOT_DIR}/Samplesheets/ -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name '*.${SAMPLESHEET_EXT}'))"
+IFS=$'\n' declare -a sampleSheets=($(ssh ${HOSTNAME_PRM} "find ${PRM_ROOT_DIR}/Samplesheets/ -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name '*.${SAMPLESHEET_EXT}'"))
 if [[ "${#sampleSheets[@]:-0}" -eq '0' ]]
 then
 	log4Bash 'WARN' "${LINENO}" "${FUNCNAME:-main}" '0' "No sample sheets found @ ${PRM_ROOT_DIR}/Samplesheets/: There is nothing to do."
@@ -325,7 +325,7 @@ fi
 #
 # Parse sample sheets.
 #
-declare -a sampleSheets=($(find "${TMP_ROOT_DIR}/Samplesheets/" -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name *".${SAMPLESHEET_EXT}"))
+declare -a sampleSheets=($(find "${TMP_ROOT_DIR}/Samplesheets/" -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name '*.csv'))
 for sampleSheet in "${sampleSheets[@]}"
 do
 	project=$(basename "${sampleSheet}" ".${SAMPLESHEET_EXT}")
