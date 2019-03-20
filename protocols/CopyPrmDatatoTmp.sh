@@ -7,16 +7,32 @@
 #string Project
 #string logsDir
 
-max_index=${#SentrixPosition_A[@]}-1
+#Function to check if array contains value
+array_contains () {
+    local array="$1[@]"
+    local seeking=$2
+    local in=1
+    for element in "${!array-}"; do
+        if [[ "$element" == "$seeking" ]]; then
+            in=0
+            break
+        fi
+    done
+    return $in
+}
 
-for i in ${SentrixBarcode_A[@]}
+INPUTREPORTS=()
+
+for file in ${SentrixBarcode_A[@]}
 do
-	mkdir -vp "${GTCtmpDataDir}/${i}"
-	for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
-	do
-		GTC_FILE="${GTCprmDataDir}/${i}/${i}_${SentrixPosition_A[samplenumber]}.gtc"
-		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
-		"${ateambotUser}@${prmHost}:${GTC_FILE}"* \
-		"${GTCtmpDataDir}/${i}/"
-	done
+        array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("$file")    # If bamFile does not exist in array add it
+done
+
+for i in ${INPUTREPORTS[@]}
+do
+        mkdir -vp "${GTCtmpDataDir}/${i}"
+        GTC_DIR="${GTCprmDataDir}/${i}"
+        rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
+        "${GTC_DIR}" \
+        "${GTCtmpDataDir}"
 done
