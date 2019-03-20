@@ -207,7 +207,7 @@ function submitPipeline () {
 					return
 				}
 	else
-		sh submit.sh >> "${_logFile}" 2>&1 \
+		sh submit.sh --qos=priority >> "${_logFile}" 2>&1 \
 			|| {
 					echo "See ${_logFile} for details." > "${_controlFileBase}.failed"
 					return
@@ -325,7 +325,7 @@ fi
 #
 # Parse sample sheets.
 #
-declare -a sampleSheets=($(find "${TMP_ROOT_DIR}/Samplesheets/" -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name *.${SAMPLESHEET_EXT}))
+declare -a sampleSheets=($(find "${TMP_ROOT_DIR}/Samplesheets/" -mindepth 1 -maxdepth 1 \( -type l -o -type f \) -name '*.csv'))
 for sampleSheet in "${sampleSheets[@]}"
 do
 	project=$(basename "${sampleSheet}" ".${SAMPLESHEET_EXT}")

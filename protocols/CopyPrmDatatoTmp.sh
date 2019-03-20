@@ -30,9 +30,18 @@ done
 
 for i in ${INPUTREPORTS[@]}
 do
-        mkdir -vp "${GTCtmpDataDir}/${i}"
-        GTC_DIR="${GTCprmDataDir}/${i}"
-        rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
-        "${GTC_DIR}" \
-        "${GTCtmpDataDir}"
+	mkdir -vp "${GTCtmpDataDir}/${i}"
+	GTC_DIR="${GTCprmDataDir}/${i}"
+
+	if [ "${prmHost}" == "localhost" ]
+        then
+                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
+                "${GTC_DIR}" \
+                "${GTCtmpDataDir}"
+
+	else
+		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
+		"${ateambotUser}@${prmHost}:${GTC_DIR}" \
+		"${GTCtmpDataDir}"
+	fi
 done

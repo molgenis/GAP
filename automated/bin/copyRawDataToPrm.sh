@@ -348,6 +348,18 @@ function splitSamplesheetPerProject() {
 	log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Created ${_projectSampleSheet}."
 	done
 	
+	if ssh "${DATA_MANAGER}@${sourceServerFQDN}" "mv ${SCR_ROOT_DIR}/Samplesheets/${_run}.${SAMPLESHEET_EXT}* ${SCR_ROOT_DIR}/Samplesheets/archive/"
+	then
+		log4Bash 'INFO' "${LINENO}" "${FUNCNAME:-main}" '0' "${_run}.${SAMPLESHEET_EXT} moved to ${SCR_ROOT_DIR}/Samplesheets/archive/ on ${sourceServerFQDN}." \
+			2>&1 | tee -a "${_controlFileBase}.started" \
+			&& mv "${_controlFileBase}."{started,finished}
+	else
+		log4Bash 'ERROR' "${LINENO}" "${FUNCNAME:-main}" '0' "${_run}.${SAMPLESHEET_EXT} cannot be moved to ${SCR_ROOT_DIR}/Samplesheets/archive/ on ${sourceServerFQDN}."
+			2>&1 | tee -a "${_controlFileBase}.started" \
+			&& mv "${_controlFileBase}."{started,failed}
+		return
+	fi
+
 	touch "${_controlFileBase}.finished"
 }
 
