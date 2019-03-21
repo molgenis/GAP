@@ -99,13 +99,10 @@ function generateScripts () {
 		log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "${_controlFileBase}.finished nor ${_controlFileBase}.started exists."
 		log4Bash 'INFO'  "${LINENO}" "${FUNCNAME:-main}" '0' "Generating scripts for ${_project} ..."
 	fi
+	_pathToPipeline="${EBROOTGAP}"
 	
-	if [ "${_sampleType}" == "GAP" ]
+	if [ "${_sampleType}" != "GAP" ]
 	then
-		_version="${GAP_VERSION}"
-		module load "${_loadPipeline}/${_version}" || log4Bash 'FATAL' ${LINENO} "${FUNCNAME:-main}" ${?} "Failed to load ${_loadPipeline} module."
-		_pathToPipeline="${EBROOTGAP}"
-	else
 		log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "Unknown _sampleType: ${_sampleType}."
 	fi
 	log4Bash 'TRACE' "${LINENO}" "${FUNCNAME:-main}" '0' "_pathToPipeline is ${_pathToPipeline}"
