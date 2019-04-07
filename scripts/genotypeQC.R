@@ -1,11 +1,18 @@
-###################################
-### QC report for genotyping data
-### date: 21-02-2019
-### version: 0.5 (unnoficcial)
-### authors: EL - RAG
-###################################
-### New
-###################################
+###################################----Init----####################
+# QC report for genotyping data
+# date: 04-03-2019
+# version: 0.8 (unnoficcial)
+# authors: EL - RAG
+##_________________________________
+### ----Change log----
+##_________________________________
+
+##04-03-2019
+##excluded PCA analysis to an individual Rscript
+##added ref-AF plots with outliers report
+##added function to plot ref-AF plots
+##added MAF plots after PCA Analysis
+
 ##21-02-2019
 ## added duplicate SNPs comment
 ## corrected fread bugg that caused to misread columns on snps files
@@ -16,7 +23,7 @@
 ## Added PCA plots
 
 ##05-02-2019
-## Corrected refMAF bug that cuased the pipeline to stop
+## Corrected refMAF bug that caused the pipeline to stop
 ## added percentajes tothe labels of the barplots
 ## harmonized chromosome nomenclature on chromosome legends
 ## Added proper format signatures to relatedness plots
@@ -39,19 +46,19 @@
 ## Changed density calculation of scatter plot - > geom_hex()
 ## Added MAF comparison with EXaC and gnomAD reference cohort 
 
-######################################################################
-## example run  
+##_______________________________
+####----example run----  
+##_______________________________
 
 #RScript genotypeQC.R -i ***/plink_autosome_QC \
 #  -o 
 #  -r /groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/eurMAF_1000g/ 
 
 
-#########################################################################################################
-#########################################################################################################
-### Functions and libraries
-#########################################################################################################
-#########################################################################################################
+###__________________________________________________________________________##
+########### ------Functions and libraries------#############################
+##___________________________________________________________________________
+##___________________________________________________________________________
 
 library(tidyverse)
 #library(ggsci)
@@ -64,7 +71,7 @@ library(MASS)
 library(viridis)
 library(readxl)
 
-## Check ref and alt alleles are the same. 
+### Check ref and alt alleles are the same. 
 check.ref.alt.alleles <- function(query.alt, query.ref, ref.alt, ref.ref){
   res <-c()
   if(sum(is.na(c(query.alt, query.ref, ref.alt, ref.ref))) >= 1){
@@ -84,17 +91,115 @@ check.ref.alt.alleles <- function(query.alt, query.ref, ref.alt, ref.ref){
   return(res)
 }
 
+###MAF outlier plot###
+maf_outlier_plot <- function(cohort.bim.dat, 
+                             ref.panel.corrected.AF, 
+                             cohort.name){
+  
+  cohort.bim.dat.pro <- cohort.bim.dat[,c("chr", "bp","cohort.maf", ref.panel.corrected.AF)]
+  colnames(cohort.bim.dat.pro) <- c("chr", "bp","cohort.maf", "maf.corrected")
+  
+  ## remove all NA's fron the reference AF
+  cohort.bim.dat.pro <- cohort.bim.dat.pro[complete.cases(cohort.bim.dat.pro),]
+  ## selecting all points outside of main group. 
+  cohort.bim.dat.pro$lm.residuals <-  lm(cohort.bim.dat.pro$cohort.maf ~ 
+                                           cohort.bim.dat.pro$maf.corrected)$residuals
+  
+  cohort.bim.dat.pro$outlier_threshold <- ifelse(abs(cohort.bim.dat.pro$lm.residuals) > 
+                                                   sd(cohort.bim.dat.pro$lm.residuals)*4,
+                                                 "Outlier", "OK")
+  
+  outlier.perc <- format(round(
+    length(which(cohort.bim.dat.pro$outlier_threshold == "Outlier")) / 
+      sum(!is.na(cohort.bim.dat.pro$outlier_threshold))*100, 
+    digits = 2))
+  
+  hla.cohort.bim.dat <- cohort.bim.dat.pro[which(cohort.bim.dat.pro$chr == 6 & 
+                                                   cohort.bim.dat.pro$bp > 28477797 & cohort.bim.dat.pro$bp < 35000000),]
+  hla.outlier.perc <- format(round(
+    length(which(hla.cohort.bim.dat$outlier_threshold == "Outlier")) / 
+      sum(!is.na(cohort.bim.dat.pro$outlier_threshold))*100, 
+    digits = 4))
+  
+  
+  main.title <- paste0("Outlier = 4xSD(residuals(cohort.maf~ref.af))", "\n",
+                       "Total number of markers = ", 
+                       format(sum(!is.na(cohort.bim.dat.pro$outlier_threshold)), scientific = T, big.mark=","), "\n",
+                       "Percentage of outliers = ", outlier.perc, "%\n",
+                       "Percentage of outliers from HLA region =  ", hla.outlier.perc, "%")
+  
+  corrected.final.v2 <- ggplot(cohort.bim.dat.pro[which(!is.na(cohort.bim.dat.pro$outlier_threshold)),], 
+                               aes(y=cohort.maf , x= maf.corrected))+
+    geom_point(size=0.75, alpha= 0.5, aes(color=outlier_threshold))+
+    scale_color_brewer(palette = "Dark2", name="")+
+    geom_abline(color="black", slope=1, intercept = sd(cohort.bim.dat.pro$lm.residuals)*4, lwd=1.25, linetype=3)+
+    geom_abline(color="black", slope=1, intercept = -sd(cohort.bim.dat.pro$lm.residuals)*4, lwd=1.25, linetype=3)+
+    theme_classic()+
+    ylab("Cohort MAF")+
+    xlab(paste0(cohort.name, " AF"))+
+    ggtitle(main.title)+
+    theme(text=element_text(size=10, family = "Helvetica") ,legend.position = "bottom", legend.text = element_text(size = 10))
+  
+  return(corrected.final.v2)
+}
+
+####Relatedness plot
+
+relatednes.multi.plot.function <- function(relatednes.df){
+  
+  hist_z0 <- ggplot(relatednes.df)+geom_histogram(aes(Z0))+
+    theme_classic()+
+    theme(text = element_text(family = "Helvetica", size=10))+
+    coord_cartesian(xlim=c(0,1))
+  
+  empty <- ggplot()+geom_point(aes(1,1), colour="white")+
+    theme(axis.ticks=element_blank(), 
+          panel.background=element_blank(), 
+          axis.text.x=element_blank(), axis.text.y=element_blank(),           
+          axis.title.x=element_blank(), axis.title.y=element_blank())
+  
+  counts<-nrow(relatednes.df)/4
+  #hexagon
+  hexagon<-ggplot(relatednes.df,aes(x=Z0,y=Z1))+
+    geom_hex(bins=30)+
+    theme_classic()+
+    scale_fill_viridis(breaks= c(1, counts*0.1,counts*0.25,counts/2,counts*0.75,counts), limits=c(0, counts), 
+                       labels=c(1, counts*0.1,counts*0.25,counts/2,counts*0.75,counts),
+                       name="Pairs of samples")+
+    theme(text=element_text(size=10,family="Helvetica"),
+          legend.position = c(.90, .80), legend.box.margin = margin(4, 4, 4,4))+
+    coord_cartesian(xlim = c(0, 1), ylim=c(0,1))+
+    xlab(paste0("Z0"," P(IBD=0)"))+
+    ylab(paste0("Z1", " P(IBD=1)"))
+  
+  hist_z1 <- ggplot(relatednes.df)+geom_histogram(aes(Z1))+
+    theme_classic()+
+    coord_flip()+
+    theme(text = element_text(family = "Helvetica", size=10))
+  
+  hist_z2 <- ggplot(relatednes.df)+geom_histogram(aes(Z2))+
+    theme_classic()+
+    scale_y_reverse()+scale_x_reverse()+
+    theme(text = element_text(family = "Helvetica", size=10))+
+    coord_cartesian(xlim = c(0, 1))
+  combine.plot.title <- paste0("Sample relatedness", "\n"," ", date())
+  
+  return(grid.arrange(hist_z0, empty, hexagon, hist_z1, hist_z2,
+                      ncol=2, nrow=3, top=combine.plot.title,
+                      widths=c(4, 2), heights=c(2, 4,2)))
+}
+
 
 ##Arguments
-## Set up arguments for testing 
+### Set up arguments for testing 
 # opt <- list()
-# opt$input <- "/groups/umcg-aad/tmp04/umcg-elopera/plink_autosome_QC"
-# opt$out <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/qcPlots_test"
+# opt$input <- "/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B_part8"
+# opt$out <- "/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B_part8/plots"
 # opt$name <- "test01"
 # opt$sampleinfo <- "/groups/umcg-aad/tmp04/projects/IBD_part/run01/jobs/IBD_part.csv"
 # opt$ref <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt"
 
-#########################################################################################################
+###############################----Parsing arguments Options-----#############################
 option_list = list(
   make_option(c("-i", "--input"), type="character", default=NULL, 
               help="Input path to perform QC", metavar="character"),
@@ -121,13 +226,11 @@ if (is.null(opt$input)){
 }
 #
 output <- as.character(opt$out)
+#_________________________________________________________________________________________________________
+############################################ ------Main------#############################################
+#_________________________________________________________________________________________________________
 
-
-#########################################################################################################
-### Main
-#########################################################################################################
-
-############### First plot - 
+#####--Plate information sheet---####### 
 # Date and project name 
 # Table of all plates used in the analysis 
 # Table showing number of starting samples 
@@ -160,8 +263,7 @@ if(is.null(opt$sampleinfo) == FALSE){
   dev.off()
 }
 
-
-############### Samples and SNPs passing call rate QC 
+############# Barplots of call rates########
 
 ## loading samples and SNPs
 samples_all.file <- file.path(opt$input,"full.ind")
@@ -169,7 +271,6 @@ samples_all <- fread(samples_all.file, data.table = FALSE, header=F)
 
 snps_all.file <- file.path(opt$input,"full.snps")
 snps_all <- fread(snps_all.file, sep=" ", header=F)
-
 
 samples_80.file <- file.path(opt$input, paste0("1_CR80/","incl80.samples"))
 samples_80 <- fread(samples_80.file, data.table = FALSE, header=F)
@@ -187,7 +288,6 @@ snps_high <- fread(snps_high.file, data.table = FALSE,sep=" ", header=F)
 
 dups.file<- file.path(opt$input, "extr.dups")
 dups<-fread(dups.file, data.table = FALSE,sep=" ", header=F)
-################################################
 ###group data to make the barplots
 samples <- c("All"=nrow(samples_all),"CR>80"=nrow(samples_80), "CR>99"=nrow(samples_high))
 samples_lab<-c(paste0(samples[1],"\n","(100%)"),
@@ -230,8 +330,10 @@ barplot.snps <- ggplot(incl, aes(group,snps)) +
 
 
 samples.snps.barplot.file <- file.path(output, "02_samples.snps.barplot.tiff")
-samples.snps.barplot.title <- paste0("Number of samples and markers at different call rate thresholds", "\n",
-                                     "(from autosomal and pseudo-autosomal chromosomes)", "\n", 
+samples.snps.barplot.title <- paste0("Number of samples and markers at different call rate thresholds", 
+                                     "\n",
+                                     "(from autosomal and pseudo-autosomal chromosomes)", 
+                                     "\n", 
                                      opt$name, " ", date())
 dups.comment<-paste0("*Y axis not starting from zero","\n", 
                      "*Showing remaining markers after removing ", nrow(dups),
@@ -246,8 +348,8 @@ grid.arrange(barplot.samples, barplot.snps,
 dev.off()
 
 
-############### FInal CR distribution
-###look for filepath of CR80####
+############### Final CR distribution#######
+##look for filepath of CR80
 #create list of filenames
 cr.files.path <- file.path(opt$input, "1_CR80/")
 cr.files <- list.files(cr.files.path, pattern = "\\.2\\.imiss$", full.names = TRUE)
@@ -323,8 +425,9 @@ tiff(cr.plots.by.chr.file,
 plot(cr.by.chr.dens+ggtitle(cr.plot.grid.tilte))
 dev.off()
 
-###########################################################################
-############### MAF and HW distributions across all chromosomes 
+#____________________________________________________________________
+############### MAF and HW distributions across all chromosomes#######
+#____________________________________________________________________
 ### outputhigh
 maf.hw.path <- file.path(opt$input, "/3_MAF_HWE/")
 #maf.hw.path <- "/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/genotype"
@@ -405,22 +508,27 @@ hw.maf.dist.plot.all <- ggplot(hw.dat[which(hw.dat$MAF > 0.01),], aes(x=-log10(P
 lay <- rbind(c(1,1,1,2,2,2),
              c(3,3,4,4,5,5)
 )
+#concluding information
+excluded<-fread(paste0(maf.hw.path, "excl_HW.snps"),data.table = FALSE,sep=" ", header=F)
+
 
 ### printing out the maf.hw distributions
-maf.hw.title <- paste0("MAF and HW distributions (from autosomal and pseudo-autosomal chromosomes)","\n", opt$name, " ", date())
+maf.hw.title <- paste0("MAF and HW distributions (from autosomal and pseudo-autosomal chromosomes)","\n", 
+                       opt$name, " ", date())
+maf.hw.conclude<-paste0(nrow(excluded)," markers excluded ", snps[3]-nrow(excluded), " remaining.")
 maf.hw.tiff.file <- file.path(output, "04_maf.hw.distributions.tiff")
 tiff(maf.hw.tiff.file, width = 3000, height = 2000, units = "px", res = 300, compression = "lzw")
 grid.arrange(maf.dist.plot.chr, maf.dist.plot.all, 
              hw.dist.plot.chr, hw.maf.dist.plot.chr, 
              hw.maf.dist.plot.all, 
-             layout_matrix = lay, top=maf.hw.title)
+             layout_matrix = lay, top=maf.hw.title, 
+             bottom=textGrob(maf.hw.conclude, gp=gpar(fontsize=6,font=8)))
 dev.off()
 
 
-########################################################################################################################
-############################################################
-############### Concordance of cohort MAF with Allelic frequencies in different reference cohorts
-
+#_____________________________________________________________________________________________
+############### Concordance of cohort MAF with Allelic frequencies in different reference cohorts########
+#_________________________________________________________________________________________________________
 ###
 # Read reference AF from pre-processed file
 
@@ -438,7 +546,7 @@ colnames(cohort.bim.dat) <- c("chr", "snp", "morgan", "bp", "A1", "A2")
 # generate chr:pos IDs
 cohort.bim.dat$id <- paste0(cohort.bim.dat[,1],":",cohort.bim.dat[,4])
 
-################################
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #### add the MAF to the bim file. 
 cohort.bim.dat$cohort.maf <- maf.dat$MAF[match(as.character(cohort.bim.dat$snp), as.character(maf.dat$SNP))]
 #### Remove all SNPS which have a MAF of 0 in the cohort
@@ -452,7 +560,7 @@ if (length(one.maf.index) >= 1){
   cohort.bim.dat <- cohort.bim.dat[-one.maf.index,]
 }
 
-############################## 
+#@@@@@@@@@@@@@@@@@@@@@@@@
 #### add the HW pvalue - remove all SNPS with a pValue <= 0.000005
 cohort.bim.dat$cohort.hw.p <- hw.dat$P[match(as.character(cohort.bim.dat$snp), as.character(hw.dat$SNP))]
 
@@ -555,8 +663,8 @@ cohort.bim.dat$gnomad.maf.corrected.nfe <- cohort.bim.dat$gnomad.maf.nfe
 cohort.bim.dat$gnomad.maf.corrected.nfe[which(cohort.bim.dat$gnomad.allele.check == "flip")] <- (1-as.numeric(cohort.bim.dat$gnomad.maf.corrected.nfe[which(cohort.bim.dat$gnomad.allele.check == "flip")]))
 cohort.bim.dat$gnomad.maf.corrected.nfe <- as.numeric(cohort.bim.dat$gnomad.maf.corrected.nfe)
 
-############################################################################################################################### 
-############################################################################################################################### 
+##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+###@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #plots
 #1000G
 maf.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$allele.check== "same"| cohort.bim.dat$allele.check== "flip"),], 
@@ -649,12 +757,11 @@ gnomad.NFE.ref.cohort.hex <- ggplot(cohort.bim.dat[which(cohort.bim.dat$gnomad.a
 
 ### saving out plots. 
 combine.plot.title <- paste0("MAF comparison with reference sets AF", "\n", opt$name, " ", date())
-maf.ref.cohort.file <- file.path(output, "05_maf.ref.cohort.scatter.tiff")
+maf.ref.cohort.file <- file.path(output, "06_maf.ref.cohort.scatter.tiff")
 
 #plotting
 tiff(maf.ref.cohort.file,  width = 2000, height = 4000, units = "px", res = 300, compression = "lzw")
-grid.arrange(maf.ref.cohort.hex, 
-             top=combine.plot.title,
+grid.arrange(top=combine.plot.title,
              maf.ref.cohort.hex,
              gonl.maf.ref.cohort.hex,
              exac.maf.ref.cohort.hex,
@@ -664,26 +771,50 @@ grid.arrange(maf.ref.cohort.hex,
              ncol=2)
 dev.off()
 
-############################################################
-############### Plot of relatedness
+# /groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt
+maf_outlier_plot_1000g <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "ref.maf.corrected", cohort.name="1000G")
+maf_outlier_plot_goNl <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "goNl.maf.corrected", cohort.name="goNl")
+maf_outlier_plot_exac <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "exac.maf.corrected", cohort.name="ExaC")
+maf_outlier_plot_exac_nfe <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "exac.maf.corrected.nfe", cohort.name="ExaC-NFE")
+maf_outlier_plot_gnomad <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "gnomad.maf.corrected", cohort.name="gNomad")
+maf_outlier_plot_gnomad_nfe <- maf_outlier_plot(cohort.bim.dat, ref.panel.corrected.AF = "gnomad.maf.corrected.nfe", cohort.name="gNomad-NFE")
+
+maf.ref.cohort.outlier.file <- file.path(output, "06b_maf.ref.cohort.scatter.outlier.tiff") 
+tiff(maf.ref.cohort.outlier.file,  width = 2000, height = 4000, units = "px", res = 300, compression = "lzw")
+grid.arrange(top=combine.plot.title, 
+             maf_outlier_plot_1000g,
+             maf_outlier_plot_goNl,
+             maf_outlier_plot_exac,
+             maf_outlier_plot_exac_nfe,
+             maf_outlier_plot_gnomad,
+             maf_outlier_plot_gnomad_nfe,
+             ncol=2)
+dev.off()
+
+##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+############### Plot of relatedness#######
+
+
+#opt<-list()
+#opt$input<-"/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B3"
+#opt$out<-"/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B3/plots"
 
 related.file <- file.path(opt$input, paste0("5_Relatedness/","autosomal_rel.genome"))
 reldata1<-read.table(related.file, header = T)
 
-##options for  plots Z1 vs Z0
-z1vz0<- ggplot(reldata1,aes(x=Z0,y=Z1))+
-  stat_sum(aes(size = factor(..n..)), geom = "point")+
-  scale_size_discrete(range = c(2, 8),name="Pairs of Samples")+
-  theme_bw()+
-  ggtitle("Sample relatedness")+
-  theme(text=element_text(size=10,family="Helvetica"))+
-  coord_cartesian(xlim = c(0, 1), ylim=c(0,0.6))+
-  xlab(paste0("Z0","\n","P(IBD=0)"))+
-  ylab(paste0("Z1","\n","P(IBD=1)"))
+s.relatedness.file <- file.path(opt$out, "07_1_related_samples.tiff")
+tiff(s.relatedness.file,
+     width = 2000, height = 2000, 
+     units = "px", 
+     res = 300, 
+     compression = "lzw")
+relatednes.multi.plot.function(reldata1)
+
+dev.off()
 
 ##pi_hat vs expected plot
 obsvexp<- ggplot(reldata1,aes(x=PI_HAT,y=EZ))+
-  geom_point()+
+  geom_point(alpha=0.4)+
   theme_bw()+
   ggtitle("Relatednes coefficient")+
   theme(text=element_text(size=10,family="Helvetica"))+
@@ -692,126 +823,60 @@ obsvexp<- ggplot(reldata1,aes(x=PI_HAT,y=EZ))+
   ylab("Expected R.C.")
 
 combine.plot.title <- paste0("Relatedness check", "\n", opt$name, " ", date())
-relatedness.file <- file.path(output, "06_relatedness.tiff")
+relatedness.file <- file.path(output, "07_02 relatedness.tiff")
 tiff(relatedness.file,
      width = 3000, height = 1500, 
      units = "px", 
      res = 300, 
      compression = "lzw")
-grid.arrange(z1vz0, obsvexp, ncol=2, top=combine.plot.title)
+grid.arrange(obsvexp, top=combine.plot.title)
 dev.off()
 
 
-############################################################
-############### PCA
+####___________________________________________
+############### MAF after PCA########
 
-###processing for 1000G
+maf.path <- file.path(opt$input, "6_PCA/")
+#maf.path <- "/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B_part8/6_PCA/"
 
-#loading data
-PCA.file <- file.path(opt$input, paste0("6_PCA/","PCA_1000G.eigenvec"))
-G_eigenvec_table<-read.table(PCA.file, header = T)
+maf.files <- list.files(maf.path, pattern = ".frq$", full.names = TRUE)
 
-####take reference file from the cluster
-G_pops<-read_excel('/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx')
+## Distribution of MAF across all SNPs with sufficient call rate 
+maf.dat.list <- lapply(maf.files, fread, data.table=FALSE)
+maf.dat.list <- lapply(maf.dat.list, function(x){x[,c("CHR", "SNP", "MAF")]})
+maf.dat.list <- lapply(maf.dat.list, function(df){mutate_at(df, .vars = c("CHR"), as.character)})
+maf.dat.list <- lapply(maf.dat.list, function(df){mutate_at(df, .vars = c("MAF"), as.numeric)})
+maf.dat <- bind_rows(maf.dat.list)
+rm(maf.dat.list)
 
-##preparing data
-colnames(G_eigenvec_table)<-c('FID','Sample ID',paste("PC",1:20))
-G_eigenvec<-left_join(G_eigenvec_table,G_pops, by='Sample ID')
-levels(G_eigenvec$Population)<-c(levels(G_eigenvec$Population),"Cohort")
-G_eigenvec$Population[is.na(G_eigenvec$Population)] <- "Cohort"    
-levels(G_eigenvec$superpop)<-c(levels(G_eigenvec$superpop),"Cohort") 
-G_eigenvec$superpop[is.na(G_eigenvec$superpop)] <- "Cohort"
 
-#### second PCA Plot ####
-eurtable<-G_eigenvec[(G_eigenvec$Population=="TSI") | 
-                   (G_eigenvec$Population=="FIN") |
-                   (G_eigenvec$Population== "GBR") | 
-                   (G_eigenvec$Population== "IBS") |
-                   (G_eigenvec$Population=="CEU") | 
-                   ( G_eigenvec$Population== "Cohort"),c(1,2,3,4,28)]
+## Define levels in CHR to plot them in numerical order
+maf.dat$CHR <- factor(maf.dat$CHR, levels= c(1:22, 25))
 
-pc2filt<-G_eigenvec[(G_eigenvec$Population=="TSI") | 
-                      (G_eigenvec$Population=="FIN") |
-                      (G_eigenvec$Population== "GBR") | 
-                      (G_eigenvec$Population== "IBS") |
-                      (G_eigenvec$Population=="CEU"),c(1,2,3,4,28)]
-##PCA European population definitions
-pc1min<-min(pc2filt[,3])-3*abs(sd(pc2filt[,3]))
-pc1max<-max(pc2filt[,3])+3*abs(sd(pc2filt[,3]))
-pc2min<-min(pc2filt[,4])-3*abs(sd(pc2filt[,4]))
-pc2max<-max(pc2filt[,4])+3*abs(sd(pc2filt[,4]))
-
-##PCA 1000G scale limits
-xlimmin<-min(G_eigenvec[,3])
-xlimmax<-max(G_eigenvec[,3])
-ylimmin<-min(G_eigenvec[,4])
-ylimmax<-max(G_eigenvec[,4])
-
-sample.list<-G_eigenvec[(G_eigenvec$`PC 1`< pc1max) &
-                          (G_eigenvec$`PC 1`> pc1min) &
-                          (G_eigenvec$Population=="Cohort") &
-                          (G_eigenvec$`PC 2`< pc2max) &
-                          (G_eigenvec$`PC 2`> pc2min),c(1,2)]
-
-sample.list.file <- file.path(opt$input, paste0("6_PCA/","Sample.list"))
-write.table(sample.list,sample.list.file, row.names = F, quote=F)
-
-##plotting
-pops.plot<- ggplot(G_eigenvec,aes(x=G_eigenvec$`PC 1`, y=G_eigenvec$`PC 2`))+
-  geom_point(aes(colour=Population, shape=Population),alpha=0.6,size=2)+
+maf.dist.plot.chr <- ggplot(maf.dat, aes(x=MAF))+
+  stat_density(aes(color= CHR), position= "identity", geom= "line")+
+  ggtitle("MAF distribution per chromosome")+
+  scale_color_manual(labels=names(chr.labels), values=rainbow(23))+
   theme_bw()+
-  scale_colour_manual(values=c(viridis(8),"brown",rainbow(18))) +
-  scale_shape_manual(values=c(rep(16,8),17,rep(16,18)))+
-  xlab("PC 1")+
-  ylab("PC 2")+
-  ggtitle("1000G Populations")+
-  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(breaks = c(seq(-0.04,0.04, 0.005)))
+  theme(text=element_text(size=10, family="Helvetica"))
 
-##aesthetics
-ELcolor<-c("chartreuse3",  "plum3", "brown",  "cyan1", "blue", "darkgreen")
-included<-nrow(sample.list)
-
-superpops.plot<-ggplot(G_eigenvec,aes(x=G_eigenvec$`PC 1`, y=G_eigenvec$`PC 2`))+
-  geom_point(aes(colour=superpop, shape=superpop),alpha=0.6, size=2)+
+maf.dist.plot.all <- ggplot(maf.dat, aes(x=MAF))+
+  stat_density(color="black",  position= "identity", geom= "line")+
+  ggtitle("MAF distribution")+
   theme_bw()+
-  scale_colour_manual(values=ELcolor)+
-  scale_shape_manual(values=c(rep(16,2),17,rep(16,3)))+
-  xlab("PC 1")+ylab("PC 2")+
-  ggtitle("1000G Superpopulations")+
-  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))
+  theme(text=element_text(size=10, family="Helvetica"))
 
-eurpops.plot<-ggplot(eurtable,aes(x=eurtable$`PC 1`, y=eurtable$`PC 2`))+
-  coord_cartesian(xlim = c(xlimmin,xlimmax), ylim = c(ylimmin,ylimmax))+
-  geom_rect(aes(xmin = pc1min, ymin = pc2min,
-                xmax= pc1max,ymax = pc2max ),fill="khaki1", alpha=0.01, linetype=2)+
-  geom_point(aes(colour=Population, shape=Population),alpha=0.6,size=2)+
-  theme_bw()+
-  scale_colour_manual(values=ELcolor[c(1,3,2,4,5,6)])+
-  scale_shape_manual(values=c(16,17,rep(16,4)))+
-  xlab("PC 1")+ylab("PC 2")+
-  ggtitle("1000G European populations")+
-  theme(text=element_text(size=10, family = 'Helvetica'),plot.title = element_text(hjust = 0.5))
-
-
-### saving out plots. 
-combine.plot.title <- paste0("PCA analysys with 1000G", "\n", opt$name, " ", date())
-PCA.plot.file <- file.path(output, "07_PCA.1000G.plot.tiff")
-plot.conclude<-paste0(included,"\n","European samples")
-#plotting
-tiff(PCA.plot.file,  width = 2000, height = 4000, 
-     units = "px", res = 300, compression = "lzw")
-grid.arrange(superpops.plot,
-             pops.plot, 
-             eurpops.plot,
-             top=combine.plot.title,
-             bottom=plot.conclude,
-             ncol=1)
+### printing out the maf.hw distributions
+maf.title <- paste0("MAF distribution After PCA","\n", 
+                    opt$name, " ", date())
+maf.final.tiff.file <- file.path(opt$out, "10_final.maf.distributions.tiff")
+tiff(maf.final.tiff.file, width = 2500, height = 1500, units = "px", res = 300, compression = "lzw")
+grid.arrange(maf.dist.plot.chr, maf.dist.plot.all, 
+             ncol=2, top=maf.title)
 dev.off()
 
 
-
-############################################################
+############################END################################
 cat("\n[INFO]\t Finished plotting QC report")
 
 ####Done
