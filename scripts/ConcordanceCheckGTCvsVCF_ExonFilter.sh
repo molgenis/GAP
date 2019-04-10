@@ -114,7 +114,7 @@ do
     ## chech for duplo NGS vcf files.
     #################
 
-    if [ -e "${ngsVcfDir}/archive/"*"${dnaNo}"* ]
+    if [[ -e "${ngsVcfDir}/archive/"[0-9]*_[0-9]*_*"${dnaNo}"* ]]
     then
         echo "NGS sample duplo with DNAno:${dnaNo}, concordance is already calculated"
         mv "${vcfFile}" "${ngsVcfDir}/archive"
