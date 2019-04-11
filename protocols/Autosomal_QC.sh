@@ -7,7 +7,7 @@
 #string plinkVersion
 #string gapVersion
 #string output80
-#string output95
+#string CR_high
 #string outputMH
 #string PCA
 #string ref1000G
@@ -16,7 +16,13 @@
 #string MAFref
 #string logsDir
 #string intermediateDir
-#string samplesheet 
+#string samplesheet
+#X_QCDir
+#X_output80
+#X_CR_high
+#X_outputMH
+#X_repout
+
 
 module load "${plinkVersion}"
 module load "${RPlusVersion}"
@@ -223,11 +229,7 @@ for chr in {1..22} "XY"
 ############################--------X chromosome QC and sex check--------##############################
 ###path variables
 
-X_QCDir="${AutosomeQCDir}/X_QC_sexcheck" 
-X_output80="${X_QCDir}/1_CR80" 
-X_CR_high="${X_QCDir}/2_CR_high"
-X_outputMH="${X_QCDir}/3_MAF_HWE"
-X_repout="${X_QCDir}/plots"
+
 
 
 ###Make working directories
