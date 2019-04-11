@@ -19,6 +19,7 @@ pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
 MAFref,/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt
 ref1000G,/apps/data/1000G/phase3
 pops1000G,/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx
+gonlref,/groups/umcg-aad/tmp04/umcg-elopera/thgref
 
 #paths
 root,/
@@ -49,11 +50,16 @@ pennCNVInputDir,${resultDir}/PennCNV/inputfiles/
 pennCNVDir,${resultDir}/PennCNV/
 CallrateDir,${intermediateDir}/Callrate/
 genSampleDir,${resultDir}/gensamplefiles
-AutosomeQCDir,${resultDir}/AutosomeQC
+AutosomeQCDir,${resultDir}/GeneralQC
 output80,${AutosomeQCDir}/1_CR80
-output95,${AutosomeQCDir}/2_CR95
+CR_high,${AutosomeQCDir}/2_CR_high
 outputMH,${AutosomeQCDir}/3_MAF_HWE
 Het,${AutosomeQCDir}/4_Het
 Relatedness,${AutosomeQCDir}/5_Relatedness
 repout,${AutosomeQCDir}/plots
 PCA,${AutosomeQCDir}/6_PCA
+X_QCDir,${AutosomeQCDir}/X_QC_sexcheck
+X_output80,${X_QCDir}/1_CR80
+X_CR_high,${X_QCDir}/2_CR_high
+X_outputMH,${X_QCDir}/3_MAF_HWE
+X_repout=,{X_QCDir}/plots
