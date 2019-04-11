@@ -52,7 +52,10 @@ if (is.null(opt$out)){opt$out<-opt$input}
 
 ################### Main ###########################################################
 
-autosomal<-c(1:22,"XY")
+if(opt$input %like% "X_"){
+  autosomal<-"X"
+  } else {autosomal<-c(1:22,'XY')}
+
 
 for (chr in autosomal)
 {
