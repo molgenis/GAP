@@ -17,11 +17,11 @@
 #string logsDir
 #string intermediateDir
 #string samplesheet
-#X_QCDir
-#X_output80
-#X_CR_high
-#X_outputMH
-#X_repout
+#string X_QCDir
+#string X_output80
+#string X_CR_high
+#string X_outputMH
+#string X_repout
 
 
 module load "${plinkVersion}"
