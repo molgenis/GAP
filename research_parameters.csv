@@ -62,4 +62,4 @@ X_QCDir,${AutosomeQCDir}/X_QC_sexcheck
 X_output80,${X_QCDir}/1_CR80
 X_CR_high,${X_QCDir}/2_CR_high
 X_outputMH,${X_QCDir}/3_MAF_HWE
-X_repout=,{X_QCDir}/plots
+X_repout,${X_QCDir}/plots
