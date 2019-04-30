@@ -12,7 +12,7 @@ set -e
 set -u
 
 
-PARSED_OPTIONS=$(getopt -n "$0"  -o t:p:a:d:s --long "tmpDir:prmDir:archiveTime:dataManager:sourceServer"  -- "$@")
+PARSED_OPTIONS=$(getopt -n "$0"  -o t:p:a:d:s: --long "tmpDir:prmDir:archiveTime:dataManager:sourceServer:"  -- "$@")
 
 #
 # Bad arguments, something has gone wrong with the getopt command.
