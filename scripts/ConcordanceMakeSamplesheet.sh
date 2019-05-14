@@ -209,7 +209,8 @@ do
 
 done
 
-
+trap - EXIT
+exit 0
 
 
 

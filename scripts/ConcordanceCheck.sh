@@ -3,7 +3,7 @@
 set -e
 set -u
 
-# onder de NGS_automated uitgevoerd door de umcg-gd-ateambot
+# executed by the umcg-gd-ateambot, part of the NGS_Automated.
 
 if [[ "${BASH_VERSINFO}" -lt 4 || "${BASH_VERSINFO[0]}" -lt 4 ]]
 then
@@ -13,7 +13,6 @@ fi
 
 
 # Env vars.
-## for the LIB_DIR and CFG_DIR be aware of the automated directory in between, this is nog in the NGS_Automated the case.
 export TMPDIR="${TMPDIR:-/tmp}" # Default to /tmp if $TMPDIR was not defined.
 SCRIPT_NAME="$(basename ${0})"
 SCRIPT_NAME="${SCRIPT_NAME%.*sh}"
@@ -23,7 +22,6 @@ CFG_DIR="${INSTALLATION_DIR}/automated/etc"
 HOSTNAME_SHORT="$(hostname -s)"
 ROLE_USER="$(whoami)"
 REAL_USER="$(logname 2>/dev/null || echo 'no login name')"
-
 
 
 #
@@ -46,7 +44,9 @@ function showHelp() {
         #
         cat <<EOH
 ======================================================================================================================
-Script to start NGS_Demultiplexing automagicly when sequencer is finished, and corresponding samplesheet is available.
+Scripts to calculate automatically concordance between ngs and array data.
+ngs.vcf should be in /groups/${NGSGROUP}/${TMP_LFS}/Concordance/ngs/.
+array.vcf should be in /groups/${ARRAYGROUP}/${TMP_LFS}/Concordance/array/.
 
 Usage:
 
@@ -117,7 +117,7 @@ done
 #
 if [[ -z "${NGSGROUP:-}" ]]
 then
-        log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' 'Must specify an ngs-group with -g. For the ngs.vcf files'
+        log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' 'Must specify a ngs-group with -g. For the ngs.vcf files'
 fi
 
 if [[ -z "${ARRAYGROUP:-}" ]]
@@ -160,41 +160,43 @@ then
         log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "This script must be executed by user ${ATEAMBOTUSER}, but you are ${ROLE_USER} (${REAL_USER})."
 fi
 
-#
-##       This script will match the ngs.vcf with the array.vcf, and will make a small sample sheet.
-###      This samplesheet is the input for the actual concordance check.
-##      
-# 
 
-module load HTSlib
+module load HTSlib/1.3.2-foss-2015b
 module load CompareGenotypeCalls/1.8.1-Java-1.8.0_74
-module load BEDTools
+module load BEDTools/2.25.0-foss-2015b
 module list
 
-ngsVcfDir="/groups/${NGSGROUP}/${TMP_LFS}/Concordance/ngs/"
+
 concordanceDir="/groups/${NGSGROUP}/${TMP_LFS}/Concordance/"
+ngsVcfDir="${concordanceDir}/ngs/"
 arrayVcfDir="/groups/${ARRAYGROUP}/${TMP_LFS}/Concordance/array/"
 
 
-for sampleSheet in $(ls "${concordanceDir}/samplesheets/"*"sampleId.txt")
+for sampleSheet in $(find "${concordanceDir}/samplesheets/" -type f -iname "*sampleId.txt")
 do
-
+    echo "______________________________________________________________________________" ## remove when script is finished
     concordanceCheckId=$(basename "${sampleSheet}" .sampleId.txt)
     arrayId=$(sed 1d "${sampleSheet}" | awk 'BEGIN {FS="\t"}{print $1}')
     arrayVcf=$(echo "${arrayId}.FINAL.vcf")
     ngsId=$(sed 1d "${sampleSheet}" | awk 'BEGIN {FS="\t"}{print $2}')
     ngsVcf=$(echo "${ngsId}.final.vcf")
     
+    if [[ -f "${arrayVcfDir}/archive/${arrayVcf}" ]]
+    then
+        mv "${arrayVcfDir}/archive/${arrayVcf}" "${arrayVcfDir}"
+        log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "array file ${arrayVcf} is already been used a Concordance check with another ngs vcf file"
+    fi
+    
     bedType="$(grep -m 1 -o -P 'intervals=\[[^\]]*.bed\]' "${ngsVcfDir}/${ngsVcf}" | cut -d [ -f2 | cut -d ] -f1)"
-    echo "bedType: ${bedType}"
     bedDir="$(dirname ${bedType})"
-    echo "bedDir: ${bedDir}"
     bedFile="${bedDir}/captured.merged.bed"
-    echo "${bedFile}"
 
     mkdir -p "${concordanceDir}/temp/${concordanceCheckId}/"
-    echo "${concordanceCheckId}"
-    
+
+    log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Calculating concordance over ${ngsVcf} compared to ${arrayVcf}"
+    log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Using ${bedFile} to intersect the array vcf file"
+    log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "Output file name: ${concordanceCheckId}"
+
     ##remove indel-calls from ngs-vcf
     grep '^#' "${ngsVcfDir}/${ngsVcf}" > "${concordanceDir}/temp/${concordanceCheckId}/${ngsId}.FINAL.vcf"
     grep -v '^#' "${ngsVcfDir}/${ngsVcf}" | awk '{if (length($4)<2 && length($5)<2 ){print $0}}' >> "${concordanceDir}/temp/${concordanceCheckId}/${ngsId}.FINAL.vcf"
@@ -224,4 +226,6 @@ do
 
 done
 
+trap - EXIT
+exit 0
 
