@@ -173,7 +173,7 @@ concordanceDir="/groups/${NGSGROUP}/${TMP_LFS}/Concordance/"
 ngsVcfDir="${concordanceDir}/ngs/"
 arrayVcfDir="/groups/${ARRAYGROUP}/${TMP_LFS}/Concordance/array/"
 
-for vcfFile in $(find "${ngsVcfDir}" -type f -iname *"final.vcf")
+for vcfFile in $(find "${ngsVcfDir}" -type f -iname "*final.vcf")
 do
     echo "_____________________________________________________________" ##Can be removed later, more easy to see when a new sample is processed
     log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "processing ngs-vcf ${vcfFile}"
