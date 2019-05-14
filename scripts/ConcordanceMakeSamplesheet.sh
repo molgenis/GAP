@@ -3,7 +3,8 @@
 set -e
 set -u
 
-# onder de NGS_automated uitgevoerd door de umcg-gd-ateambot
+# executed by the umcg-gd-ateambot, part of the NGS_Automated.
+
 
 if [[ "${BASH_VERSINFO}" -lt 4 || "${BASH_VERSINFO[0]}" -lt 4 ]]
 then
@@ -13,7 +14,6 @@ fi
 
 
 # Env vars.
-## for the LIB_DIR and CFG_DIR be aware of the automated directory in between, this is nog in the NGS_Automated the case.
 export TMPDIR="${TMPDIR:-/tmp}" # Default to /tmp if $TMPDIR was not defined.
 SCRIPT_NAME="$(basename ${0})"
 SCRIPT_NAME="${SCRIPT_NAME%.*sh}"
@@ -46,7 +46,10 @@ function showHelp() {
         #
         cat <<EOH
 ======================================================================================================================
-Script to start NGS_Demultiplexing automagicly when sequencer is finished, and corresponding samplesheet is available.
+Scripts to make automatically a samplesheet for the concordance check between ngs and array data.
+ngs.vcf should be in /groups/${NGSGROUP}/${TMP_LFS}/Concordance/ngs/.
+array.vcf should be in /groups/${ARRAYGROUP}/${TMP_LFS}/Concordance/array/.
+
 
 Usage:
 
@@ -117,7 +120,7 @@ done
 #
 if [[ -z "${NGSGROUP:-}" ]]
 then
-        log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' 'Must specify an ngs-group with -g. For the ngs.vcf files'
+        log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' 'Must specify a ngs-group with -g. For the ngs.vcf files'
 fi
 
 if [[ -z "${ARRAYGROUP:-}" ]]
@@ -160,26 +163,22 @@ then
         log4Bash 'FATAL' "${LINENO}" "${FUNCNAME:-main}" '1' "This script must be executed by user ${ATEAMBOTUSER}, but you are ${ROLE_USER} (${REAL_USER})."
 fi
 
-#
-##       This script will match the ngs.vcf with the array.vcf, and will make a small sample sheet.
-###      This samplesheet is the input for the actual concordance check.
-##      
-# 
 
-module load HTSlib
-module load BEDTools
+module load HTSlib/1.3.2-foss-2015b
+module load BEDTools/2.25.0-foss-2015b
 module list
 
-ngsVcfDir="/groups/${NGSGROUP}/${TMP_LFS}/Concordance/ngs/"
+
 concordanceDir="/groups/${NGSGROUP}/${TMP_LFS}/Concordance/"
+ngsVcfDir="${concordanceDir}/ngs/"
 arrayVcfDir="/groups/${ARRAYGROUP}/${TMP_LFS}/Concordance/array/"
 
-for vcfFile in $(ls "${ngsVcfDir}"*"final.vcf")
+for vcfFile in $(find "${ngsVcfDir}" -type f -iname *"final.vcf")
 do
     echo "_____________________________________________________________" ##Can be removed later, more easy to see when a new sample is processed
     log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "processing ngs-vcf ${vcfFile}"
     ngsVcfId=$(basename "${vcfFile}" .final.vcf)
-    ngsBarcode=$(grep "##FastQ_Barcode=" "${vcfFile}" | awk 'BEGIN {FS="="}{OFS="_"} {print _,$2}')
+    ngsBarcode=$(grep "##FastQ_Barcode=" "${vcfFile}" | awk 'BEGIN {FS="="}{OFS="_"} {print _,$2}') ## test file without barcode 
     ngsInfo=$(echo "${ngsVcfId}" | awk 'BEGIN {FS="_"}{OFS="_"}{print $3,$4,$5}')
     ngsInfoList=$(echo "${ngsInfo}${ngsBarcode}")
     dnaNo=$(echo "${ngsVcfId}" | awk 'BEGIN {FS="_"}{print substr($3,4)}')
@@ -190,7 +189,7 @@ do
 
     if [[ -z "${checkArrayVcf}" ]]
     then
-        log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "there is not (jet) an array vcf file precent for ${ngsVcfId}"
+        log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "there is not (yet) an array vcf file precent for ${ngsVcfId}"
         continue
     else
         arrayFile=$(ls -1 "${arrayVcfDir}/DNA-${dnaNo}_"*".FINAL.vcf")
@@ -205,8 +204,7 @@ do
         log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "the concordance between ${arrayInfoList} ${ngsInfoList} is being calculated"
         continue
     else
-        touch "${concordanceDir}/samplesheets/${arrayInfoList}_${ngsInfoList}.sampleId.txt"
-        echo -e "data1Id\tdata2Id\n${arrayId}\t${ngsVcfId}" >> "${concordanceDir}/samplesheets/${arrayInfoList}_${ngsInfoList}.sampleId.txt"
+        echo -e "data1Id\tdata2Id\n${arrayId}\t${ngsVcfId}" > "${concordanceDir}/samplesheets/${arrayInfoList}_${ngsInfoList}.sampleId.txt"
     fi 
 
 done
