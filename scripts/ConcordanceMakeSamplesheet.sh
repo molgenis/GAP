@@ -178,7 +178,7 @@ do
     echo "_____________________________________________________________" ##Can be removed later, more easy to see when a new sample is processed
     log4Bash 'DEBUG' "${LINENO}" "${FUNCNAME:-main}" '0' "processing ngs-vcf ${vcfFile}"
     ngsVcfId=$(basename "${vcfFile}" .final.vcf)
-    ngsBarcode=$(grep "##FastQ_Barcode=" "${vcfFile}" | awk 'BEGIN {FS="="}{OFS="_"} {print _,$2}') ## test file without barcode 
+    ngsBarcode=$(grep "##FastQ_Barcode=" "${vcfFile}" | awk 'BEGIN {FS="="}{OFS="_"} {print _,$2}')
     ngsInfo=$(echo "${ngsVcfId}" | awk 'BEGIN {FS="_"}{OFS="_"}{print $3,$4,$5}')
     ngsInfoList=$(echo "${ngsInfo}${ngsBarcode}")
     dnaNo=$(echo "${ngsVcfId}" | awk 'BEGIN {FS="_"}{print substr($3,4)}')
