@@ -19,7 +19,6 @@ Usage:
 Options:
 	-h   Show this help.
 	-a   sampleType (default=GAP)
-	-l   pipeline (default=diagnostics)
 	-p   project
 	-g   group (default=basename of ../../../ )
 	-f   filePrefix (default=basename of this directory)
@@ -34,9 +33,9 @@ EOH
 	exit 0
 }
 
-while getopts "t:g:w:f:r:l:h:x:" opt;
+while getopts "t:g:w:f:r:h:x:" opt;
 do
-	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; l)pipeline="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
+	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
 	esac
 done
 
@@ -45,10 +44,24 @@ if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../ && pwd )) ; fi ; 
 if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi ; echo "workDir=${workDir}"
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
 if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
-if [[ -z "${pipeline:-}" ]]; then pipeline="diagnostics" ; fi ; echo "pipeline=${pipeline}"
 if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
 genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
+
+### Which pipeline to run
+samplesHeetColumnNames=()
+sampleSheetColumnOffsets=()
+IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${_samplesheet}"))
+for (( _offset = 0 ; _offset < ${#sampleSheetColumnNames[@]:-0} ; _offset++ ))
+do
+	_sampleSheetColumnOffsets["${sampleSheetColumnNames[${_offset}]}"]="${_offset}"
+done
+if [[ ! -z "${sampleSheetColumnOffsets['pipeline']+isset}" ]]; then
+	pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
+	IFS=$'\n' pipeline=($(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex} | head -1))
+else
+	pipeline="diagnostics"
+fi
 
 host=$(hostname -s)
 echo "${host}"
