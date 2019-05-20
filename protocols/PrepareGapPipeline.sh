@@ -13,6 +13,7 @@
 #string runID
 #string logsDir
 #string perlVersion
+#string group
 
 umask 0007
 
@@ -72,10 +73,12 @@ cp "${genScripts}/${Project}.csv" "${resultDir}/${Project}.csv"
 cd "${rocketPoint}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${rocketPoint}/parameters_group_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${rocketPoint}/parameters_converted.csv"
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
+-p "${genScripts}/parameters_group_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${genScripts}/${Project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
