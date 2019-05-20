@@ -49,7 +49,7 @@ genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 ### Which pipeline to run
-samplesHeetColumnNames=()
+sampleSheetColumnNames=()
 sampleSheetColumnOffsets=()
 IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${_samplesheet}"))
 for (( _offset = 0 ; _offset < ${#sampleSheetColumnNames[@]:-0} ; _offset++ ))
