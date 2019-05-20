@@ -76,10 +76,12 @@ mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/jobs/"
 #samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${genScripts}/parameters_group_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${genScripts}/parameters_converted.csv"
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
+-p "${genScripts}/parameters_group_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${samplesheet}" \
 -w "${EBROOTGAP}/Prepare_${pipeline}_workflow.csv" \
