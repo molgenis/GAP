@@ -14,7 +14,7 @@ fastaFile, /apps/data/1000G/phase1/human_g1k_v37_phiX.fasta
 #paths
 root,/
 appsDir,${root}/apps/
-workDir,/groups/umcg-gap/
+workDir,/groups/${group}/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}/${runid}/
@@ -28,7 +28,7 @@ IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
 GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
-ateambotUser,umcg-gap-ateambot
+ateambotUser,umcg-${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 vcfDir,${resultDir}/VCF/
