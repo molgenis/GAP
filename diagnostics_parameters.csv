@@ -28,7 +28,7 @@ IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
 GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
-ateambotUser,umcg-${group}-ateambot
+ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 vcfDir,${resultDir}/VCF/
