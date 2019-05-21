@@ -8,7 +8,6 @@
 #string intermediateDir
 #string bpmFile
 #string projectRawTmpDataDir
-#string gapVersion
 #list Sample_ID
 #list SentrixBarcode_A
 #list SentrixPosition_A
@@ -34,7 +33,6 @@ array_contains () {
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
-module load "${gapVersion}"
 module list
 
 set -e

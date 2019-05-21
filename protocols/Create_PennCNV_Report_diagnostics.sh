@@ -4,7 +4,6 @@
 
 #string pythonVersion
 #string beadArrayVersion
-#string gapVersion
 #string bpmFile
 #string projectRawTmpDataDir
 #string intermediateDir
@@ -24,7 +23,6 @@ set -u
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
-module load "${gapVersion}"
 module list
 
 
