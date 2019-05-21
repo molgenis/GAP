@@ -8,7 +8,6 @@
 #string projectJobsDir
 #string projectRawTmpDataDir
 #string genScripts
-#string gapVersion
 #string pipeline
 #string runID
 #string logsDir
@@ -18,7 +17,6 @@
 umask 0007
 
 module load ${computeVersion}
-module load ${gapVersion}
 module list
 
 
