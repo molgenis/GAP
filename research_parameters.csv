@@ -24,7 +24,7 @@ gonlref,/groups/umcg-aad/tmp04/umcg-elopera/thgref
 #paths
 root,/
 appsDir,${root}/apps/
-workDir,/groups/umcg-gap/
+workDir,/groups/${group}/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}/${runid}/
@@ -38,7 +38,7 @@ IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
 GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
-ateambotUser,umcg-gap-ateambot
+ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 arrayFinalReport,${intermediateDir}/${Project}_${SentrixBarcode_A}_finalreport.txt
