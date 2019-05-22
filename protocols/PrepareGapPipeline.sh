@@ -13,6 +13,7 @@
 #string logsDir
 #string perlVersion
 #string group
+#string gapVersion
 
 umask 0007
 
@@ -85,11 +86,12 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
--o "runID=${runID}" \
 -b slurm \
 -g \
 -weave \
--runid "${runID}"
+-runid "${runID}" \
+-o "gapVersion=${gapVersion};\
+runID=${runID}" 
 
  sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
 

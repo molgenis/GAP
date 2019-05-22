@@ -17,12 +17,14 @@
 #list SentrixPosition_A
 #string PennCNV_reportDir
 #list Sample_ID
+#string gapVersion
 
 set -e
 set -u
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
+module load "${gapVersion}"
 module list
 
 
