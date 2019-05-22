@@ -91,6 +91,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -o "outputdir=scripts/jobs;\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
+gapVersion=$(module list | grep -o -P 'GAP(.+)')\
 Project=${filePrefix};\
 pipeline=${pipeline};\
 runID=${runID};\
