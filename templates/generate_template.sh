@@ -1,6 +1,5 @@
 #!/bin/bash
 
-module load Molgenis-Compute/v17.08.1-Java-1.8.0_74
 module list
 
 host=$(hostname -s)
@@ -91,7 +90,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -o "outputdir=scripts/jobs;\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
-gapVersion=$(module list | grep -o -P 'GAP(.+)')\
+gapVersion=$(module list | grep -o -P 'GAP(.+)');\
 Project=${filePrefix};\
 pipeline=${pipeline};\
 runID=${runID};\

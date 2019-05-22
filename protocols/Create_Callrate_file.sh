@@ -16,6 +16,7 @@
 #string resultDir
 #string pipeline
 #string CallrateDir
+#string gapVersion
 
 #Function to check if array contains value
 array_contains () {
@@ -33,6 +34,7 @@ array_contains () {
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
+module load "${gapVersion}"
 module list
 
 set -e
