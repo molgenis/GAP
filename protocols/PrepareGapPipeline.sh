@@ -82,7 +82,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/${Project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOTGAP}/${pipeline}_workflow.csv" \
+-w "${EBROOTGAP}/workflow_${pipeline}.csv" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
