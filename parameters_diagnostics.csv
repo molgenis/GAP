@@ -29,7 +29,6 @@ IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
-concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 vcfDir,${resultDir}/VCF/
 PennCNV_reportDir,${intermediateDir}/PennCNV_reports/
 CallrateDir,${intermediateDir}/Callrate/
