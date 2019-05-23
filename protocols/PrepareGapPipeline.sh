@@ -8,16 +8,16 @@
 #string projectJobsDir
 #string projectRawTmpDataDir
 #string genScripts
-#string gapVersion
 #string pipeline
 #string runID
 #string logsDir
 #string perlVersion
+#string group
+#string gapVersion
 
 umask 0007
 
 module load ${computeVersion}
-module load ${gapVersion}
 module list
 
 
@@ -72,23 +72,26 @@ cp "${genScripts}/${Project}.csv" "${resultDir}/${Project}.csv"
 cd "${rocketPoint}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
-perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/${pipeline}_parameters.csv" > "${rocketPoint}/parameters_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${rocketPoint}/parameters_group_converted.csv"
+perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${pipeline}.csv" > "${rocketPoint}/parameters_converted.csv"
 
 sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
+-p "${genScripts}/parameters_group_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
 -p "${genScripts}/${Project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOTGAP}/${pipeline}_workflow.csv" \
+-w "${EBROOTGAP}/workflow_${pipeline}.csv" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
--o "runID=${runID}" \
 -b slurm \
 -g \
 -weave \
--runid "${runID}"
+-runid "${runID}" \
+-o "gapVersion=${gapVersion};\
+runID=${runID}" 
 
  sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
 

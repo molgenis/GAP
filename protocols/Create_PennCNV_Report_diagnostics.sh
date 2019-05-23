@@ -4,7 +4,6 @@
 
 #string pythonVersion
 #string beadArrayVersion
-#string gapVersion
 #string bpmFile
 #string projectRawTmpDataDir
 #string intermediateDir
@@ -18,6 +17,7 @@
 #list SentrixPosition_A
 #string PennCNV_reportDir
 #list Sample_ID
+#string gapVersion
 
 set -e
 set -u

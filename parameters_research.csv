@@ -3,7 +3,6 @@ pythonVersion,Python/2.7.11-foss-2015b
 perlVersion,Perl/5.22.0-foss-2015b-bare
 beadArrayVersion,BeadArrayFiles/1.3.1-foss-2015b-Python-2.7.11
 computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
-gapVersion,GAP/v2.2.0
 pennCNVVersion,PennCNV/1.0.4-foss-2015b
 optiCallVersion,opticall/0.7.0-foss-2015b
 RPlusVersion,RPlus/3.4.4-foss-2015b-v19.01.1
@@ -24,7 +23,7 @@ gonlref,/groups/umcg-aad/tmp04/umcg-elopera/thgref
 #paths
 root,/
 appsDir,${root}/apps/
-workDir,/groups/umcg-gap/
+workDir,/groups/${group}/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
 intermediateDir,${tmpTmpdir}/${Project}/${runid}/
@@ -38,7 +37,7 @@ IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
 GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
-ateambotUser,umcg-gap-ateambot
+ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 arrayFinalReport,${intermediateDir}/${Project}_${SentrixBarcode_A}_finalreport.txt

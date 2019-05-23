@@ -8,7 +8,6 @@
 #string intermediateDir
 #string bpmFile
 #string projectRawTmpDataDir
-#string gapVersion
 #list Sample_ID
 #list SentrixBarcode_A
 #list SentrixPosition_A
@@ -17,6 +16,7 @@
 #string resultDir
 #string pipeline
 #string CallrateDir
+#string gapVersion
 
 #Function to check if array contains value
 array_contains () {
