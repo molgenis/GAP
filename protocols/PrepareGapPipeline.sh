@@ -36,7 +36,7 @@ cd "${projectRawTmpDataDir}"
 
 max_index=${#SentrixPosition_A[@]}-1
 
-if [ ${pipeline} == 'diagnostics' ] 
+if [ "${pipeline}" == 'diagnostics' ] 
 then
     for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
     do
@@ -49,7 +49,7 @@ then
 else
     for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
     do
-        mkdir -p ${SentrixBarcode_A[samplenumber]}
+        mkdir -p "${SentrixBarcode_A[samplenumber]}"
         ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
             "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
 
@@ -93,9 +93,9 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 
 sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
 
-if [ ${pipeline} == 'research' ] && [ $sampleSize -gt 1000 ]
+if [ "${pipeline}" == 'research' ] && [ "${sampleSize}" -gt 1000 ]
 then
-	echo "Samplesize is ${sampleSize}"
-	ml "${perlVersion}"
-	perl ${EBROOTGAP}/scripts/RemoveDuplicatesCompute.pl "${projectJobsDir}/"*"_mergeFinalReports_0.sh"
+    echo "Samplesize is ${sampleSize}"
+    ml "${perlVersion}"
+    perl ${EBROOTGAP}/scripts/RemoveDuplicatesCompute.pl "${projectJobsDir}/"*"_mergeFinalReports_0.sh"
  fi
