@@ -62,7 +62,7 @@ then
     pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
     IFS=$'\n' pipeline=($(tail -n +2 "${samplesheet}" | cut -d "," -f "${pipelineFieldIndex}" | head -1 ))
 else
-    pipeline="diagnostics"
+    echo "ERROR: pipeline is missing from the samplesheet, please enter a pipeline type in the samplesheet."
 fi
 
 echo "pipeline: ${pipeline}"
