@@ -1,2 +1,2 @@
 group,umcg-gap
-concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
+concordanceInputDir,${resultDir}/Concordance/array/

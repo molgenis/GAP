@@ -1,2 +1,2 @@
 group,umcg-gsad
-concordanceInputDir,/groups/umcg-atd/${tmpName}/Concordance/array/
+concordanceInputDir,${resultDir}/Concordance/array/
