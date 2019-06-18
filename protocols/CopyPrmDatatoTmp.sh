@@ -25,7 +25,7 @@ INPUTREPORTS=()
 
 for file in ${SentrixBarcode_A[@]}
 do
-        array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("$file")    # If bamFile does not exist in array add it
+        array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("${file}")    # If GTC file does not exist in array add it
 done
 
 for i in ${INPUTREPORTS[@]}
@@ -35,7 +35,7 @@ do
 
 	if [ "${prmHost}" == "localhost" ]
         then
-                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
+                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \ 
                 "${GTC_DIR}" \
                 "${GTCtmpDataDir}"
 

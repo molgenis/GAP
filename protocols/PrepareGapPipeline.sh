@@ -1,6 +1,5 @@
 #MOLGENIS walltime=02:00:00 mem=4gb
 #list SentrixBarcode_A,SentrixPosition_A
-#string projectRawTmpDataDir
 #string intermediateDir
 #string resultDir
 #string computeVersion
@@ -14,6 +13,7 @@
 #string perlVersion
 #string group
 #string gapVersion
+#string workDir
 
 umask 0007
 
@@ -36,28 +36,26 @@ cd "${projectRawTmpDataDir}"
 
 max_index=${#SentrixPosition_A[@]}-1
 
-if [ ${pipeline} == 'diagnostics' ]
+if [ "${pipeline}" == 'diagnostics' ] 
 then
-for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
-do
-	ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
-	"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
+    for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
+    do
+        ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
+        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
 
-	ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
-	"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
-done
+        ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
+        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
+    done
 else
-
-for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
-do
-	mkdir -p ${SentrixBarcode_A[samplenumber]}
-	ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
-        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
+    for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
+    do
+        mkdir -p "${SentrixBarcode_A[samplenumber]}"
+        ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
+            "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
 
         ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
-        "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
-done
-
+            "${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
+    done
 fi
 
 #Copying samplesheet to project jobs,results folder
@@ -90,14 +88,14 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -g \
 -weave \
 -runid "${runID}" \
--o "gapVersion=${gapVersion};\
-runID=${runID}" 
+-o "gapVersion=${gapVersion}"
 
- sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
 
-if [ ${pipeline} == 'research' ] && [ $sampleSize -gt 1000 ]
+sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
+
+if [ "${pipeline}" == 'research' ] && [ "${sampleSize}" -gt 1000 ]
 then
-	echo "Samplesize is ${sampleSize}"
-	ml "${perlVersion}"
-	perl ${EBROOTGAP}/scripts/RemoveDuplicatesCompute.pl "${projectJobsDir}/"*"_mergeFinalReports_0.sh"
+    echo "Samplesize is ${sampleSize}"
+    ml "${perlVersion}"
+    perl ${EBROOTGAP}/scripts/RemoveDuplicatesCompute.pl "${projectJobsDir}/"*"_mergeFinalReports_0.sh"
  fi

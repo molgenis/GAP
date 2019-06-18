@@ -6,60 +6,66 @@ host=$(hostname -s)
 environmentParameters="parameters_${host}"
 
 function showHelp() {
-	#
-	# Display commandline help on STDOUT.
-	#
-	cat <<EOH
+    #
+    # Display commandline help on STDOUT.
+    #
+    cat <<EOH
 ===============================================================================================================
-Script to copy (sync) data from a succesfully finished analysis project from tmp to prm storage.
+Script to generate a pipeline template to process Global Screening Array projects.
 Usage:
-	$(basename $0) OPTIONS
+    $(basename $0) OPTIONS
 Options:
-	-h   Show this help.
-	-a   sampleType (default=GAP)
-	-p   project
-	-g   group (default=basename of ../../../ )
-	-f   filePrefix (default=basename of this directory)
-	-r   runID (default=run01)
-	-t   tmpDirectory (default=basename of ../../ )
-	-x   excludeGTCFiles
-	-w   workdir (default=/groups/\${group}/\${tmpDirectory})
+    -h   Show this help.
+    -p   project (default=basename of this directory)
+    -g   group (default=basename of ../../../ )
+    -f   filePrefix (default=basename of this directory)
+    -r   runID (default=run01)
+    -t   tmpDirectory (default=basename of ../../ )
+    -x   excludeGTCsFile ## waarom dit dit er in?
+    -w   workdir (default=/groups/\${group}/\${tmpDirectory})
 
 ===============================================================================================================
 EOH
-	trap - EXIT
-	exit 0
+    trap - EXIT
+    exit 0
 }
 
-while getopts "t:g:w:f:r:h:x:" opt;
+while getopts "t:g:w:f:p:r:x:h" opt;
 do
-	case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
-	esac
+    case $opt in h)showHelp;; t)tmpDirectory="${OPTARG}";; g)group="${OPTARG}";; w)workDir="${OPTARG}";; f)filePrefix="${OPTARG}";; p)project="${OPTARG}";; r)runID="${OPTARG}";; x)excludeGTCsFile="${OPTARG}";;
+    esac
 done
 
 if [[ -z "${tmpDirectory:-}" ]]; then tmpDirectory=$(basename $(cd ../../ && pwd )) ; fi ; echo "tmpDirectory=${tmpDirectory}"
 if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../ && pwd )) ; fi ; echo "group=${group}"
 if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi ; echo "workDir=${workDir}"
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
+if [[ -z "${project:-}" ]]; then project=$(basename $(pwd )) ; fi ; echo "project=${project}"
 if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
 if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
 genScripts="${workDir}/generatedscripts/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 ### Which pipeline to run
-sampleSheetColumnNames=()
-sampleSheetColumnOffsets=()
-IFS="${SAMPLESHEET_SEP}" sampleSheetColumnNames=($(head -1 "${_samplesheet}"))
-for (( _offset = 0 ; _offset < ${#sampleSheetColumnNames[@]:-0} ; _offset++ ))
+declare -a sampleSheetColumnNames=()
+declare -A sampleSheetColumnOffsets=()
+
+IFS="," sampleSheetColumnNames=($(head -1 "${samplesheet}"))
+
+for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 do
-	_sampleSheetColumnOffsets["${sampleSheetColumnNames[${_offset}]}"]="${_offset}"
+    sampleSheetColumnOffsets["${sampleSheetColumnNames[${offset}]}"]="${offset}"
 done
-if [[ ! -z "${sampleSheetColumnOffsets['pipeline']+isset}" ]]; then
-	pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
-	IFS=$'\n' pipeline=($(tail -n +2 "${sampleSheet}" | cut -d "${SAMPLESHEET_SEP}" -f ${pipelineFieldIndex} | head -1))
+
+if [[ ! -z "${sampleSheetColumnOffsets['pipeline']+isset}" ]]; 
+then
+    pipelineFieldIndex=$((${sampleSheetColumnOffsets['pipeline']} + 1))
+    IFS=$'\n' pipeline=($(tail -n +2 "${samplesheet}" | cut -d "," -f "${pipelineFieldIndex}" | head -1 ))
 else
-	pipeline="diagnostics"
+    echo "ERROR: The variable pipeline empty in the samplesheet. Please enter a valid value in the samplesheet."
 fi
+
+echo "pipeline: ${pipeline}"
 
 host=$(hostname -s)
 echo "${host}"
@@ -71,7 +77,6 @@ mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/jobs/"
 
-#samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${genScripts}/parameters_group_converted.csv"
@@ -91,7 +96,8 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
 gapVersion=$(module list | grep -o -P 'GAP(.+)');\
-Project=${filePrefix};\
+Project=${project};\
 pipeline=${pipeline};\
 runID=${runID};\
 excludeGTCsFile=${excludeGTCsFile:-};"
+
