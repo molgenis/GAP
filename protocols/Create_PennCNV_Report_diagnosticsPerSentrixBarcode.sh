@@ -33,7 +33,7 @@ mkdir -p "${PennCNV_reportDir}"
 makeTmpDir "${PennCNV_reportDir}"
 tmpPennCNV_reportDir="${MC_tmpFile}"
 
-python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${SentrixBarcode_A}"
+#python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${SentrixBarcode_A}"
 
 barcodelist=()
 
@@ -46,10 +46,12 @@ done
 
 for i in ${barcodelist[@]}
 do
-        echo "processing $i"
-        barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
-        echo "${barcodeCombined}"
-        echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
-        mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
+    python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnosticsPerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${i}"
+    
+    echo "processing $i"
+    barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $1}')
+    echo "${barcodeCombined}"
+    echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.txt ${PennCNV_reportDir}"
+    mv "${tmpPennCNV_reportDir}/${barcodeCombined}.txt" "${PennCNV_reportDir}" # maybe do mv to results dir?
 done
 
