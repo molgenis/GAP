@@ -5,10 +5,10 @@ import glob
 import argparse
 
 parser = argparse.ArgumentParser("Generate a final report from a directory of GTC files")
-parser.add_argument("manifest", help="BPM manifest file") #"/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm"
-parser.add_argument("gtc_directory", help="Directory containing GTC files per glass number") # "/groups/umcg-gsad//tmp04/projects//GSA-24+v1.0-MD_000617/run01/rawdata/array/"
-parser.add_argument("output_directory", help="Directory where output has to be written") #"/groups/umcg-gsad//tmp04//tmp//GSA-24+v1.0-MD_000617/run01//PennCNV_reports/"
-parser.add_argument("Sample_ID", help="Sample_ID, array_ID:SentrixBarcode_SentrixPosition") #DNA-119212_OND-545213_EXP-18091_Female:203273700072_R01C01
+parser.add_argument("manifest", help="BPM manifest file")
+parser.add_argument("gtc_directory", help="Directory containing GTC files per glass number")
+parser.add_argument("output_directory", help="Directory where output has to be written")
+parser.add_argument("Sample_ID", help="Sample_ID, array_ID:SentrixBarcode_SentrixPosition")
 args = parser.parse_args()
 
 split_Sample_ID = args.Sample_ID.split(':')
