@@ -33,8 +33,6 @@ mkdir -p "${PennCNV_reportDir}"
 makeTmpDir "${PennCNV_reportDir}"
 tmpPennCNV_reportDir="${MC_tmpFile}"
 
-#python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${SentrixBarcode_A}"
-
 barcodelist=()
 
 n_elements=${Sample_ID[@]}
