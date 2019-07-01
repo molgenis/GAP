@@ -3,6 +3,6 @@ s01a_Create_PennCNV_Report_diagnostics,protocols/Create_PennCNV_Report_diagnosti
 s01b_Create_Callrate_file_PerSentrixBarcode,protocols/Create_Callrate_file_PerSentrixBarcode.sh, # makes a Callrate file per sample, processing per glass no.
 s01c_Create_PennCNV_Report_diagnosticsPerSentrixBarcode,protocols/Create_PennCNV_Report_diagnosticsPerSentrixBarcode.sh, # generates PennCNV report per samples, per glass no. Output is compatible with "new" downstream processing.
 s02a_Make_Final_PennCNV_report,protocols/Make_Final_PennCNV_report.sh,s01a_Create_PennCNV_Report_diagnostics, # makes from the PennCNV report from step s01a, 1 PennCNV report for the whole project. Compatible with "old" downstream processing. Can be removed when adlas is ready for new process.
-s02b_Make_Callrate_FinalReport,protocols/Make_Callrate_FinalReport.sh,s01c_Create_PennCNV_Report_diagnosticsPerSentrixBarcode, # makes a callrate file for the whole project merging multiple glass numbers.
-s03_CalculateSD,protocols/CalculateSD.sh,s01a_Create_PennCNV_Report_diagnostics;s01b_Create_Callrate_file_PerSentrixBarcode;s01c_Create_PennCNV_Report_diagnosticsPerSentrixBarcode;s02a_Make_Final_PennCNV_report;s02b_Make_Callrate_FinalReport,
-s04_PipelineFinished,protocols/PipelineFinished.sh,s01a_Create_PennCNV_Report_diagnostics;s01b_Create_Callrate_file_PerSentrixBarcode;s01c_Create_PennCNV_Report_diagnosticsPerSentrixBarcode;s02a_Make_Final_PennCNV_report;s02b_Make_Callrate_FinalReport;s03_CalculateSD,
+s02b_Make_Callrate_FinalReport,protocols/Make_Callrate_FinalReport.sh,s01b_Create_Callrate_file_PerSentrixBarcode, # makes a callrate file for the whole project merging multiple glass numbers.
+s03_CalculateSD,protocols/CalculateSD.sh,s02a_Make_Final_PennCNV_report;s02b_Make_Callrate_FinalReport,
+s04_PipelineFinished,protocols/PipelineFinished.sh,s03_CalculateSD,
