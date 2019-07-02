@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string Project

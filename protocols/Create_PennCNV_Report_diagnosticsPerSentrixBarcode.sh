@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
@@ -15,9 +13,6 @@
 #string resultDir
 #string logsDir
 #string intermediateDir
-
-set -e
-set -u
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
