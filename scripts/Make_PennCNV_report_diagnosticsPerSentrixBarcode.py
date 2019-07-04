@@ -8,38 +8,32 @@ parser = argparse.ArgumentParser("Generate a final report from a directory of GT
 parser.add_argument("manifest", help="BPM manifest file")
 parser.add_argument("gtc_directory", help="Directory containing GTC files per glass number")
 parser.add_argument("output_directory", help="Directory where output has to be written")
-parser.add_argument("SentrixBarcode_A", help="Sentrix_barcode_A")
-
+parser.add_argument("Sample_ID", help="Sample_ID, array_ID:SentrixBarcode_SentrixPosition")
 args = parser.parse_args()
 
-samples = []
-for gtc_file in os.listdir(args.gtc_directory):
-	if gtc_file.lower().endswith(".gtc"):
-		samples.append(gtc_file)
+split_Sample_ID = args.Sample_ID.split(':')
+array_ID = split_Sample_ID[0]
+sentrix_ID = split_Sample_ID[1]
 
-for gtc_file in glob.glob(os.path.join(args.gtc_directory, args.SentrixBarcode_A+'*.gtc')):
-	# print gtc_file
-	gtc_output = gtc_file + ".txt"
-	gtc_output2 = os.path.basename(gtc_output)
+for gtc_file in glob.glob(os.path.join(args.gtc_directory, sentrix_ID+'.gtc')):
+	print "gtc_file is" + gtc_file
 	save_path = args.output_directory
-	gtc_output3 = os.path.join(save_path, gtc_output2)
-	print gtc_output3
+	print "save_path:" + save_path
+	gtc_output = os.path.join(args.output_directory, array_ID + ".txt")
+	print "gtc_output is" + gtc_output
 	
-	
-	output = open(gtc_output3, "w")
+	output = open(gtc_output, "w")
 	print "output is" + str(output)
 	if gtc_file.lower().endswith(".gtc"):
 		manifest = BeadPoolManifest(args.manifest)
 		names = manifest.names
-		sample_id = os.path.basename(gtc_file)[:-4]
-		print sample_id
-		genotypes = GenotypeCalls( gtc_file ).get_genotypes()
 		chrom = manifest.chroms
 		map_info = manifest.map_infos 
 		map_info2 = str(map_info)
 		logratio = GenotypeCalls( gtc_file ).get_logr_ratios()
 		BAF = GenotypeCalls( gtc_file ).get_ballele_freqs()
-		for (names, chrom, map_info, genotypes, logratio, BAF) in zip( names, chrom, map_info, genotypes, logratio, BAF):
-			output.write(sample_id + "\t" + names + "\t" + chrom + "\t" + str(map_info) + "\t" + code2genotype[genotypes] + "\t" + str(logratio) + "\t" + str(BAF) + "\n")
+		output.write("[Data]" + "\n")
+		output.write("SNP Name" + "\t" + "Sample ID" + "\t" + "Chr" + "\t" + "Position" + "\t" + "Log R Ratio" + "\t" + "B Allele Freq" + "\n")
+		for (names, chrom, map_info, logratio, BAF) in zip(names, chrom, map_info, logratio, BAF):
+			output.write(names + "\t" + array_ID + "\t" + chrom + "\t" + str(map_info) + "\t" + str(logratio) + "\t" + str(BAF) + "\n")
 	output.close()
-

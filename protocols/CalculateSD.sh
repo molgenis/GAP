@@ -1,6 +1,4 @@
-#!/bin/bash
-
-#MOLGENIS walltime=05:59:00 mem=4gb ppn=1
+#MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
 #string beadArrayVersion
@@ -23,9 +21,6 @@
 #string resultDir
 #string CalculateSDDir
 #string PennCNV_reportDir
-
-set -e
-set -u
 
 mkdir -p "${CalculateSDDir}/"
 
@@ -51,18 +46,34 @@ python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
 log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${PennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
 sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 
-echo -e "${Sample_ID}\t${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf.sd"
+echo "${Sample_ID}": "${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_SD.txt"
 
 mv "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf"
-awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
+awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
+
+
+#Move VCF to intermediateDir
+
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf ${CalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
+mv "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf" "${CalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
+
+#Move SD values to intermediateDir
+echo "mv ${tmpCalculateSDDir}/${Sample_ID}_SD.txt ${CalculateSDDir}/${Sample_ID}_SD.txt"
+mv "${tmpCalculateSDDir}/${Sample_ID}_SD.txt" "${CalculateSDDir}/${Sample_ID}_SD.txt"
+
 
 
 #Copy VCF to resultsdir
-mkdir -p "${resultDir}/vcf/"
 
-#Move vcf and sd values to intermediateDir
-echo "moving ${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf.sd ${resultDir}/vcf/"
-mv "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf.sd" "${resultDir}/vcf/"
+mkdir -p "${resultDir}/VCF/"
+mkdir -p "${resultDir}/SD/"
 
-echo "moving ${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf to ${resultDir}/vcf/"
-mv "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf" "${resultDir}/vcf/"
+rsync -av "${CalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf" "${resultDir}/VCF/"
+rsync -av "${CalculateSDDir}/${Sample_ID}_SD.txt" "${resultDir}/SD/"
+
+
+if  [[ "${sd}" < 0.2 ]]
+	then
+	echo "move VCF to concordancedir when standard deviation <0.20 ."
+	cp "${CalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf" "${concordanceInputDir}/"
+fi

@@ -1,26 +1,18 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
 #string beadArrayVersion
 #string bpmFile
 #string projectRawTmpDataDir
-#string intermediateDir
-#string tmpTmpdir
-#string tmpDir
-#string workDir
-#string tmpName
 #string Project
-#string logsDir
 #string SentrixBarcode_A
 #list SentrixPosition_A
 #string PennCNV_reportDir
 #list Sample_ID
 #string gapVersion
-
-set -e
-set -u
+#string resultDir
+#string logsDir
+#string intermediateDir
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
@@ -29,27 +21,31 @@ module list
 
 
 mkdir -p "${PennCNV_reportDir}"
+mkdir -p "${resultDir}/PennCNV_reports/"
 
 makeTmpDir "${PennCNV_reportDir}"
 tmpPennCNV_reportDir="${MC_tmpFile}"
 
-python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${SentrixBarcode_A}"
+## Make a list of all samples to be processed per SentrixBarcode
 
-barcodelist=()
+samplelist=()
 
 n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
-    barcodelist+=("${Sample_ID[samplenumber]}:${SentrixBarcode_A}_${SentrixPosition_A[samplenumber]}")
+	samplelist+=("${Sample_ID[samplenumber]}:${SentrixBarcode_A}_${SentrixPosition_A[samplenumber]}")
 done
 
-for i in ${barcodelist[@]}
+## Process all samples in the samplelist. A PennCNV report per sample is made, compatible with downstream diagnostics. 
+
+for i in ${samplelist[@]}
 do
-        echo "processing $i"
-        barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
-        echo "${barcodeCombined}"
-        echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
-        mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
+	python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnosticsPerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${i}"
+	echo "processing $i"
+	barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $1}')
+	echo "${barcodeCombined}"
+	echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.txt ${resultDir}/PennCNV_reports/"
+	mv "${tmpPennCNV_reportDir}/${barcodeCombined}.txt" "${resultDir}/PennCNV_reports/"
 done
 
