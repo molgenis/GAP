@@ -6,6 +6,3 @@ s02a_Make_Final_PennCNV_report,protocols/Make_Final_PennCNV_report.sh,s01a_Creat
 s02b_Make_Callrate_FinalReport,protocols/Make_Callrate_FinalReport.sh,s01b_Create_Callrate_file_PerSentrixBarcode
 s03_CalculateSD,protocols/CalculateSD.sh,s02a_Make_Final_PennCNV_report;s02b_Make_Callrate_FinalReport
 s04_PipelineFinished,protocols/PipelineFinished.sh,s03_CalculateSD
-
-# s01a and s02a generate a PennCNV report for the whole project. 
-# Can be removed when adlas is ready for processing PennCNV reports per sample.

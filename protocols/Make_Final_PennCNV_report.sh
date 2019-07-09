@@ -47,7 +47,7 @@ do
 	if [ $count == 0 ]
 	then
 		echo "count=0"
-                echo -en "Name\tChr\tPosition\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq\t${sampleName2}.GType\t${sampleName2}.Log R Ratio\t${sampleName2}.B Allele Freq" > ${tmpFinalReportDir}/header.txt
+				echo -en "Name\tChr\tPosition\t${sampleName}.GType\t${sampleName}.Log R Ratio\t${sampleName}.B Allele Freq\t${sampleName2}.GType\t${sampleName2}.Log R Ratio\t${sampleName2}.B Allele Freq" > ${tmpFinalReportDir}/header.txt
 		echo "join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7 ${intermediateDir}/${barcodeCombined} ${intermediateDir}/${barcodeCombined2} > ${tmpFinalReportDir}/bron.txt"
 		join -1 2 -2 2 -t $'\t' -o 1.2,1.3,1.4,1.5,1.6,1.7,2.5,2.6,2.7  "${PennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}/${barcodeCombined2}.gtc.txt" > "${tmpFinalReportDir}/bron.txt"
 	elif [[ $count -gt 1 ]]
@@ -85,7 +85,7 @@ mv "${tmpFinalReportDir}/${Project}_PennCNV.txt" "${FinalReportDir}/${Project}_P
 #Copy results to resultDir
 
 rsync -a "${FinalReportDir}/${Project}_PennCNV.txt" "${resultDir}"
-rsync -a "${FinalReportDir}/${Project}_PennCNV.txt" "${diagnosticOutputFolder}/${Project}"
+rsync -a "${FinalReportDir}/${Project}_PennCNV.txt" "${diagnosticOutputFolder}/${Project}/"
 
 #Touch file for DARWIN so they know pipeline is finished and can start proceeding step to put data in SNP Module...
-touch "${diagnosticOutputFolder}/${Project}/${Project}".finished
+touch "${diagnosticOutputFolder}/${Project}/${Project}.finished"

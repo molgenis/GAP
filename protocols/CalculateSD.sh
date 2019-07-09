@@ -67,6 +67,7 @@ mv "${tmpCalculateSDDir}/${Sample_ID}_SD.txt" "${CalculateSDDir}/${Sample_ID}_SD
 
 mkdir -p "${resultDir}/VCF/"
 mkdir -p "${resultDir}/SD/"
+mkdir -p "${concordanceInputDir}/"
 
 rsync -av "${CalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf" "${resultDir}/VCF/"
 rsync -av "${CalculateSDDir}/${Sample_ID}_SD.txt" "${resultDir}/SD/"

@@ -9,6 +9,7 @@
 #string gapVersion
 #string logsDir
 #string intermediateDir
+#string diagnosticOutputFolder
 
 #Function to check if array contains value
 array_contains () {
@@ -46,3 +47,6 @@ done
 
 #Put results in resultsfolder
 rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${resultDir}"
+
+#rsync to DiagnosticOutput folder, can be removed when data is stored on shared isilon storage.
+rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}/"

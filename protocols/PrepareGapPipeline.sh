@@ -88,7 +88,8 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -g \
 -weave \
 -runid "${runID}" \
--o "gapVersion=${gapVersion}"
+-o "gapVersion=${gapVersion};\
+runID=${runID}"
 
 
 sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
