@@ -7,7 +7,7 @@ GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
 HTSlibVersion,HTSlib/1.3.2-foss-2015b
 
 #references
-bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
+bpmFile,/apps/data/GSAarray/${manifest}
 fastaFile, /apps/data/1000G/phase1/human_g1k_v37_phiX.fasta
 
 #paths
