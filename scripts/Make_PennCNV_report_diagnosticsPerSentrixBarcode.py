@@ -1,4 +1,5 @@
 from IlluminaBeadArrayFiles import GenotypeCalls, BeadPoolManifest, code2genotype
+from datetime import date
 import sys
 import os
 import glob
@@ -32,6 +33,15 @@ for gtc_file in glob.glob(os.path.join(args.gtc_directory, sentrix_ID+'.gtc')):
 		map_info2 = str(map_info)
 		logratio = GenotypeCalls( gtc_file ).get_logr_ratios()
 		BAF = GenotypeCalls( gtc_file ).get_ballele_freqs()
+		delim="\t"
+	    	output.write("[Header]\n")
+		output.write(delim.join(["GSGT Version", "1.9.4"]) + "\n")
+		output.write(delim.join(["Processing Date", date.today().strftime("%d/%m/%Y")]) + "\n")
+    		output.write(delim.join(["Content", os.path.basename(args.manifest)]) + "\n")
+    		output.write(delim.join(["Num SNPs", str(len(names))]) + "\n")
+    		output.write(delim.join(["Total SNPs", str(len(names))]) + "\n")
+		output.write(delim.join(["Num Samples", str(1)]) + "\n")
+		output.write(delim.join(["Total Samples", str(1)]) + "\n")
 		output.write("[Data]" + "\n")
 		output.write("SNP Name" + "\t" + "Sample ID" + "\t" + "Chr" + "\t" + "Position" + "\t" + "Log R Ratio" + "\t" + "B Allele Freq" + "\n")
 		for (names, chrom, map_info, logratio, BAF) in zip(names, chrom, map_info, logratio, BAF):
