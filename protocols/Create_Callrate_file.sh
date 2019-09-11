@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#MOLGENIS walltime=05:59:00 mem=10gb ppn=6
+#MOLGENIS walltime=05:59:00 mem=10gb ppn=1
 
 #string Project
 #string pythonVersion
