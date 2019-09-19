@@ -40,7 +40,7 @@ The GAP pipeline consist of 7 steps:
 This step creates a file containing per SNP information about the log ratio and the B allel frequency of the specific snp.
 
 Fileformat:
-Name '/t' Chromosome '/t' Position '/t' Sample1.GType '/t' Sample1.LogRratio '/t' Sample1.B Allele Freq '/t' Sample2.GType '/t' Sample2.LogRratio '/t' Sample2.B Allele Freq
+Name '\t' Chromosome '\t' Position '\t' Sample1.GType '\t' Sample1.LogRratio '\t' Sample1.B Allele Freq '\t' Sample2.GType '\t' Sample2.LogRratio '\t' Sample2.B Allele Freq
 
 The log R ratio and B allele Frequency per SNP are used by Nexus (commercial software) to call CNV's
 
@@ -66,7 +66,7 @@ If this number is below 0.97 we know the data is of pour quality.
 
 Fileformat:
 
-Sample ID '/t' Call Rate '/t' Gender.
+Sample ID '\t' Call Rate '\t' Gender.
 
 ```
 4: Make_Final_PennCNV_report
