@@ -11,8 +11,8 @@
                                          v
                                          v
    ⎛¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯⎞
-   ⎜                    DARWIN conversion of IDAT files to GTC files.                     ⎜
-   ⎜                    Takes place on GATTACA {01,02}machines                            ⎜
+   ⎜                    DARWIN conversion of IDAT files to GTC files,                     ⎜
+   ⎜                    and takes place on GATTACA {01,02}machines.                            ⎜
    ⎝______________________________________________________________________________________⎠
                                          v
                                          v  > > > > > > > > > > NGS_Automated CopyRawDataToPRM [stores .IDAT and .GTC files on permanent storage system]
@@ -21,14 +21,14 @@
    ⎛¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯⎞
    ⎜                         Run GAP Pipeline, to create a CallRates report per project   ⎜
    ⎜                         and a PennCNV report and VCF file per patient.               ⎜
-   ⎜                         Takes place on [zinc-finger of leucine-zipper]               ⎜
+   ⎜                         Takes place on [zinc-finger of leucine-zipper].               ⎜
    ⎝______________________________________________________________________________________⎠
                                          v
                                          v  > > > > > > > > > > NGS_Automated CopyProjectDataToPRM [stores data produced by pipeline on permanent storage system]
                                          v
    ⎛¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯⎞
    ⎜                  DARWIN, calculate standard deviation                                ⎜
-   ⎜                  and stores all data in array database                               ⎜
+   ⎜                  and stores all data in array database.                               ⎜
    ⎝______________________________________________________________________________________⎠
 ```
 
