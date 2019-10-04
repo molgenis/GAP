@@ -35,7 +35,7 @@ do
 
 	if [ "${prmHost}" == "localhost" ]
         then
-                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \ 
+                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
                 "${GTC_DIR}" \
                 "${GTCtmpDataDir}"
 
