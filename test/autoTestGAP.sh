@@ -48,7 +48,7 @@ EOF
 	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e "s|/groups/umcg-gsad/tmp03/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e 's|workflow=\${EBROOTGAP/workflow.csv|workflow=\${EBROOTGAP/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
+	perl -pi -e 's|workflow=\${EBROOTGAP/workflow_diagnostics.csv|workflow=\${EBROOTGAP/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
 
 	sh generate_template.sh -p ${_projectName}
