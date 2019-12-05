@@ -5,7 +5,7 @@ function preparePipeline(){
 
 	local _workflowType="${1}"
 
-	local _projectName="NIS_TRIO"
+	local _projectName="NIST_TRIO"
 	rm -f ${tmpfolder}/logs/${_projectName}/run01.pipeline.finished
 	echo "TMPFOLDER: ${tmpfolder}"
 	pwd
@@ -46,9 +46,9 @@ EOF
 	## Grep used version of molgenis compute out of the parameters file
 
 	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e "s|/groups/umcg-atd/tmp03/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
+	perl -pi -e "s|/groups/umcg-gsad/tmp03/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e 's|workflow=\${EBROOTNGS_DNA}/workflow.csv|workflow=\${EBROOTNGS_DNA}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
+	perl -pi -e 's|workflow=\${EBROOTGAP/workflow.csv|workflow=\${EBROOTGAP/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
 
 	sh generate_template.sh -p ${_projectName}
@@ -60,7 +60,7 @@ EOF
 }
 
 function checkIfFinished(){
-	local _projectName="NIS_TRIO_${1}"
+	local _projectName="NIST_TRIO_${1}"
 	count=0
 	minutes=0
 	while [ ! -f "${tmpfolder}/projects/${_projectName}/run01/jobs/autoTestArray_0.sh.finished" ]
@@ -136,10 +136,10 @@ cd "${pipelinefolder}"
 pwd
 
 cp test/results/vcf/*.vcf* /home/umcg-molgenis/GAP/vcf/
-cp test/results/PennCNV_reports/*_True.txt /home/umcg-molgenis/GAP/PennCNV_reports/
+cp test/results/PennCNV_reports/*_TRUE.txt /home/umcg-molgenis/GAP/PennCNV_reports/
 
-cp test/results/Callrates_NIS_TRIO_TRUE.txt /home/umcg-molgenis/GAP/
-cp test/results/NIS_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
+cp test/results/Callrates_NIST_TRIO_TRUE.txt /home/umcg-molgenis/GAP/
+cp test/results/NIST_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
 
 
 
