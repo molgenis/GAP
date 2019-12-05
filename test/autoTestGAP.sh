@@ -125,7 +125,7 @@ cd ..
 rm -rf GAP/
 
 ### create testworkflow
-cp workflow_diagnostics.csv test_workflow.csv
+cp "${pipelinefolder}/workflow_diagnostics.csv" test_workflow.csv
 tail -1 workflow.csv | perl -p -e 's|,|\t|g' | awk '{print "autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
 
 cd  /home/umcg-molgenis/GAP/
