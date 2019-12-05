@@ -117,6 +117,7 @@ cd GAP
 git fetch --tags --progress https://github.com/molgenis/GAP/ +refs/pull/*:refs/remotes/origin/pr/*
 COMMIT=$(git rev-parse refs/remotes/origin/pr/$PULLREQUEST/merge^{commit})
 echo "checkout commit: COMMIT"
+pwd
 git checkout -f ${COMMIT}
 
 mv * ../
@@ -124,7 +125,7 @@ cd ..
 rm -rf GAP/
 
 ### create testworkflow
-cp workflow.csv test_workflow.csv
+cp workflow_diagnostics.csv test_workflow.csv
 tail -1 workflow.csv | perl -p -e 's|,|\t|g' | awk '{print "autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
 
 cd  /home/umcg-molgenis/GAP/
