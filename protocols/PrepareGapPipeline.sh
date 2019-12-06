@@ -78,7 +78,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_group_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
--p "${genScripts}/$project}.csv" \
+-p "${genScripts}/${project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
 -w "${workflowpath}" \
