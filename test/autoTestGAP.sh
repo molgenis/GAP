@@ -48,7 +48,7 @@ EOF
 	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e "s|/groups/umcg-gsad/tmp03/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e 's|workflow=\${EBROOTGAP/workflow_diagnostics.csv|workflow=\${EBROOTGAP/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
+	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
 
 	sh generate_template.sh -p ${_projectName}
@@ -126,15 +126,9 @@ rm -rf GAP/
 
 ### create testworkflow
 cp "${pipelinefolder}/workflow_diagnostics.csv" test_workflow.csv
-tail -1 workflow.csv | perl -p -e 's|,|\t|g' | awk '{print "autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
-
-cd  /home/umcg-molgenis/GAP/
-
-mkdir vcf
-mkdir PennCNV_reports
+tail -1 workflow_diagnostics.csv | perl -p -e 's|,|\t|g' | awk '{print "autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
 
 cd "${pipelinefolder}"
-pwd
 
 cp test/results/vcf/*.vcf* /home/umcg-molgenis/GAP/vcf/
 cp test/results/PennCNV_reports/*_TRUE.txt /home/umcg-molgenis/GAP/PennCNV_reports/
