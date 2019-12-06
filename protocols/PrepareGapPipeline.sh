@@ -3,7 +3,7 @@
 #string intermediateDir
 #string resultDir
 #string computeVersion
-#string project
+#string Project
 #string projectJobsDir
 #string projectRawTmpDataDir
 #string genScripts
@@ -61,8 +61,8 @@ fi
 
 #Copying samplesheet to project jobs,results folder
 
-cp "${genScripts}/${project}.csv" "${projectJobsDir}/${project}.csv"
-cp "${genScripts}/${project}.csv" "${resultDir}/${project}.csv"
+cp "${genScripts}/${Project}.csv" "${projectJobsDir}/${Project}.csv"
+cp "${genScripts}/${Project}.csv" "${resultDir}/${Project}.csv"
 
 #
 # Execute MOLGENIS/compute to create job scripts to analyse this project.
@@ -78,7 +78,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/parameters_converted.csv" \
 -p "${genScripts}/parameters_group_converted.csv" \
 -p "${genScripts}/parameters_host_converted.csv" \
--p "${genScripts}/${project}.csv" \
+-p "${genScripts}/${Project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
 -w "${workflowpath}" \
@@ -93,7 +93,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 runID=${runID}"
 
 
-sampleSize=$(cat "${genScripts}/${project}.csv" |  wc -l)
+sampleSize=$(cat "${genScripts}/${Project}.csv" |  wc -l)
 
 if [ "${pipeline}" == 'research' ] && [ "${sampleSize}" -gt 1000 ]
 then
