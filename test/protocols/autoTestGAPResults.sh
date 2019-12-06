@@ -5,7 +5,6 @@
 #string tmpName
 #string	Project
 #string logsDir
-#string logsDirectory
 #string groupname
 #string projectResultsDir
 #string ngsUtilsVersion
