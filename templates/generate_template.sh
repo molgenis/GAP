@@ -71,6 +71,7 @@ host=$(hostname -s)
 echo "${host}"
 
 projectDir="${workDir}/projects/${filePrefix}/${runID}/jobs/"
+workflow=${EBROOTGAP}/workflow_diagnostics.csv
 
 mkdir -p -m 2770 "${workDir}/projects/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
@@ -92,7 +93,8 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --generate \
 -rundir "${genScripts}/scripts" \
 --runid "${runID}" \
--o "outputdir=scripts/jobs;\
+-o workflowpath="${workflow};\
+outputdir=scripts/jobs;\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
 gapVersion=$(module list | grep -o -P 'GAP(.+)');\
