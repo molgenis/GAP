@@ -5,9 +5,6 @@
 #string tmpName
 #string	Project
 #string logsDir
-#string projectResultsDir
-#string ngsUtilsVersion
-#string intermediateDir
 
 set -e
 set -u
