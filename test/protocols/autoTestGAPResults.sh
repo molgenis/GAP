@@ -1,5 +1,16 @@
 #!/bin/bash
 
+#MOLGENIS walltime=05:59:00 mem=8gb ppn=1
+
+#string tmpName
+#string	Project
+#string logsDir
+#string logsDirectory
+#string groupname
+#string projectResultsDir
+#string ngsUtilsVersion
+#string intermediateDir
+
 set -e
 set -u
 
