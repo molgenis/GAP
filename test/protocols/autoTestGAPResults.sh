@@ -44,7 +44,7 @@ do
 	echo "filtering the vcf file: ${i} ..."
 	file=$(basename ${i})
 	sample=$(basename ${file} .FINAL.vcf.gz)
-	bedtools intersect -a ${i} -b /home/umcg-molgenis/GAP/test/autoTestArray.bed > /groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/${sample}.FINAL_FILTERED.vcf
+	bedtools intersect -a ${i} -b /home/umcg-molgenis/GAP/autoTestArray.bed > /groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/${sample}.FINAL_FILTERED.vcf
 done
 
 ## Comparing the VCF files
