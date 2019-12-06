@@ -9,7 +9,7 @@ function preparePipeline(){
 	rm -f ${tmpfolder}/logs/${_projectName}/run01.pipeline.finished
 	echo "TMPFOLDER: ${tmpfolder}"
 	pwd
-	rsync -r --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials ${pipelinefolder}/test/rawdata/203693990030 ${tmpfolder}/rawdata/array/
+	rsync -r --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials ${pipelinefolder}/test/rawdata/203693990030 ${tmpfolder}/rawdata/array/GTC/
 
 	if [ -d "${tmpfolder}/generatedscripts/${_projectName}" ]
 	then
@@ -42,6 +42,7 @@ exit
 EOF
 
 	module load GAP/betaAutotest
+	module load Molgenis-Compute/v19.01.1-Java-11.0.2
 
 	## Grep used version of molgenis compute out of the parameters file
 
@@ -50,9 +51,9 @@ EOF
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
-
 	sh generate_template.sh -p ${_projectName}
 	cd scripts
+
 	sh submit.sh
 
 	cd "${tmpfolder}/projects/${_projectName}/run01/jobs/"
@@ -126,12 +127,15 @@ rm -rf GAP/
 
 ### create testworkflow
 cp "${pipelinefolder}/workflow_diagnostics.csv" test_workflow.csv
-tail -1 workflow_diagnostics.csv | perl -p -e 's|,|\t|g' | awk '{print "autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
+tail -1 workflow_diagnostics.csv | perl -p -e 's|,|\t|g' | awk '{print "s05_autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
 
 cd "${pipelinefolder}"
+pwd
 
 cp test/results/vcf/*.vcf* /home/umcg-molgenis/GAP/vcf/
 cp test/results/PennCNV_reports/*_TRUE.txt /home/umcg-molgenis/GAP/PennCNV_reports/
+cp test/autoTestArray.bed /home/umcg-molgenis/GAP/
+
 
 cp test/results/Callrates_NIST_TRIO_TRUE.txt /home/umcg-molgenis/GAP/
 cp test/results/NIST_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
@@ -141,3 +145,4 @@ cp test/results/NIST_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
 
 preparePipeline "ExternalSamples"
 checkIfFinished "InhouseSamples"
+
