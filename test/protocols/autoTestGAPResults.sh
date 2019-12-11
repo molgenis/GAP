@@ -89,7 +89,9 @@ do
 
 	echo "Comparing the PennCNV per sample file for ${sample}"
 	diffPennCNV="false"
-	diff -q /home/umcg-molgenis/GAP/PennCNV_reports/${sample}_TRUE.txt ${i} || diffPennCNV="true"
+
+	diff -q  <(tail -n +4 /home/umcg-molgenis/GAP/PennCNV_reports/${sample}_TRUE.txt) <(tail -n +4 ${i}) || diffPennCNV="true"
+#	diff -q /home/umcg-molgenis/GAP/PennCNV_reports/${sample}_TRUE.txt ${i} || diffPennCNV="true"
 	if [ "${diffPennCNV}" == "true" ]
 	then
 		echo "there are differences in the PennCNV files between the test and original data for sample ${sample}"
