@@ -3,8 +3,6 @@ set -u
 
 function preparePipeline(){
 
-	local _workflowType="${1}"
-
 	local _projectName="NIST_TRIO"
 	rm -f ${tmpfolder}/logs/${_projectName}/run01.pipeline.finished
 	echo "TMPFOLDER: ${tmpfolder}"
@@ -61,10 +59,10 @@ EOF
 }
 
 function checkIfFinished(){
-	local _projectName="NIST_TRIO_${1}"
+	local _projectName="NIST_TRIO"
 	count=0
 	minutes=0
-	while [ ! -f "${tmpfolder}/projects/${_projectName}/run01/jobs/autoTestArray_0.sh.finished" ]
+	while [ ! -f "${tmpfolder}/projects/${_projectName}/run01/jobs/s05_autoTestGAPResults_0.sh.finished" ]
 	do
 
 		echo "${_projectName} is not finished in $minutes minutes, sleeping for 2 minutes"
@@ -72,9 +70,9 @@ function checkIfFinished(){
 		minutes=$((minutes+2))
 
 		count=$((count+2))
-		if [ "${count}" -eq 60 ]
+		if [ "${count}" -eq 30 ]
 		then
-			echo "the test was not finished within 60 minutes, let's kill it"
+			echo "the test was not finished within 30 minutes, let's kill it"
 			echo -e "\n"
 			for i in $(ls "${tmpfolder}/projects/${_projectName}/run01/jobs/"*.sh)
 			do
@@ -143,6 +141,5 @@ cp test/results/NIST_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
 
 
 
-preparePipeline "ExternalSamples"
-checkIfFinished "InhouseSamples"
-
+preparePipeline
+checkIfFinished
