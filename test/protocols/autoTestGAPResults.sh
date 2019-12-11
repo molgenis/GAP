@@ -145,7 +145,7 @@ echo "Comparing the Project callrate files ... "
 
 diffProjectCallrateFile="false"
 
-diff -q /home/umcg-molgenis/GAP/results/Callrates_NIST_TRIO_TRUE.txt /groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/Callrates_NIST_TRIO.txt || diffProjectCallrateFile="true"
+diff -q /home/umcg-molgenis/GAP/Callrates_NIST_TRIO_TRUE.txt /groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/Callrates_NIST_TRIO.txt || diffProjectCallrateFile="true"
         if [ "${diffProjectCallrateFile}" == "true" ]
         then
                 echo "there are differences in the Project Callrate files between the test and original data for sample ${sample}"
