@@ -4,7 +4,7 @@ set -u
 function preparePipeline(){
 
 	local _projectName="NIST_TRIO"
-	rm -f ${tmpfolder}/logs/${_projectName}/run01.pipeline.finished
+	rm -f "${tmpfolder}/logs/${_projectName}/run01.pipeline.finished"
 	echo "TMPFOLDER: ${tmpfolder}"
 	pwd
 	rsync -r --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials ${pipelinefolder}/test/rawdata/203693990030 ${tmpfolder}/rawdata/array/GTC/
@@ -40,7 +40,6 @@ exit
 EOF
 
 	module load GAP/betaAutotest
-	module load Molgenis-Compute/v19.01.1-Java-11.0.2
 
 	## Grep used version of molgenis compute out of the parameters file
 
@@ -49,7 +48,7 @@ EOF
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
-	sh generate_template.sh -p ${_projectName}
+	sh generate_template.sh -p "${_projectName}"
 	cd scripts
 
 	sh submit.sh
@@ -65,7 +64,7 @@ function checkIfFinished(){
 	while [ ! -f "${tmpfolder}/projects/${_projectName}/run01/jobs/s05_autoTestGAPResults_0.sh.finished" ]
 	do
 
-		echo "${_projectName} is not finished in $minutes minutes, sleeping for 2 minutes"
+		echo "${_projectName} is not finished in ${minutes} minutes, sleeping for 2 minutes"
 		sleep 120
 		minutes=$((minutes+2))
 
@@ -117,7 +116,7 @@ git fetch --tags --progress https://github.com/molgenis/GAP/ +refs/pull/*:refs/r
 COMMIT=$(git rev-parse refs/remotes/origin/pr/$PULLREQUEST/merge^{commit})
 echo "checkout commit: COMMIT"
 pwd
-git checkout -f ${COMMIT}
+git checkout -f "${COMMIT}"
 
 mv * ../
 cd ..
@@ -130,13 +129,13 @@ tail -1 workflow_diagnostics.csv | perl -p -e 's|,|\t|g' | awk '{print "s05_auto
 cd "${pipelinefolder}"
 pwd
 
-cp test/results/vcf/*.vcf* /home/umcg-molgenis/GAP/vcf/
-cp test/results/PennCNV_reports/*_TRUE.txt /home/umcg-molgenis/GAP/PennCNV_reports/
-cp test/autoTestArray.bed /home/umcg-molgenis/GAP/
+cp "test/results/vcf/"*".vcf"* "/home/umcg-molgenis/GAP/vcf/"
+cp "test/results/PennCNV_reports/"*"_TRUE.txt" "/home/umcg-molgenis/GAP/PennCNV_reports/"
+cp "test/autoTestArray.bed" "/home/umcg-molgenis/GAP/"
 
 
-cp test/results/Callrates_NIST_TRIO_TRUE.txt /home/umcg-molgenis/GAP/
-cp test/results/NIST_TRIO_PennCNV_TRUE.txt /home/umcg-molgenis/GAP/
+cp "test/results/Callrates_NIST_TRIO_TRUE.txt" "/home/umcg-molgenis/GAP/"
+cp "test/results/NIST_TRIO_PennCNV_TRUE.txt" "/home/umcg-molgenis/GAP/"
 
 
 
