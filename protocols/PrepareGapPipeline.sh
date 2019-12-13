@@ -14,6 +14,7 @@
 #string group
 #string gapVersion
 #string workDir
+#string workflowpath
 
 umask 0007
 
@@ -80,7 +81,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 -p "${genScripts}/${Project}.csv" \
 -p "${EBROOTGAP}/chromosomes.homo_sapiens.csv" \
 -rundir "${projectJobsDir}" \
--w "${EBROOTGAP}/workflow_${pipeline}.csv" \
+-w "${workflowpath}" \
 --header "${EBROOTGAP}/templates/slurm/header.ftl" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 --footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
