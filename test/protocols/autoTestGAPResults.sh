@@ -50,15 +50,9 @@ do
 	sample=$(basename "${file}" ".FINAL_FILTERED.vcf")
 	echo "Comparing the VCF file with the TRUE VCF for the sample sample : ${sample} ..."
 	"${EBROOTNGSMINUTILS}/vcf-compare_2.0.sh" -1 "/home/umcg-molgenis/GAP/vcf/${sample}.FINAL_TRUE_FILTERED.vcf" -2 "${i}" -o "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/VCF_Compare/${sample}/"
-done
 
-## Checking if the output is correct
+	## Checking if the output is correct
 
-for i in $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/"*".FINAL_FILTERED.vcf")
-do
-	file=$(basename "${i}")
-	echo "${file}"
-	sample=$(basename "${file}" ".FINAL_FILTERED.vcf")
 	vcfCheckvalue="$(awk 'NR == 2 {print $4}' /groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/VCF_Compare/${sample}/vcfStats.txt)"
 	echo "${sample}: vcf Check value is: ${vcfCheckvalue}"
 
