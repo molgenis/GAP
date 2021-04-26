@@ -36,7 +36,7 @@ find $inputdir/ -maxdepth 1  -name "*_part*" > $tempdir/batches.list
 sed -i 's|'$inputdir/UGLI'||g' $tempdir/batches.list 
 
 
-### convert files to plink format
+### convert files to plink format from oxford files
 for batch in $(cat $tempdir/batches.list)
  do
 
