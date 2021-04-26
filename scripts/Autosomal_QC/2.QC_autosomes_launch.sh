@@ -62,9 +62,13 @@ mv  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
 mv  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
 mv  ${InputDir}/chr_* ${GeneralQCDir}/0_pre/
  
+ 
 ##################################################################################################
 ################-------------Call rate filtering--------########################################
-
+### start second iteration from here
+# cp  ${InputDir}/chr_Y.* ${GeneralQCDir}/Y_QC/
+# cp  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
+# cp  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
  for chr in {1..22} "XY"
  do
 
