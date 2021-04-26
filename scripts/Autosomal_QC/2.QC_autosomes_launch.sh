@@ -8,7 +8,8 @@ module load plink
 module load RPlus
 
 
-##inpit and putput variables
+##input and output variables
+#UGLIbatch="012' ##optional variable to work in a single batch instead of the whole data. can be left empty if working with the whole data
 InputDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
 GeneralQCDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
 
@@ -49,15 +50,20 @@ mkdir -p "${GeneralQCDir}/X_QC"
 mkdir -p "${GeneralQCDir}/Y_QC"
 mkdir -p "${GeneralQCDir}/MT_QC"
  
+ 
 for chr in {1..22} "XY" "X" "MT" "Y"
 do
 sed -i 's|'_[0-9]_'|'_'|g' ${InputDir}/chr_${chr}.fam ###turn repeated samples into the original sample name DNA###_[A-Z]#
 done
 
+## move non-autosomal chromosomes together with the autosomes
 mv  ${InputDir}/chr_Y.* ${GeneralQCDir}/Y_QC/
 mv  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
 mv  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
 mv  ${InputDir}/chr_* ${GeneralQCDir}/0_pre/
+ 
+##################################################################################################
+################-------------Call rate filtering--------########################################
 
  for chr in {1..22} "XY"
  do
@@ -72,8 +78,9 @@ mv  ${InputDir}/chr_* ${GeneralQCDir}/0_pre/
    awk '$6>0.20 {print $1, $2}' ${GeneralQCDir}/0_pre/chr_${chr}.imiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_sam.temp
 done
  
-## create files with duplicate SNPs to exlude 
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/position_duplicates.R -i ${GeneralQCDir}/0_pre
+## create files with duplicate SNPs to exlude
+####change script location ##############
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_position_duplicates.R -i ${GeneralQCDir}/0_pre 
 
 ##creates list of individuals and dup snps excluded for all the autosomes
 cat ${GeneralQCDir}/1_CR80/chr_*.extr80_sam.temp |sort -u > ${GeneralQCDir}/1_CR80/extr80.samples
@@ -226,7 +233,8 @@ rm ${GeneralQCDir}/4_Het/proc/*temp*
 cat ${GeneralQCDir}/2_CR_high/chr_*.incl_CR_sam> ${GeneralQCDir}/4_Het/CR.samples
 rm ${GeneralQCDir}/2_CR_high/chr_*.incl_CR_sam
 ## create file with samples to exclude (het>4sd) and heterozygosity density plot
- Rscript /groups/umcg-aad/tmp04/umcg-elopera/Het_autosomeQC.R -i ${GeneralQCDir}/4_Het \
+##### change script location
+ Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_Het_autosomeQC.R -i ${GeneralQCDir}/4_Het \   
    -o ${GeneralQCDir}/plots
  
 ## Create QCed files corrected by heterozygosity 
@@ -261,9 +269,10 @@ ${GeneralQCDir}/5_Relatedness/proc/full_autosomal_rel.temp.bim > ${GeneralQCDir}
 
 
 ## exclude intentionally duplicated samples
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sample_duplicates.R -w ${GeneralQCDir}/5_Relatedness/proc/ \
+## change script location
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_sample_duplicates.R \
+        -w ${GeneralQCDir}/5_Relatedness/proc/ \
         -r $all_pairing_file
-        
         
 ## apply filters to reduce SNP number
  plink --bfile ${GeneralQCDir}/5_Relatedness/proc/full_data \
@@ -271,9 +280,10 @@ Rscript /groups/umcg-aad/tmp04/umcg-elopera/sample_duplicates.R -w ${GeneralQCDi
        --make-bed \
        --out ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup
 
-
 ### genetic family concordance
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/fam_check3.R -p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \
+##### change script location
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_fam_check.R \ 
+                              -p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \ 
                               -c ${pairing_ID} \
                               -i ${pedigree_ref} \
                               -k ${king_tool} \
@@ -309,7 +319,8 @@ plink --bfile ${GeneralQCDir}/X_QC/chr_X \
      --out ${GeneralQCDir}/X_QC/0_pre/chr_X
 
 ## generate list of duplicated SNPs (selecting the one with best call rate).
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/position_duplicates.R -i ${GeneralQCDir}/X_QC/0_pre 
+### change script location
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_position_duplicates.R -i ${GeneralQCDir}/X_QC/0_pre 
 
 ##creates list of individuals and dup snps excluded for the X chromosome
 cat ${GeneralQCDir}/X_QC/0_pre/chr_X.excl.duplicates > ${GeneralQCDir}/X_QC/0_pre/extr.dups
@@ -343,50 +354,28 @@ plink --bfile ${GeneralQCDir}/X_QC/1_CR80/chr_X.2 \
      --exclude ${GeneralQCDir}/X_QC/2_CR_high/extrhigh.vars \
      --out ${GeneralQCDir}/X_QC/2_CR_high/chr_X
 
-
-#### Files with variants throughout the CR filtering steps. 
+#### Files with variants throughout the Call rate filtering steps. 
 cat ${GeneralQCDir}/X_QC/0_pre/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/X_QC/0_pre/untouched.snps
 sort ${GeneralQCDir}/X_QC/0_pre/extr.dups ${GeneralQCDir}/X_QC/0_pre/untouched.snps|uniq -u >${GeneralQCDir}/X_QC/0_pre/full.snps 
 
 cat ${GeneralQCDir}/X_QC/1_CR80/chr_*.2.bim|awk '{print$2}' > ${GeneralQCDir}/X_QC/1_CR80/incl80.vars
 cat ${GeneralQCDir}/X_QC/2_CR_high/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/X_QC/2_CR_high/inclhigh.vars
 
-
 ######################### Impute sex and sexcheck ###################################
 plink --bfile  ${GeneralQCDir}/X_QC/2_CR_high/chr_X  --impute-sex --make-bed --out ${GeneralQCDir}/X_QC/0_pre/imputed
 
 ###call the Rscript for plotting sex concordance
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sexCheck_genotypeQC.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
+### change script location
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
                               -p ${pairing_ID}  \
                               -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
                               -o ${GeneralQCDir}/plots
 
-
 grep -E 'Non concordant|Failed'  ${GeneralQCDir}/plots/sex_check/all.samples.concordance*.txt| awk '{{print $4, $4}}' > ${GeneralQCDir}/X_QC/sex.flagged
 
 ####################Filter out SNPs based on HW and MAF#############################
-## calculate MAF and HWE
-#plink --bfile ${GeneralQCDir}/X_QC/2_CR_high/chr_X \
-     --freq \
-     --hardy \
-     --out ${GeneralQCDir}/X_QC/3_MAF_HWE/chr_X
-
-###Eliminate outlier markers from  H-WE 
-## awk '$5==0 {print $2}' ${GeneralQCDir}/X_QC/3_MAF_HWE/chr_X.frq > ${GeneralQCDir}/X_QC/3_MAF_HWE/zeroMAF_X.temp
-  #merge both HW and MAF SNPs
- # cat ${GeneralQCDir}/X_QC/3_MAF_HWE/highhw_X.temp ${GeneralQCDir}/X_QC/3_MAF_HWE/zeroMAF_X.temp > ${GeneralQCDir}/X_QC/3_MAF_HWE/extr_Xhw
-   ## extract markers with MAF==0 and WHE< 1x 10 exp(-6)
- # plink --bfile ${GeneralQCDir}/X_QC/2_CR_high/chr_X \
-         --make-bed \
-         --exclude ${GeneralQCDir}/X_QC/3_MAF_HWE/extr_Xhw \
-         --out ${GeneralQCDir}/X_QC/3_MAF_HWE/chr_X
-
-         #--remove ${GeneralQCDir}/X_QC/sex.exclude \
-
-#cat ${GeneralQCDir}/X_QC/3_MAF_HWE/chr_X.bim|awk '{print$2}' > ${GeneralQCDir}/X_QC/3_MAF_HWE/incl_HW.snps
-
- 
-
+### X chromosome HWE QC is done in a separate script afer family and sex correction
+### see sub_MendelianErrors_FounderStats.R afeter second iteration
 
 ##################################################################################################
 ###########################-----------------PCA analysis---------------###########################
@@ -461,10 +450,8 @@ awk 'BEGIN { FS=" " ;} {if ($2 ~ /DNA/) print $0 " Cohort"; else if($2 ~ /gonl/)
 ###make pca on ggonl thousand genomes and [plot PCA of cohort ]project chorot on them
 plink -bfile ${GeneralQCDir}/6_PCA/PCA_data1 --within ${GeneralQCDir}/6_PCA/proc2/clusters --pca --pca-cluster-names 1000G GoNl --out ${GeneralQCDir}/6_PCA/PCA_1000G
 
-
-
 ###first PCA plot
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/PCA1.R -i ${GeneralQCDir}/6_PCA \
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
  -f "PCA_1000G.eigenvec" \
  -o ${GeneralQCDir}/plots \
  -r "1st."
@@ -487,7 +474,7 @@ grep -f ${GeneralQCDir}/6_PCA/second_PCA.samples ${GeneralQCDir}/6_PCA/proc2/clu
 plink -bfile ${GeneralQCDir}/6_PCA/PCA_data2 --within ${GeneralQCDir}/6_PCA/second_clusters --pca --pca-cluster-names GoNl 1000G --out ${GeneralQCDir}/6_PCA/second_PCA
 
 #Rscript PCA1_v1.R -i ${GeneralQCDir}/6_PCA \
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/PCA1.R -i ${GeneralQCDir}/6_PCA \
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
  -f "second_PCA.eigenvec" \
  -o ${GeneralQCDir}/plots \
  -r "2nd."
@@ -507,7 +494,7 @@ for chr in {1..22} "XY"
 
 #######################################################
 #################plot results###########################
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/genotypeQC_v9.R -i ${GeneralQCDir} \
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_plots_reports.R -i ${GeneralQCDir} \
  -o ${GeneralQCDir}/plots \
  -n "batch${UGLIbatch}" \
  -r ${MAFref} \
@@ -515,7 +502,7 @@ Rscript /groups/umcg-aad/tmp04/umcg-elopera/genotypeQC_v9.R -i ${GeneralQCDir} \
 #########################################################
 ### Samples external concordance###
 
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck_v1.2.R -p ${GeneralQCDir}/5_Relatedness/proc/full_data \
+Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_concordanceCheck.R -p ${GeneralQCDir}/5_Relatedness/proc/full_data \
  -o ${GeneralQCDir}/plots/sample_concordance/ \
  -l $merged_conc1 \
  -g $merged_conc2 \
