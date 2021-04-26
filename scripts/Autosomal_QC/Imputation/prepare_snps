@@ -1,0 +1,107 @@
+#################################
+### preparation for Imputation ##
+### 10/09/2019
+### v1.0
+### author: ealopera
+#################################
+
+###load packages
+ml plink
+ml BCFtools/1.7-foss-2015b
+
+########### main ################
+
+##go to directory
+cd /groups/umcg-ugli/tmp04/projects/merged_general_QC/8_second_QC_iteration/10_pre_imputation
+mkdir -p 2.dup_removed
+
+##remove both of the duplicated alleles
+for chr in {1..22} "XY" "X"
+do 
+
+ plink --bfile 1.InDels_removed/chr_$chr \
+       --exclude dupvars.remove \
+       --make-bed \
+       --out 2.dup_removed/chr_$chr 
+done
+
+
+#### merge all the chromosomes
+mkdir -p 1.merged
+cd 2.dup_removed
+
+plink --merge-list ../mergeList.txt \
+      --make-bed \
+      --out ../3.merged/final_QCed_merged
+
+
+### convert to vcf files
+cd /groups/umcg-ugli/tmp04/projects/merged_general_QC/8_second_QC_iteration/10_pre_imputation
+mkdir -p 4.vcf_files
+
+plink --bfile 3.5_merged/final_QCed_merged \
+      --recode vcf bgz \
+      --out 4.vcf_files/final_QCed_merged
+
+
+####change chromosome names
+mkdir -p 5.change_chr_name
+bcftools annotate -Oz --rename-chrs ucsc2ensembl.txt 4.vcf_files/final_QCed_merged.vcf.gz  >  5.change_chr_name/final_QCed_merged.vcf.gz
+
+
+### 6.sort preoperly the VCF
+bcftools index 5.change_chr_name/final_QCed_merged.vcf.gz
+
+##test
+bgzip -c 5.change_chr_name/merged_small.vcf > 5.change_chr_name/merged_small.vcf.gz
+bcftools index 5.change_chr_name/merged_small.vcf.gz
+
+
+#####################alternative
+
+#### cconvert to vcf files before merging
+for chr in {1..22} "X"
+do 
+plink --bfile 2.dup_removed/chr_$chr \
+      --recode vcf bgz \
+      --out 4.vcf_files/chr_$chr
+done
+
+####change chromosome names
+for chr in {1..22} "X"
+do
+bcftools annotate -Oz --rename-chrs ucsc2ensembl.txt 4.vcf_files/chr_$chr.vcf.gz  >  5.change_chr_name/chr_$chr.vcf.gz
+done
+
+
+#################################
+
+
+##### check reference
+wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz ## not working
+curl ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz
+
+/apps/data/1000G/phase1/original/human_g1k_v37.fasta
+
+mkdir -p 6.ref_alleles
+
+export BCFTOOLS_PLUGINS=/apps/software/BCFtools/1.7-foss-2015b/lib/plugins/
+
+#####test###
+ ##stats
+bcftools +fixref 5.change_chr_name/merged_small.vcf.gz -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta
+bcftools norm --check-ref w -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta 5.change_chr_name/merged_small.vcf.gz -Ou -o /dev/null
+
+#fix
+bcftools +fixref 5.change_chr_name/merged_small.vcf.gz  -Ob -o output.bcf -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta -m top
+
+##stats again
+bcftools +fixref output.bcf -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta
+
+
+
+#### actual data
+bcftools +fixref 5.change_chr_name/final_QCed_merged.vcf.gz -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta
+bcftools +fixref 5.change_chr_name/final_QCed_merged.vcf.gz  -Ob -o  6.ref_alleles/final_QCed_merged_1.bcf -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta -m top
+###stats
+bcftools +fixref 6.ref_alleles/final_QCed_merged_1.bcf -- -f /apps/data/1000G/phase1/original/human_g1k_v37.fasta
