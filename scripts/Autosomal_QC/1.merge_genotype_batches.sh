@@ -2,7 +2,7 @@
 #SBATCH --time=05:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=140G
+#SBATCH --mem-per-cpu=64G
 
 #############################################
 ### Merge multiple batches of GSA genotyping
@@ -11,6 +11,10 @@
 ### author: EL
 #############################################
 ### New
+## 26-04-2021
+## commented
+## added line to remove temporary directory
+## changed memory required from 140G to 64G (untested)
 #############################################
 
 ### Load packages
@@ -18,9 +22,9 @@ module load plink
 module load RPlus
 
 ### Define variables (paths)
-wkdir="/groups/umcg-aad/tmp04/umcg-elopera" ##input wkdir the place used to process the data and make output
-inputdir="/groups/umcg-ugli/tmp04/projects"
-tempdir="$wkdir/temp"
+wkdir="/groups/umcg-aad/tmp04/umcg-elopera" ## the place used to process the data and make output
+inputdir="/groups/umcg-ugli/tmp04/projects" ## directory with the folders fo each batch
+tempdir="$wkdir/temp" ## a temporary directory
 
 ################################################################################
 ### Main
@@ -72,6 +76,8 @@ mkdir -p $wkdir/merged_general_QC/
            --out $wkdir/merged_general_QC/chr_$chr
  done
 
-echo "Done. Thank you for using me ;) . \n temp directory not erased, remember to erase it later"
+rm -r $tempdir
+
+echo "Done. Thank you for using me ;) . "
 
 
