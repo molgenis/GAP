@@ -34,7 +34,7 @@ A feedback loop should be done manually by the user, after processing also manua
 - Calculates mendelian errors \
 - Calculates MAF and HWE filters for chormosome X with females-only
 
-4. Pre-inputation steps: located in the folder <Imputation>. This is the process to prepare the data for inputation with the HRC reference panel, following the steps indicated by the Sanger imputation server (https://imputation.sanger.ac.uk/). \
+4. Pre-imputation steps: located in the folder <Imputation>. This is the process to prepare the data for inputation with the HRC reference panel, following the steps indicated by the Sanger imputation server (https://imputation.sanger.ac.uk/). \
 - Remove insertions and deletions (script with number 1) \
 - Remove duplicated snps (same position SNPS) (script with number 2) \
 - transform to VCF and format for imputation, fix reference and alternative alleles in each SNP (use fixref plugin form BCFtools). \
