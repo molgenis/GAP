@@ -18,8 +18,8 @@
 #############################################
 
 ### Load packages
-module load plink
-module load RPlus
+module load plink/1.9-foss-2015b
+module load RPlus/3.5.1-foss-2015b-v19.04.1
 
 ### Define variables (paths)
 wkdir="/groups/umcg-aad/tmp04/umcg-elopera" ## the place used to process the data and make output
