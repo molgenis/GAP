@@ -146,7 +146,6 @@ system(plink.merge.chr.Xchr.call)
 
 ##### Load the family info to the fam file from merged.plink
 pairing <- fread(as.character(opt$pairing), data.table = FALSE)
-pairing$Gender[which(pairing$PSEUDOIDEXT == "15534601")] <- "F"
 
 fam.file <- paste0(merged.Xchr.plink, ".fam")
 fam <- fread(fam.file, data.table=FALSE)
