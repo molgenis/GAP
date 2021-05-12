@@ -27,7 +27,7 @@ dummy_pedigree="/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/corrected_v2_
 king_tool="/groups/umcg-aad/tmp04/umcg-elopera/tools/KING/king" ## exact location of the KING executable
 cranefoot_tool="/groups/umcg-aad/tmp04/umcg-elopera/tools/Cranefoot/example/cranefoot" ## exact location of the Cranefoot executable
 
-all_pairing_file="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt" ## pairing file for external samples
+all_pairing_file="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt" ## pairing file for internal sample concordance
 merged_conc1="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gwas_og_plink_chr/filtered_merged_LL_GWAS" ## merged file 1, for the previous gwas study
 merged_conc2="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gonl_og_plink_chr/filtered_merged_goNL_OG" ## merged file 2, for the goNL study
 
@@ -503,19 +503,11 @@ Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_plots_reports.R -i ${GeneralQCDi
  -r ${MAFref} \
 
 #########################################################
-### Samples external concordance###
+### Samples internal concordance###
 
 Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_concordanceCheck.R -p ${GeneralQCDir}/5_Relatedness/proc/full_data \
  -o ${GeneralQCDir}/plots/sample_concordance/ \
  -l $merged_conc1 \
  -g $merged_conc2 \
  -d $all_pairing_file
-
-
-# opt$plink<-"/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC_err/5_Relatedness/proc/full_data"
-# opt$out<-"/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC_err/plots/sample_concordance/"
-# opt$llref<-"/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gwas_og_plink_chr/filtered_merged_LL_GWAS"
-# opt$gonlref<- "/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gonl_og_plink_chr/filtered_merged_goNL_OG"
-# opt$datapairing<- "/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt"
-
 
