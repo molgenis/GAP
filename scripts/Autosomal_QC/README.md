@@ -1,4 +1,4 @@
-# Quality Control for GSA-genotyped on the UMCG HPC
+# Quality Control for GSA-genotyped data on the UMCG HPC
 Created by: Raul Aguirre-Gamboa, Esteban Lopera-Maya. \
 Contact information: e.a.lopera.maya@umcg.nl. \
 
