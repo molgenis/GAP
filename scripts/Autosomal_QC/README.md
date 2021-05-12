@@ -1,4 +1,4 @@
-# Quality Control for GSA array on the UMCG HPC
+# Quality Control for GSA-genotyped on the UMCG HPC for UGLI
 Created by: Raul Aguirre-Gamboa, Esteban Lopera-Maya. \
 Contact information: e.a.lopera.maya@umcg.nl. \
 
