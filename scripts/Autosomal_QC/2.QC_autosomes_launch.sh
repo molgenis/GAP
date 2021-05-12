@@ -9,10 +9,9 @@ module load RPlus/3.5.1-foss-2015b-v19.04.1
 
 
 ##input and output variables
-#UGLIbatch="012' ##optional variable to work in a single batch instead of the whole data. can be left empty if working with the whole data
+#UGLIbatch="012" ##optional variable to work in a single batch instead of the whole data. can be left empty if working with the whole data
 InputDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
 GeneralQCDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
-
 
 ### Reference files
 MAFref="/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt" ## reference for external marker concordance
