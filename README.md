@@ -11,7 +11,7 @@
                                          v
                                          v
    ⎛¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯⎞
-   ⎜                    DARWIN conversion of IDAT files to GTC files,                     ⎜
+   ⎜                    AGCT Pipeline conversion of IDAT files to GTC files,                     ⎜
    ⎜                    and takes place on GATTACA {01,02}machines.                            ⎜
    ⎝______________________________________________________________________________________⎠
                                          v
