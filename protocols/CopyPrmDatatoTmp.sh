@@ -23,21 +23,21 @@ array_contains () {
 
 INPUTREPORTS=()
 
-for file in ${SentrixBarcode_A[@]}
+for file in "${SentrixBarcode_A[@]}"
 do
         array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("${file}")    # If GTC file does not exist in array add it
 done
 
-for i in ${INPUTREPORTS[@]}
+for i in "${INPUTREPORTS[@]}"
 do
 	mkdir -vp "${GTCtmpDataDir}/${i}"
 	GTC_DIR="${GTCprmDataDir}/${i}"
 
 	if [ "${prmHost}" == "localhost" ]
-        then
-                rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
-                "${GTC_DIR}" \
-                "${GTCtmpDataDir}"
+	then
+		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
+		"${GTC_DIR}" \
+		"${GTCtmpDataDir}"
 
 	else
 		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
