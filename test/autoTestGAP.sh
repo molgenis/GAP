@@ -87,7 +87,7 @@ function checkIfFinished(){
 	echo "${_projectName} test succeeded!"
 	echo ""
 }
-tmpdirectory="tmp03"
+tmpdirectory="tmp01"
 groupName="umcg-gsad"
 
 if [ $(hostname) == "calculon" ]
