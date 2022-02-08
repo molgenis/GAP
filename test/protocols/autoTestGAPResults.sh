@@ -20,14 +20,14 @@ module list
 #1 Compress  and indexing the VCFfile
 
 
-for i in  $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/vcf/"*".vcf")
+for i in  $(ls "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/vcf/"*".vcf")
 do
 	file=$(basename "${i}")
-	mkdir -p "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/"
+	mkdir -p "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/"
 	echo  "zipping vcf file : ${file} ..."
-	bgzip -c "${i}" > "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/${file}.gz"
+	bgzip -c "${i}" > "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/${file}.gz"
 	echo "indexing the vcf file of ${file}.gz ..."
-        tabix -p vcf "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/${file}.gz"
+        tabix -p vcf "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/${file}.gz"
 
 done
 
@@ -38,22 +38,22 @@ do
 	echo "filtering the vcf file: ${i} ..."
 	file=$(basename "${i}")
 	sample=$(basename "${file}" ".FINAL.vcf.gz")
-	bedtools intersect -a "${i}" -b "/home/umcg-molgenis/GAP/autoTestArray.bed" > "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/${sample}.FINAL_FILTERED.vcf"
+	bedtools intersect -a "${i}" -b "/home/umcg-molgenis/GAP/autoTestArray.bed" > "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/${sample}.FINAL_FILTERED.vcf"
 done
 
 ## Comparing the VCF files
 
-for i in $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/"*".FINAL_FILTERED.vcf")
+for i in $(ls "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/"*".FINAL_FILTERED.vcf")
 do
 	file=$(basename "${i}")
 	echo "${file}"
 	sample=$(basename "${file}" ".FINAL_FILTERED.vcf")
 	echo "Comparing the VCF file with the TRUE VCF for the sample sample : ${sample} ..."
-	"${EBROOTNGSMINUTILS}/vcf-compare_2.0.sh" -1 "/home/umcg-molgenis/GAP/vcf/${sample}.FINAL_TRUE_FILTERED.vcf" -2 "${i}" -o "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/VCF_Compare/${sample}/"
+	"${EBROOTNGSMINUTILS}/vcf-compare_2.0.sh" -1 "/home/umcg-molgenis/GAP/vcf/${sample}.FINAL_TRUE_FILTERED.vcf" -2 "${i}" -o "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/VCF_Compare/${sample}/"
 
 	## Checking if the output is correct
 
-	vcfCheckvalue="$(awk 'NR == 2 {print $4}' /groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/VCF_Compare/${sample}/vcfStats.txt)"
+	vcfCheckvalue="$(awk 'NR == 2 {print $4}' /groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/VCF_Compare/${sample}/vcfStats.txt)"
 	echo "${sample}: vcf Check value is: ${vcfCheckvalue}"
 
 	if [ "${vcfCheckvalue}" = 100.00% ]
@@ -70,7 +70,7 @@ done
 ## Checking the PennCNV per sample files
 echo "start comparing the PennCNV per sample files ..."
 
-for i in $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/PennCNV_reports/"*".txt")
+for i in $(ls "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/PennCNV_reports/"*".txt")
 do
 	file=$(basename "${i}")
 	sample=$(basename "${file}" ".txt")
@@ -92,7 +92,7 @@ done
 
 ## Checking the SD files per sample
 
-for i in $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/vcf/"*".sd")
+for i in $(ls "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/vcf/"*".sd")
 do
 	file=$(basename "${i}")
         sample=$(basename "${file}" ".vcf.sd")
@@ -117,7 +117,7 @@ echo "Comparing the Project PennCNV files ... "
 
 diffPennCNVProjectFile="false"
 
-diff -q "/home/umcg-molgenis/GAP/NIST_TRIO_PennCNV_TRUE.txt" "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/NIST_TRIO_PennCNV.txt" || diffPennCNVProjectFile="true"
+diff -q "/home/umcg-molgenis/GAP/NIST_TRIO_PennCNV_TRUE.txt" "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/NIST_TRIO_PennCNV.txt" || diffPennCNVProjectFile="true"
         if [ "${diffPennCNVProjectFile}" == "true" ]
         then
 		echo "there are differences in the PennCNV Project files between the test and original data for sample ${sample}"
@@ -132,7 +132,7 @@ echo "Comparing the Project callrate files ... "
 
 diffProjectCallrateFile="false"
 
-diff -q "/home/umcg-molgenis/GAP/Callrates_NIST_TRIO_TRUE.txt" "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/run01/results/Callrates_NIST_TRIO.txt" || diffProjectCallrateFile="true"
+diff -q "/home/umcg-molgenis/GAP/Callrates_NIST_TRIO_TRUE.txt" "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/Callrates_NIST_TRIO.txt" || diffProjectCallrateFile="true"
         if [ "${diffProjectCallrateFile}" == "true" ]
         then
                 echo "there are differences in the Project Callrate files between the test and original data for sample ${sample}"
