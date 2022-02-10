@@ -11,11 +11,11 @@ set -u
 
 #Get command line options
 while getopts ":i:o:" opt; do
-  case "$opt" in
-    i) input=$OPTARG ;;
-    o) output=$OPTARG ;;
-  esac
-done
+	case "$opt" in
+	i) input=$OPTARG ;;
+	o) output=$OPTARG ;;
+	esac
+	done
 # Flag to extract header
 flag=1
 shift $(( OPTIND - 1 ))
@@ -29,7 +29,7 @@ IFS=$'\t' sampleSheetColumnNames=($(awk '{if(NR==9){print $0}}' "${input}"))
 for (( offset = 0 ; offset < ${#sampleSheetColumnNames[@]:-0} ; offset++ ))
 do
 	columnName="${sampleSheetColumnNames[${offset}]}"
-        sampleSheetColumnOffsets["${columnName}"]="${offset}"
+	sampleSheetColumnOffsets["${columnName}"]="${offset}"
 done
 
 # map ColumnHeader to correct variable
@@ -49,17 +49,17 @@ awk -v headerNumber="$headerNumber" '{if(NR>headerNumber){print >> $2".tmp"}}' "
 
 # Extract info of all snps in the first condition + intensities of first sample
 for a in *tmp;
-    do
-    sid=${a%.tmp}
-    if [ "$flag" -eq 1 ]
-        then
-            less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v GT=$GType -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print "Name" "\t" "Chr" "\t" "Position" "\t" name ".GType" "\t" name ".X" "\t" name ".Y" }{ print $snp "\t" $chr "\t" $c "\t" $GT "\t" $A "\t" $B}' > info
-            flag=2
-# keep intensities per sample
-    else
-        echo $sid
-        less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v GT=$GType -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print  name ".GType" "\t" name ".X" "\t" name ".Y" }{ print $GT "\t" $A "\t" $B}' > "$a".tmp2
-    fi
+	do
+	sid=${a%.tmp}
+	if [ "$flag" -eq 1 ]
+	then
+		less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v GT=$GType -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print "Name" "\t" "Chr" "\t" "Position" "\t" name ".GType" "\t" name ".X" "\t" name ".Y" }{ print $snp "\t" $chr "\t" $c "\t" $GT "\t" $A "\t" $B}' > info
+		flag=2
+		# keep intensities per sample
+	else
+		echo $sid
+		less "$a" | awk -F "\t" -v name=$sid -v chr=$chr -v snp=$my_snp -v GT=$GType -v c=$coor -v A=$intA -v B=$intB 'BEGIN { print  name ".GType" "\t" name ".X" "\t" name ".Y" }{ print $GT "\t" $A "\t" $B}' > "$a".tmp2
+	fi
 done
 
 # Paste all intensities and paste snp info with the merged intensities
@@ -70,12 +70,12 @@ awk '{if(NR>1){print >> $2".tmp3"}}' all_final.tmp
 
 # Add header and remove chromosome column
 for z in *tmp3;
-    do
-    sid2=${z%.tmp3}
-    head -1 all_final.tmp > "chr_"$sid2
-    cat $z >> "chr_"$sid2
-#    cut -f2- "chr_tmp_"$sid2 > "chr_"$sid2
-done
+	do
+	sid2=${z%.tmp3}
+	head -1 all_final.tmp > "chr_"$sid2
+	cat $z >> "chr_"$sid2
+	#    cut -f2- "chr_tmp_"$sid2 > "chr_"$sid2
+	done
 # Remove temp files.
 rm *tmp*
 rm info
