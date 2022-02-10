@@ -47,9 +47,9 @@ done
 
 for i in ${barcodelist[@]}
 do
-        echo "processing $i"
-        barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
-        echo "${barcodeCombined}"
-        echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
-        mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
+	echo "processing $i"
+	barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
+	echo "${barcodeCombined}"
+	echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
+	mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
 done
