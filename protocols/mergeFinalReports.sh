@@ -16,7 +16,7 @@ array_contains () {
 	local in=1
 	for element in "${!array-}"; do
 	if [[ "$element" == "$seeking" ]]; then
-		 in=0
+		in=0
 		break
 	fi
 	done
