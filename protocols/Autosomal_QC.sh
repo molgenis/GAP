@@ -61,7 +61,7 @@ for chr in {1..22} "XY"
 do
 ### create plink files and call_rate stats for individuals and SNPs
 	plink --data ${genSampleDir}/chr_${chr} \
-		 --make-bed  \
+		--make-bed  \
 		--missing \
 		--out ${AutosomeQCDir}/chr_${chr}
 
@@ -83,10 +83,10 @@ for chr in {1..22} "XY"
 			--make-bed \
 			--remove ${output80}/extr80.samples \
 			--exclude ${AutosomeQCDir}/extr.dups \
-         --out ${output80}/chr_${chr}
- 
-	 #calculates callrate stats from the previously filtered datafile
- 		plink  --bfile ${output80}/chr_${chr} \
+			--out ${output80}/chr_${chr}
+
+		#calculates callrate stats from the previously filtered datafile
+		plink  --bfile ${output80}/chr_${chr} \
 		--missing \
 		--out ${output80}/chr_${chr}
 
@@ -105,10 +105,10 @@ for chr in {1..22} "XY"
 
 	#calculates callrate stats from the previously filtered datafile
 	plink  --bfile ${output80}/chr_${chr}.2 \
-		 --missing \
-		 --out ${output80}/chr_${chr}.2
+		--missing \
+		--out ${output80}/chr_${chr}.2
 
-	 ##create list of SNPs snd samples to exclude on the criteria callrate<=high
+	##create list of SNPs snd samples to exclude on the criteria callrate<=high
 	awk '$6>0.01 {print $1, $2}' ${output80}/chr_${chr}.2.imiss > ${CR_high}/chr_${chr}.extrhigh_sam
 	##information for the heterozygosity analysis
 	awk '$6<0.01 {print $1, $2,$6}' ${output80}/chr_${chr}.imiss > ${CR_high}/chr_${chr}.incl_CR_sam
@@ -119,7 +119,7 @@ for chr in {1..22} "XY"
 	do
 	## exclude individuals with callrate<=high (creates excluded individuals_file) creates data set with  individual_ callrate>99
 	plink --bfile ${output80}/chr_${chr}  \
-		 --make-bed \
+		--make-bed \
 		--remove ${CR_high}/extrhigh.samples \
 	--out ${CR_high}/chr_${chr}
 
@@ -127,7 +127,7 @@ for chr in {1..22} "XY"
 	plink  --bfile ${CR_high}/chr_${chr} \
 		--missing \
 		--out ${CR_high}/chr_${chr}
-          
+
 	awk '$5>0.01 {print $2}' ${output80}/chr_${chr}.lmiss > ${CR_high}/chr_${chr}.extrhigh_var
 	done
 cat ${CR_high}/chr_*.extrhigh_var > ${CR_high}/extrhigh.vars
@@ -146,7 +146,7 @@ for chr in {1..22} "XY"
 		--hardy \
 		--out ${outputMH}/chr_${chr}
 	done
- 
+
 ##creates merged files of included individuals and SNPs to be used of further analysis
 
 cat ${AutosomeQCDir}/chr_*.fam|sort -u|awk '{print$2}' > ${AutosomeQCDir}/full.ind
@@ -201,12 +201,12 @@ plink --bfile ${Het}/proc/full_autosomal_het.temp \
 plink --bfile ${Het}/proc/full_autosomal_het.temp \
 	--extract ${Het}/proc/full_extract.temp.prune.in \
 	--make-bed --out ${Het}/proc/pruned_autosomal_het.temp;
- 
+
 #perform heterozigocity
 plink --het \
 	--bfile ${Het}/proc/pruned_autosomal_het.temp \
 	--homozyg \
-	 --out ${Het}/autosomal
+	--out ${Het}/autosomal
 #erase temp files 
 rm ${Het}/proc/*temp*
 #retrieve Call rate information from samples
@@ -214,13 +214,13 @@ cat ${CR_high}/chr_*.incl_CR_sam> ${Het}/CR.samples
 
 ## create file with samples to exclude (het>4sd) and heterozygosity density plot
 Rscript Het_autosomeQC.R -i ${Het} \
-	 -o ${repout}
+	-o ${repout}
 
 ## Create QCed files corrected by heterozygosity 
 for chr in {1..22} "XY"
 	do
 	plink --bfile ${outputMH}/chr_"${chr}" \
-		 --make-bed \
+		--make-bed \
 		--remove ${Het}/Excluded.het \
 		--out ${Het}/chr_${chr}
 	done
@@ -320,7 +320,7 @@ grep -E 'Non concordant|Failed'  ${X_QCDir}/plots/all.samples.concordance.txt| a
 	cat ${X_outputMH}/highhw_X.temp ${X_outputMH}/zeroMAF_X.temp > ${X_outputMH}/extr_Xhw
 ## extract markers with MAF>0.01 and WHE< 1x 10 exp(-6)
 	plink --bfile ${X_CR_high}/chr_X \
-		 --make-bed \
+		--make-bed \
 		--remove ${X_QCDir}/sex.exclude \
 		--exclude ${X_outputMH}/extr_Xhw \
 		--out ${X_outputMH}/chr_X
@@ -343,12 +343,12 @@ ${Relatedness}/proc/full_autosomal_rel.temp.bim > ${Relatedness}/proc/HLAexclude
 
 ## apply filters to reduce SNP number
 	plink --bfile ${Relatedness}/proc/full_autosomal_rel.temp \
-		 --exclude ${Relatedness}/proc/HLAexclude.txt \
+		--exclude ${Relatedness}/proc/HLAexclude.txt \
 		--make-bed \
 		--out ${Relatedness}/proc/full_data
 ##first, separate a list of SNPs to exclude by MAF and LD (--indep [SNPwindow] [shift] [LD threshold in 1/(1-r2)])
 	plink --bfile ${Relatedness}/proc/full_data \
-		 --maf 0.1 --indep 50 5 1.1 \
+		--maf 0.1 --indep 50 5 1.1 \
 		--out ${Relatedness}/proc/full_extract;
 ##then exclude this list from the working files
 	plink --bfile ${Relatedness}/proc/full_data \
@@ -372,9 +372,9 @@ awk '$9>0.99 {print $2, $3, $7, $8, $9}' ${Relatedness}/autosomal_rel.genome \
 
 ### filter reference Databases by the common SNPs
 	plink --bfile ${ref1000G}/1000G_all \
-		 --extract  ${outputMH}/incl_HW.snps \
-	 	--make-bed \
-	 	--out ${PCA}/proc/thg
+		--extract  ${outputMH}/incl_HW.snps \
+		--make-bed \
+		--out ${PCA}/proc/thg
 
 	plink --bfile ${gonlref}/gonl_SNV_INDELs_ab \
 		--extract  ${outputMH}/incl_HW.snps \
@@ -456,7 +456,7 @@ Rscript PCA1.R -i ${PCA} \
 ##extract selected samples by PCA
 plink --bfile ${PCA}/PCA_data1 \
 	--keep ${PCA}/1st.eur.samples \
-	 --make-bed \
+	--make-bed \
 	--out ${PCA}/PCA_data2
 
 #2nd. PCA

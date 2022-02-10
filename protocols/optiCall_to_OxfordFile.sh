@@ -64,7 +64,7 @@ fi
 			ORS="";
 			print "\n"
 		}
-	 ' < ${input} > ${output}.gen
+		' < ${input} > ${output}.gen
 fi
 
 echo "mv ${tmpOutputFolder}/chr_${chrNr}.gen ${outputFolder}/"
