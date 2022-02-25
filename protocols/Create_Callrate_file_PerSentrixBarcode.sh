@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string Project
@@ -59,7 +61,7 @@ then
 
 
 	rm -f "${tmpCallrateDir}/callratedata_project.txt"
-	for j in ${INPUTARRAYS[@]}
+	for j in "${INPUTARRAYS[@]}"
 	do
 		echo "cat ${tmpCallrateDir}/${j}_callratedata_project.txt >> ${tmpCallrateDir}/callratedata_project.txt"
 		cat "${tmpCallrateDir}/${j}_callratedata_project.txt" >> "${tmpCallrateDir}/callratedata_project.txt"
@@ -82,9 +84,9 @@ perl -pi -e 's|U|Unknown|g' "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt
 
 #Replace barcode with sampleid
 
-barcodelist=()
+#barcodelist=()
 
-n_elements=${Sample_ID[@]}
+#n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
