@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
@@ -30,7 +32,6 @@ tmpPennCNV_reportDir="${MC_tmpFile}"
 
 samplelist=()
 
-n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
@@ -39,11 +40,11 @@ done
 
 ## Process all samples in the samplelist. A PennCNV report per sample is made, compatible with downstream diagnostics. 
 
-for i in ${samplelist[@]}
+for i in "${samplelist[@]}"
 do
 	python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnosticsPerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${i}"
 	echo "processing $i"
-	barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $1}')
+	barcodeCombined=$(echo "${i}" | awk 'BEGIN {FS=":"}{print $1}')
 	echo "${barcodeCombined}"
 	echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.txt ${resultDir}/PennCNV_reports/"
 	mv "${tmpPennCNV_reportDir}/${barcodeCombined}.txt" "${resultDir}/PennCNV_reports/"
