@@ -38,7 +38,6 @@ python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "$
 
 barcodelist=()
 
-#n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do

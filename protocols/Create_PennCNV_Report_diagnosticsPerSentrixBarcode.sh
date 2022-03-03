@@ -32,7 +32,6 @@ tmpPennCNV_reportDir="${MC_tmpFile}"
 
 samplelist=()
 
-#n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do

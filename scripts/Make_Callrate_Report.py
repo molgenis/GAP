@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/env python
 
 from IlluminaBeadArrayFiles import GenotypeCalls, BeadPoolManifest, code2genotype
 

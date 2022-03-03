@@ -84,9 +84,6 @@ perl -pi -e 's|U|Unknown|g' "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt
 
 #Replace barcode with sampleid
 
-#barcodelist=()
-
-#n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
