@@ -51,24 +51,7 @@ do
 	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # If GTCfile does not exist in array add it
 done
 
-
-if [ "${pipeline}" == 'research' ]
-then
-	for i in "${INPUTARRAYS[@]}"
-	do
-		python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}/${i}/" "${tmpCallrateDir}/${i}_callratedata_project.txt"
-	done
-
-
-	rm -f "${tmpCallrateDir}/callratedata_project.txt"
-	for j in "${INPUTARRAYS[@]}"
-	do
-		echo "cat ${tmpCallrateDir}/${j}_callratedata_project.txt >> ${tmpCallrateDir}/callratedata_project.txt"
-		cat "${tmpCallrateDir}/${j}_callratedata_project.txt" >> "${tmpCallrateDir}/callratedata_project.txt"
-	done
-else
-	python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
-fi
+python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${tmpCallrateDir}/callrate_header.txt"
@@ -95,6 +78,3 @@ done
 
 echo "mv ${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt ${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
 mv "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt" "${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
-
-
-
