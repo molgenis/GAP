@@ -189,7 +189,7 @@ if (opt$makeped==TRUE) {
                              " -b ", paste0(opt$plink,".bed"),
                              " --fam ", paste0(opt$workdir,"batchinfo.fam"),
                              " --bim ", paste0(opt$plink,".bim"),
-                             " -- related", 
+                             " --related", 
                              " --degree 2",
                              " --prefix famCheck_genotypeQC")
   system(king.system.call)
@@ -328,6 +328,16 @@ if (opt$makeped==TRUE) {
   ### Pedigree function with Cranefoot
   
   pedigree_crane<-function(ls,pedfile,king,king_0,unexpected=TRUE,Fs.grade=F,fam_batch,crane.path){
+    
+    ########requirements
+    #ls: vector containing the families to be viewed in a pedigree
+    #pedfile: .famfile with column names= "FAM_ID","PSEUDOIDEXT","FATHER_PSEUDOID","MOTHER_PSEUDOID","GENDER1M2F","PARTNEREXT"
+    #king:kin file with expected genetic relationships
+    #king_0; kin0 file with unexpected genetic relationships
+    #unexpected: TRUE to visualize unexpected (kin0) genetic relationships, FALSE to evaluate pedigree-known (.kin) relationships
+    #Fs.grade: TRUE to evaluate only first grade relationships, FAlSE to see all relationshipsin the families listed in ls
+    #fam_batch: the fam file from the batch
+    #crane.path: path to the cranefoot executable
     
     if(Fs.grade==T){rel_vector=c("PO","FS")} else {rel_vector=king_0$InfType}
     
