@@ -46,7 +46,8 @@ python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
 --log-file "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}_GTCtoVCF.log.txt"
 
 #log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${PennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
-log_ratios=$(awk 'NR>10{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $5}' "${resultDir}/PennCNV_reports/${Sample_ID}.txt"
+# log_ratios=$(awk 'NR>10{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $5}' "${resultDir}/PennCNV_reports/${Sample_ID}.txt")
+log_ratios=$(awk '{if (NR>10){if ($3 != "X" && $3 != "Y" && $3 != "XY" ){ print $5}}}' "${resultDir}/PennCNV_reports/${Sample_ID}.txt")
 
 sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 echo "${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf.sd"
