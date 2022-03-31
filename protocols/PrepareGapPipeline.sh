@@ -41,6 +41,8 @@ mkdir -p -m 2770 "${resultDir}"
 mkdir -p -m 2770 "${projectJobsDir}"
 mkdir -p -m 2770 "${projectRawTmpDataDir}"
 
+declare -a arrayMissingSampleNames
+
 #Create Symlinks
 
 rocketPoint=$(pwd)

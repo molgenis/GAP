@@ -1,0 +1,4 @@
+step,protocol,dependencies
+s01a_Create_Final_Report,protocols/Create_Final_Report.sh,
+s01b_mergeFinalReports,protocols/mergeFinalReports.sh,s01a_Create_Final_Report
+s03_Create_Callrate_file,protocols/Create_Callrate_file.sh,
