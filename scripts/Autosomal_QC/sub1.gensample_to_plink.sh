@@ -26,13 +26,10 @@ echo "chr=" ${3} ### cromosome processed
 ################################################################################
 ### Main
 ################################################################################
-mkdir -p ${1}/${2}/meta/ # make directory for metafiles (used independently of chromosomes)
-
       plink --data ${2}/chr_${3} \
             --allow-no-sex \
             --make-bed  \
             --out ${1}/chr_${3}
-      echo "${1}/chr_${3}" >> ${1}/meta/allb_${3}.list
 
 
 
