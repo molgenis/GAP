@@ -9,9 +9,9 @@ module load RPlus/3.5.1-foss-2015b-v19.04.1
 
 
 ##input and output variables
-#UGLIbatch="012" ##optional variable to work in a single batch instead of the whole data. can be left empty if working with the whole data
-InputDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
-GeneralQCDir="/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC"
+InputDir="" ##directory with the location for gen-sample files
+GeneralQCDir=""
+codedir=""
 
 ### Reference files
 MAFref="/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt" ## reference for external marker concordance
@@ -49,18 +49,23 @@ mkdir -p "${GeneralQCDir}/X_QC"
 mkdir -p "${GeneralQCDir}/Y_QC"
 mkdir -p "${GeneralQCDir}/MT_QC"
  
+##################################################################################################
+################-------------oxford file to plink files--------########################################
  
-for chr in {1..22} "XY" "X" "MT" "Y"
+log="${GeneralQCDir}/0_pre/log/"
+mkdir -p  ${log}
+for chr in {1..22} "XY" "Y" "X" "MT"
 do
-sed -i 's|'_[0-9]_'|'_'|g' ${InputDir}/chr_${chr}.fam ###turn repeated samples into the original sample name DNA###_[A-Z]#
+
+ sbatch -J "ox2plink.${chr}" \
+           -o "${log}/ox2plink.${chr}.out" \
+           -e "${log}/ox2plink.${chr}.err" \
+           -v ${codedir}/sub1.gensample_to_plink.sh \
+           ${GeneralQCDir} \
+           ${InputDir} \
+           ${chr} 
 done
 
-## move non-autosomal chromosomes together with the autosomes
-mv  ${InputDir}/chr_Y.* ${GeneralQCDir}/Y_QC/
-mv  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
-mv  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
-mv  ${InputDir}/chr_* ${GeneralQCDir}/0_pre/
- 
  
 ##################################################################################################
 ################-------------Call rate filtering--------########################################
