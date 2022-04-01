@@ -4,8 +4,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=150G
 
-module load plink/1.9-foss-2015b
-module load RPlus/3.5.1-foss-2015b-v19.04.1
+module load PLINK/1.9-beta6-20190617
+module load RPlus
 
 
 ##input and output variables
