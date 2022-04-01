@@ -51,164 +51,164 @@ mkdir -p "${GeneralQCDir}/MT_QC"
  
 ##################################################################################################
 ################-------------oxford file to plink files--------########################################
- 
+
 log="${GeneralQCDir}/0_pre/log/"
 mkdir -p  ${log}
-for chr in {1..22} "XY" "Y" "X" "MT"
+for chr in {1..22} "XY" "X" "MT"
 do
 
- sbatch -J "ox2plink.${chr}" \
-           -o "${log}/ox2plink.${chr}.out" \
-           -e "${log}/ox2plink.${chr}.err" \
-           -v ${codedir}/sub1.gensample_to_plink.sh \
-           {GeneralQCDir}/0_pre/ \
-           ${InputDir} \
-           ${chr} 
+sbatch -J "ox2plink.${chr}" \
+-o "${log}/ox2plink.${chr}.out" \
+-e "${log}/ox2plink.${chr}.err" \
+-v ${codedir}/sub1.gensample_to_plink.sh \
+${GeneralQCDir}/0_pre/ \
+${InputDir} \
+${chr} 
 done
+### move haploid cromodomes out
+mv  ${GeneralQCDir}/0_pre/chr_Y.* ${GeneralQCDir}/Y_QC/
+mv  ${GeneralQCDir}/0_pre/chr_MT.* ${GeneralQCDir}/MT_QC/
+mv  ${GeneralQCDir}/0_pre/chr_X.* ${GeneralQCDir}/X_QC/
 
- 
 ##################################################################################################
 ################-------------Call rate filtering--------########################################
 ### start second iteration from here
-# cp  ${InputDir}/chr_Y.* ${GeneralQCDir}/Y_QC/
-# cp  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
-# cp  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
- for chr in {1..22}  "XY" "X" "MT"
- do
 
-  ### create plink files and call_rate stats for individuals and SNPs
-   plink --bfile ${GeneralQCDir}/0_pre/chr_${chr} \
-         --missing \
-         --out ${GeneralQCDir}/0_pre/chr_${chr}
- 
-  ##create list of samples to exclude on the criteria callrate<=80
-   awk '$6>0.20 {print $1, $2}' ${GeneralQCDir}/0_pre/chr_${chr}.imiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_sam.temp
+for chr in {1..22}  "XY"
+do
+### create plink files and call_rate stats for individuals and SNPs
+plink --bfile ${GeneralQCDir}/0_pre/chr_${chr} \
+--missing \
+--out ${GeneralQCDir}/0_pre/chr_${chr}
+
+##create list of samples to exclude on the criteria callrate<=80
+awk '$6>0.20 {print $1, $2}' ${GeneralQCDir}/0_pre/chr_${chr}.imiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_sam.temp
 done
- 
-## create files with duplicate SNPs to exlude
+
+## create files with duplicate SNPs to exclude
 ####change script location ##############
 Rscript ${codedir}/sub_position_duplicates.R -i ${GeneralQCDir}/0_pre 
 
 ##creates list of individuals and dup snps excluded for all the autosomes
 cat ${GeneralQCDir}/1_CR80/chr_*.extr80_sam.temp |sort -u > ${GeneralQCDir}/1_CR80/extr80.samples
-rm ${GeneralQCDir}/1_CR80/chr_*.extr80_sam.temp
+#rm ${GeneralQCDir}/1_CR80/chr_*.extr80_sam.temp
 cat ${GeneralQCDir}/0_pre/chr_*.excl.duplicates > ${GeneralQCDir}/0_pre/extr.dups
 rm ${GeneralQCDir}/0_pre/*.excl.duplicates
 rm ${GeneralQCDir}/0_pre/*nosex*
+  
+  for chr in {1..22}  "XY"
+do
+# exclude individuals with callrate<=80 (creates excluded individuals_file) creates data set with individual_ callrate>80
+plink --bfile ${GeneralQCDir}/0_pre/chr_${chr}  \
+--make-bed \
+--remove ${GeneralQCDir}/1_CR80/extr80.samples \
+--exclude ${GeneralQCDir}/0_pre/extr.dups \
+--allow-no-sex \
+--out ${GeneralQCDir}/1_CR80/chr_${chr}
 
-for chr in {1..22}  "XY" "X" "MT"
- do
- # exclude individuals with callrate<=80 (creates excluded individuals_file) creates data set with individual_ callrate>80
-   plink --bfile ${GeneralQCDir}/0_pre/chr_${chr}  \
-         --make-bed \
-         --remove ${GeneralQCDir}/1_CR80/extr80.samples \
-         --exclude ${GeneralQCDir}/0_pre/extr.dups \
-         --allow-no-sex \
-         --out ${GeneralQCDir}/1_CR80/chr_${chr}
- 
- #calculates callrate stats from the previously filtered datafile
-   plink  --bfile ${GeneralQCDir}/1_CR80/chr_${chr} \
-          --missing \
-          --allow-no-sex \
-          --out ${GeneralQCDir}/1_CR80/chr_${chr}
+#calculates callrate stats from the previously filtered datafile
+plink  --bfile ${GeneralQCDir}/1_CR80/chr_${chr} \
+--missing \
+--allow-no-sex \
+--out ${GeneralQCDir}/1_CR80/chr_${chr}
 
- awk '$5>0.20 {print $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.lmiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_var.temp
- done
- 
+awk '$5>0.20 {print $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.lmiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_var.temp
+done
+
 ##file of snps to exclude
 cat ${GeneralQCDir}/1_CR80/chr_*.extr80_var.temp > ${GeneralQCDir}/1_CR80/extr80.vars
 rm ${GeneralQCDir}/1_CR80/*.temp ##remove chrosome files for excluded samples and markers
 rm ${GeneralQCDir}/1_CR80/*nosex* 
- for chr in {1..22}  "XY"  "X" "MT"
- do
-   # exclude  SNPs with CR<80
-   plink --bfile ${GeneralQCDir}/1_CR80/chr_${chr}  \
-         --make-bed \
-         --exclude ${GeneralQCDir}/1_CR80/extr80.vars \
-         --out ${GeneralQCDir}/1_CR80/chr_${chr}.2
+  
+  for chr in {1..22}  "XY" 
+do
+# exclude  SNPs with CR<80
+plink --bfile ${GeneralQCDir}/1_CR80/chr_${chr}  \
+--make-bed \
+--exclude ${GeneralQCDir}/1_CR80/extr80.vars \
+--out ${GeneralQCDir}/1_CR80/chr_${chr}.2
 
-   #calculates callrate stats from the previously filtered datafile
-   plink  --bfile ${GeneralQCDir}/1_CR80/chr_${chr}.2 \
-          --missing \
-          --out ${GeneralQCDir}/1_CR80/chr_${chr}.2
+#calculates callrate stats from the previously filtered datafile
+plink  --bfile ${GeneralQCDir}/1_CR80/chr_${chr}.2 \
+--missing \
+--out ${GeneralQCDir}/1_CR80/chr_${chr}.2
 
-   ##create list of SNPs snd samples to exclude on the criteria callrate<=high
-   awk '$6>0.01 {print $1, $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.2.imiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.extrhigh_sam.temp
-   ##information for the heterozygosity analysis
-   awk '$6<0.01 {print $1, $2,$6}' ${GeneralQCDir}/1_CR80/chr_${chr}.imiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.incl_CR_sam
- done
+##create list of SNPs snd samples to exclude on the criteria callrate<=high
+awk '$6>0.01 {print $1, $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.2.imiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.extrhigh_sam.temp
+##information for the heterozygosity analysis
+awk '$6<0.01 {print $1, $2,$6}' ${GeneralQCDir}/1_CR80/chr_${chr}.imiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.incl_CR_sam
+done
 cat ${GeneralQCDir}/2_CR_high/chr_*.extrhigh_sam.temp|sort -u > ${GeneralQCDir}/2_CR_high/extrhigh.samples
 
 
- for chr in {1..22} "XY"
- do
-   ## exclude individuals with callrate<=high (creates excluded individuals_file) creates data set with  individual_ callrate>99
-   plink --bfile ${GeneralQCDir}/1_CR80/chr_${chr}  \
-         --make-bed \
-         --remove ${GeneralQCDir}/2_CR_high/extrhigh.samples \
-         --out ${GeneralQCDir}/2_CR_high/chr_${chr}
- 
-  #calculates callrate stats from the previously filtered datafile
-   plink  --bfile ${GeneralQCDir}/2_CR_high/chr_${chr} \
-          --missing \
-          --out ${GeneralQCDir}/2_CR_high/chr_${chr}
-          
- awk '$5>0.01 {print $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.lmiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.extrhigh_var.temp
- done
+for chr in {1..22} "XY"
+do
+## exclude individuals with callrate<=high (creates excluded individuals_file) creates data set with  individual_ callrate>99
+plink --bfile ${GeneralQCDir}/1_CR80/chr_${chr}  \
+--make-bed \
+--remove ${GeneralQCDir}/2_CR_high/extrhigh.samples \
+--out ${GeneralQCDir}/2_CR_high/chr_${chr}
+
+#calculates callrate stats from the previously filtered datafile
+plink  --bfile ${GeneralQCDir}/2_CR_high/chr_${chr} \
+--missing \
+--out ${GeneralQCDir}/2_CR_high/chr_${chr}
+
+awk '$5>0.01 {print $2}' ${GeneralQCDir}/1_CR80/chr_${chr}.lmiss > ${GeneralQCDir}/2_CR_high/chr_${chr}.extrhigh_var.temp
+done
 cat ${GeneralQCDir}/2_CR_high/chr_*.extrhigh_var.temp > ${GeneralQCDir}/2_CR_high/extrhigh.vars
 rm ${GeneralQCDir}/2_CR_high/*.temp ##remove chrosome files for excluded samples and markers
 
- for chr in {1..22} "XY"
- do
-   ## exclude SNPs callrate>99
-   plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}  \
-         --make-bed \
-         --exclude ${GeneralQCDir}/2_CR_high/extrhigh.vars \
-         --out ${GeneralQCDir}/2_CR_high/chr_${chr}.2
+for chr in {1..22} "XY"
+do
+## exclude SNPs callrate>99
+plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}  \
+--make-bed \
+--exclude ${GeneralQCDir}/2_CR_high/extrhigh.vars \
+--out ${GeneralQCDir}/2_CR_high/chr_${chr}.2
 
- done
- 
+done
+
 ##creates merged files of included individuals and SNPs to be used of further analysis
- 
-cat ${GeneralQCDir}/0_pre/chr_*.fam|sort -u|awk '{print$2}' > ${GeneralQCDir}/0_pre/full.ind
-cat ${GeneralQCDir}/0_pre/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/0_pre/untouched.snps
+cat ${GeneralQCDir}/0_pre/chr_*.fam|awk '{print$2}'|sort -u > ${GeneralQCDir}/0_pre/full.ind ## number of individuals entering teh QC process
+cat ${GeneralQCDir}/0_pre/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/0_pre/untouched.snps  ## number of SNPs entering the qc process
 sort ${GeneralQCDir}/0_pre/extr.dups ${GeneralQCDir}/0_pre/untouched.snps|uniq -u >${GeneralQCDir}/0_pre/full.snps 
 
-cat ${GeneralQCDir}/1_CR80/chr_*.2.fam|sort -u|awk '{print$2}' > ${GeneralQCDir}/1_CR80/incl80.samples
+cat ${GeneralQCDir}/1_CR80/chr_*.2.fam|awk '{print$2}'|sort -u > ${GeneralQCDir}/1_CR80/incl80.samples
 cat ${GeneralQCDir}/1_CR80/chr_*.2.bim|awk '{print$2}' > ${GeneralQCDir}/1_CR80/incl80.vars
- 
-cat ${GeneralQCDir}/2_CR_high/chr_*.2.fam|sort -u|awk '{print$2}' > ${GeneralQCDir}/2_CR_high/inclhigh.samples
+
+cat ${GeneralQCDir}/2_CR_high/chr_*.2.fam|awk '{print$2}'|sort -u > ${GeneralQCDir}/2_CR_high/inclhigh.samples
 cat ${GeneralQCDir}/2_CR_high/chr_*.2.bim|awk '{print$2}' > ${GeneralQCDir}/2_CR_high/inclhigh.vars
- 
- 
+
+
 ##################################################################################################
 ################-------------MAF and HWE filtering--------########################################
 
 ###Eliminate outlier markers from  H-WE 
 for chr in {1..22} "XY"
-  do
- 
-    ## calculate MAF and HWE 
-   plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}.2 \
-         --freq \
-         --hardy \
-         --out ${GeneralQCDir}/3_MAF_HWE/chr_${chr}
- 
-  awk '$9<0.000001 {print $2}' ${GeneralQCDir}/3_MAF_HWE/chr_${chr}.hwe|sort > ${GeneralQCDir}/3_MAF_HWE/highhw_${chr}.temp
-  awk '$5==0 {print $2}' ${GeneralQCDir}/3_MAF_HWE/chr_${chr}.frq|sort > ${GeneralQCDir}/3_MAF_HWE/zeroMAF_${chr}.temp
-  cat ${GeneralQCDir}/3_MAF_HWE/highhw_${chr}.temp ${GeneralQCDir}/3_MAF_HWE/zeroMAF_${chr}.temp  > ${GeneralQCDir}/3_MAF_HWE/extr_${chr}hw
-  rm ${GeneralQCDir}/3_MAF_HWE/*.temp
-  done
+do
+
+## calculate MAF and HWE 
+plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}.2 \
+--freq \
+--hardy \
+--out ${GeneralQCDir}/3_MAF_HWE/chr_${chr}
+
+awk '$9<0.000001 {print $2}' ${GeneralQCDir}/3_MAF_HWE/chr_${chr}.hwe|sort > ${GeneralQCDir}/3_MAF_HWE/highhw_${chr}.temp
+awk '$5==0 {print $2}' ${GeneralQCDir}/3_MAF_HWE/chr_${chr}.frq|sort > ${GeneralQCDir}/3_MAF_HWE/zeroMAF_${chr}.temp
+cat ${GeneralQCDir}/3_MAF_HWE/highhw_${chr}.temp ${GeneralQCDir}/3_MAF_HWE/zeroMAF_${chr}.temp  > ${GeneralQCDir}/3_MAF_HWE/extr_${chr}hw
+rm ${GeneralQCDir}/3_MAF_HWE/*.temp
+done
 cat ${GeneralQCDir}/3_MAF_HWE/extr_*hw> ${GeneralQCDir}/3_MAF_HWE/excl_HW.snps
 rm  ${GeneralQCDir}/3_MAF_HWE/extr_*hw
 for chr in {1..22} "XY"
- do
-   ## extract markers with MAF>0.01 and WHE< 1x 10 exp(-6)
-   plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}.2 \
-         --make-bed \
-         --exclude ${GeneralQCDir}/3_MAF_HWE/excl_HW.snps\
-         --out ${GeneralQCDir}/3_MAF_HWE/chr_${chr}
- done
+do
+## extract markers with MAF>0.01 and WHE< 1x 10 exp(-6)
+plink --bfile ${GeneralQCDir}/2_CR_high/chr_${chr}.2 \
+--make-bed \
+--exclude ${GeneralQCDir}/3_MAF_HWE/excl_HW.snps \
+--out ${GeneralQCDir}/3_MAF_HWE/chr_${chr}
+done
 cat ${GeneralQCDir}/3_MAF_HWE/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/3_MAF_HWE/incl_HW.snps
 
 ##################################################################################################
@@ -219,41 +219,40 @@ find ${GeneralQCDir}/3_MAF_HWE/ -name "*.bim" > ${GeneralQCDir}/4_Het/proc/allch
 sed -i 's/.bim//g' ${GeneralQCDir}/4_Het/proc/allchr.list;
 #merge all chromosomes into one single genotype ...set of files (.fam, .bim, .bed)
 plink --merge-list ${GeneralQCDir}/4_Het/proc/allchr.list \
-       --out ${GeneralQCDir}/4_Het/proc/full_autosomal_het.temp
+--out ${GeneralQCDir}/4_Het/proc/full_autosomal_het.temp
 
 ##first, separate a list of SNPs to exclude by LD (--indep [SNPwindow] [shift] [LD threshold in 1/(1-r2)])
 plink --bfile ${GeneralQCDir}/4_Het/proc/full_autosomal_het.temp \
-      --indep 50 5 2.5 --out ${GeneralQCDir}/4_Het/proc/full_extract.temp ;
+--indep 50 5 2.5 --out ${GeneralQCDir}/4_Het/proc/full_extract.temp ;
 #then exclude this list from the working files
 plink --bfile ${GeneralQCDir}/4_Het/proc/full_autosomal_het.temp \
-      --extract ${GeneralQCDir}/4_Het/proc/full_extract.temp.prune.in \
-      --make-bed --out ${GeneralQCDir}/4_Het/proc/pruned_autosomal_het.temp;
- 
+--extract ${GeneralQCDir}/4_Het/proc/full_extract.temp.prune.in \
+--make-bed --out ${GeneralQCDir}/4_Het/proc/pruned_autosomal_het.temp;
+
 #perform heterozigocity
 plink --het \
-       --bfile ${GeneralQCDir}/4_Het/proc/pruned_autosomal_het.temp \
-       --homozyg \
-       --out ${GeneralQCDir}/4_Het/autosomal
+--bfile ${GeneralQCDir}/4_Het/proc/pruned_autosomal_het.temp \
+--homozyg \
+--out ${GeneralQCDir}/4_Het/autosomal
 #erase temp files 
 rm ${GeneralQCDir}/4_Het/proc/*temp*
-#retrieve Call rate information from samples
-cat ${GeneralQCDir}/2_CR_high/chr_*.incl_CR_sam> ${GeneralQCDir}/4_Het/CR.samples
+  #retrieve Call rate information from samples
+  cat ${GeneralQCDir}/2_CR_high/chr_*.incl_CR_sam> ${GeneralQCDir}/4_Het/CR.samples
 rm ${GeneralQCDir}/2_CR_high/chr_*.incl_CR_sam
 ## create file with samples to exclude (het>4sd) and heterozygosity density plot
 ##### change script location
- Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_Het_autosomeQC.R -i ${GeneralQCDir}/4_Het \   
-   -o ${GeneralQCDir}/plots
- 
+Rscript ${codedir}/sub_Het_autosomeQC.R -i ${GeneralQCDir}/4_Het -o ${GeneralQCDir}/plots
+
+
 ## Create QCed files corrected by heterozygosity 
 for chr in {1..22} "XY"
- do
-   plink --bfile ${GeneralQCDir}/3_MAF_HWE/chr_"${chr}" \
-         --make-bed \
-         --remove ${GeneralQCDir}/4_Het/Excluded.het \
-         --out ${GeneralQCDir}/4_Het/chr_${chr}
- done
- 
- 
+do
+plink --bfile ${GeneralQCDir}/3_MAF_HWE/chr_"${chr}" \
+--make-bed \
+--remove ${GeneralQCDir}/4_Het/Excluded.het \
+--out ${GeneralQCDir}/4_Het/chr_${chr}
+done
+
 ##################################################################################################
 ###############---------Relatedness and identity by descent (IBD)------###########################
 
