@@ -10,8 +10,8 @@ module load RPlus/3.5.1-foss-2015b-v19.04.1
 
 ##input and output variables
 InputDir="" ##directory with the location for gen-sample files
-GeneralQCDir=""
-codedir=""
+GeneralQCDir=""  ##name & allocate your results directory
+codedir="" ##allocate your scripts directory 
 
 ### Reference files
 MAFref="/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt" ## reference for external marker concordance
