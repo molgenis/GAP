@@ -26,25 +26,11 @@ echo "chr=" ${3} ### cromosome processed
 ################################################################################
 ### Main
 ################################################################################
-       if [[ ${8} == "1" ]]; then
       
       plink --data ${2}/chr_${3} \
             --allow-no-sex \
             --make-bed  \
             --out ${1}/chr_${3}
-      else
-            plink --data ${2}/chr_${3} \
-            --allow-no-sex \
-            --make-bed  \
-            --out ${1}/chr_${3}_temp
-            
-      plink --bed ${1}/chr_${3}_temp \
-            --allow-no-sex \
-            --set-hh-missing \
-            --make-bed  \
-            --out ${1}/chr_${3}
-           
-      fi
 
 
 
