@@ -73,7 +73,7 @@ done
 # cp  ${InputDir}/chr_Y.* ${GeneralQCDir}/Y_QC/
 # cp  ${InputDir}/chr_MT.* ${GeneralQCDir}/MT_QC/
 # cp  ${InputDir}/chr_X.* ${GeneralQCDir}/X_QC/
- for chr in {1..22} "XY"
+ for chr in {1..22}  "XY" "X" "MT"
  do
 
   ### create plink files and call_rate stats for individuals and SNPs
@@ -82,13 +82,12 @@ done
          --out ${GeneralQCDir}/0_pre/chr_${chr}
  
   ##create list of samples to exclude on the criteria callrate<=80
-  sed -i 's|'_[0-9]_'|'_'|g' ${GeneralQCDir}/0_pre/chr_${chr}.fam ###turn repeated samples into the original sample name DNA###_[A-Z]#
    awk '$6>0.20 {print $1, $2}' ${GeneralQCDir}/0_pre/chr_${chr}.imiss > ${GeneralQCDir}/1_CR80/chr_${chr}.extr80_sam.temp
 done
  
 ## create files with duplicate SNPs to exlude
 ####change script location ##############
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_position_duplicates.R -i ${GeneralQCDir}/0_pre 
+Rscript ${codedir}/sub_position_duplicates.R -i ${GeneralQCDir}/0_pre 
 
 ##creates list of individuals and dup snps excluded for all the autosomes
 cat ${GeneralQCDir}/1_CR80/chr_*.extr80_sam.temp |sort -u > ${GeneralQCDir}/1_CR80/extr80.samples
@@ -97,7 +96,7 @@ cat ${GeneralQCDir}/0_pre/chr_*.excl.duplicates > ${GeneralQCDir}/0_pre/extr.dup
 rm ${GeneralQCDir}/0_pre/*.excl.duplicates
 rm ${GeneralQCDir}/0_pre/*nosex*
 
-for chr in {1..22} "XY"
+for chr in {1..22}  "XY" "X" "MT"
  do
  # exclude individuals with callrate<=80 (creates excluded individuals_file) creates data set with individual_ callrate>80
    plink --bfile ${GeneralQCDir}/0_pre/chr_${chr}  \
@@ -120,12 +119,12 @@ for chr in {1..22} "XY"
 cat ${GeneralQCDir}/1_CR80/chr_*.extr80_var.temp > ${GeneralQCDir}/1_CR80/extr80.vars
 rm ${GeneralQCDir}/1_CR80/*.temp ##remove chrosome files for excluded samples and markers
 rm ${GeneralQCDir}/1_CR80/*nosex* 
- for chr in {1..22} "XY"
+ for chr in {1..22}  "XY"  "X" "MT"
  do
    # exclude  SNPs with CR<80
    plink --bfile ${GeneralQCDir}/1_CR80/chr_${chr}  \
          --make-bed \
-         --exclude ${GeneralQCDir}/1_CR80/extr80.vars\
+         --exclude ${GeneralQCDir}/1_CR80/extr80.vars \
          --out ${GeneralQCDir}/1_CR80/chr_${chr}.2
 
    #calculates callrate stats from the previously filtered datafile
