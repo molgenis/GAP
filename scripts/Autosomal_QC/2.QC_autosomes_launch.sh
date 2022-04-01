@@ -61,7 +61,7 @@ do
            -o "${log}/ox2plink.${chr}.out" \
            -e "${log}/ox2plink.${chr}.err" \
            -v ${codedir}/sub1.gensample_to_plink.sh \
-           ${GeneralQCDir} \
+           {GeneralQCDir}/0_pre/ \
            ${InputDir} \
            ${chr} 
 done
