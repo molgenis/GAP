@@ -26,12 +26,19 @@ echo "chr=" ${3} ### cromosome processed
 ################################################################################
 ### Main
 ################################################################################
+      if[ ${3} !="Y" ]; then
+      
       plink --data ${2}/chr_${3} \
             --allow-no-sex \
             --make-bed  \
             --out ${1}/chr_${3}
-
-
+      else
+            plink --data ${2}/chr_${3} \
+            --allow-no-sex \
+            --set-hh-missing \
+            --make-bed  \
+            --out ${1}/chr_${3}
+      fi
 
 
 
