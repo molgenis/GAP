@@ -1,14 +1,17 @@
 ###################################
 ### Duplicate samples removal by Call rate
 ### date: 15-02-2019
-### version: 0.01
+### version: 2
 ### authors: EL - RAG
 ###################################
+### new
+### 44-04-2022
+### removed handlers for specific sample names
 
 ## example run 
-
-#RScript Het_autosomeQC.R -i ***/Autosome_QC
-#  -o repout
+## the duplicated sample with the lesser missing rate will be kept
+### make sure you use a headless duplicated sample files & that your duplicated samples are named as [samplename]_1, [samplename]_2... etc
+#RScript Het_autosomeQC.R -w [working dir] -r [duplicated sample file]
 
 #########################################################################################################
 #########################################################################################################
@@ -17,22 +20,10 @@
 #########################################################################################################
 
 ###packages
-
-
-library(ggplot2)
 library(data.table)
 library(dplyr)
 library(optparse)
 
-###test
-## local test
-## opt<-list()
-## opt$input<-"~/Tasks/testdata/"
-## opt$out<-"~/Tasks/testdata/"
-## cluster test
-## opt$wd<-"/groups/umcg-aad/tmp04/umcg-elopera/merged_general_QC/5_Relatedness/proc"
-## opt$ref<-"/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt"
-## chr=1
 ##Arguments
 
 codextract <- function(x) {
