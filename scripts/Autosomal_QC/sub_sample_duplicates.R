@@ -5,7 +5,7 @@
 ### authors: EL - RAG
 ###################################
 ### new
-### 44-04-2022
+### 04-04-2022
 ### removed handlers for specific sample names
 
 ## example run 
