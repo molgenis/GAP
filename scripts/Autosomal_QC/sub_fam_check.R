@@ -218,24 +218,25 @@ duplicate_samples<-rbind(king_0[king_0$InfType=="Dup/MZ", c("ID1","ID2")],king[k
 
 ### if the questionary information is compete we will want to make the pedigrees check, otherwise, just looking
 ### duplicates should be enough
+ if (opt$makeped==TRUE) {
+  info.table$Age<-" "
+  if(file.exists(opt$pairing) == TRUE){
   pairing.table <- fread(opt$pairing, data.table=F)
-  
-if (opt$makeped==TRUE) {
-  
-  info.table$Age<-pairing.table$Age[match(info.table$V2,pairing.table$V2)]
-  info.table$Birth_year<-pairing.table$BIRTHYEAR[match(info.table$V2,pairing.table$V2)]
+  info.table$Age<-pairing.table$age[match(info.table$IID,pairing.table$IID)]
+  info.table$Birth_year<-pairing.table$BIRTHYEAR[match(info.table$IID,pairing.table$IID)]
   info.table[which(is.na(info.table$Age)),"Age"]<-" "
-  
+  }
+ 
   ############
   ###prepare list of families for plotting
   names(new.fam)<-c("FAM_ID","IID","FATHER_PSEUDOID","MOTHER_PSEUDOID","GENDER1M2F","V6")
-  
+
   ####for kin0: list of families with more than 3 memebers and new FIRST GRADE relationships
   fstdeg <- king_0[king_0$InfType=="FS" | king_0$InfType=="PO", ]
   fam_list0<-c()
   for (i in 1:nrow(fstdeg)) {
-    size1<-nrow(new.fam[which(new.fam$FAM_ID==fstdeg$FID1[i] |new.fam$V2==fstdeg$ID1[i]), ])
-    size2<-nrow(new.fam[which(new.fam$FAM_ID==fstdeg$FID2[i] |new.fam$V2==fstdeg$ID2[i]), ])
+    size1<-nrow(new.fam[which(new.fam$FAM_ID==fstdeg$FID1[i] |new.fam$IID==fstdeg$ID1[i]), ])
+    size2<-nrow(new.fam[which(new.fam$FAM_ID==fstdeg$FID2[i] |new.fam$IID==fstdeg$ID2[i]), ])
     if (size1>2) {fam_list0<-c(fam_list0,fstdeg$FID1[i])} 
     else { if (size2>2) {fam_list0<-c(fam_list0,fstdeg$FID2[i])}}
   }
@@ -336,7 +337,8 @@ if (opt$makeped==TRUE) {
       err.col.index<-c("FID","Familial_errors","IID","Error.tag","message","InfType")
       event<-"error."
     }
-    if (gen.fam=="incomplete family information") {return(paste0("Family ",ls," incomplete"))} ####incomplete will be reported when there is no pedigree onformation  for genetic samples
+    if (gen.fam=="incomplete family information") {return(paste0("Family ",ls," incomplete"))} 
+    ####incomplete will be reported when there is no pedigree information  for genetic samples
     else {
       
       gen.fam$GENDER1M2F<-family.ped$GENDER1M2F[match(gen.fam$IID,family.ped$IID)]
@@ -409,5 +411,5 @@ if (opt$makeped==TRUE) {
   
   write.table(unlist(all_error.list),paste0(opt$out,"Crane_all_error.FID.list"),quote = F,row.names = F,col.names = F)
   write.table(unlist(all_new_found.list),paste0(opt$out,"Crane_all_newfound.FID.list"),quote = F,row.names = F,col.names = F)
-  
+}
   
