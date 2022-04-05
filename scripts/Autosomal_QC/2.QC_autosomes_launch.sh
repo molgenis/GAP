@@ -8,28 +8,24 @@ module load PLINK/1.9-beta6-20190617
 module load RPlus
 
 
-##input and output variables
+### input and output variables
 InputDir="" ##directory with the location for gen-sample files
 GeneralQCDir=""  ##name & allocate your results directory
 codedir="" ##allocate your scripts directory 
 
 ### Reference files
-MAFref="/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt" ## reference for external marker concordance
-samplesheet="/groups/umcg-ugli/tmp04/projects/UGLI${UGLIbatch}/run01/results/UGLI${UGLIbatch}.csv" ## Identificator list for samples
+intended_dup_samples_file="" ### file with intentional duplicates in the genotyping process (make sure it's without header, and the format is [samplename]_[0-9])
+pedigree_ref="" ## pedigree information
+MAFref="" ## reference for external marker concordance
+ref1000G="" ## reference for PCA from 1000genomes
+commonSNPs="" ## PCA reference of common snps from GoNL and 1000G, prunned according to doi:10.1038/ejhg.2014.19
+samplesheet="" ## Identifier list for samples
+pairing_ID="" ## pairing file for the IDs of family and samples (when needed)
 
-ref1000G="/apps/data/1000G/phase3/1000G_all" ## reference for PCA from 1000genomes
-gonlref="/groups/umcg-aad/tmp04/umcg-elopera/thgref/gonl_SNV_INDELs_ab" ## reference for PCA from GoNL
-commonSNPs="/groups/umcg-aad/tmp04/umcg-elopera/thgref/gonl_1KGenomes_GSA_common_SNPs" ## PCA reference of common snps from GoNL and 1000G, prunned according to doi:10.1038/ejhg.2014.19
+### Tools
+king_tool="" ## exact location of the KING executable
+cranefoot_tool="" ## exact location of the Cranefoot executable
 
-pairing_ID="/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/pairing.dat" ## pairing file for the IDs of family and samples
-pedigree_ref="/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/LifeLines_Corrected_family_info.dat" ## pedigree information
-dummy_pedigree="/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/corrected_v2_dummy_allped" ## dummy plink file with information of all the pedigree
-king_tool="/groups/umcg-aad/tmp04/umcg-elopera/tools/KING/king" ## exact location of the KING executable
-cranefoot_tool="/groups/umcg-aad/tmp04/umcg-elopera/tools/Cranefoot/example/cranefoot" ## exact location of the Cranefoot executable
-
-all_pairing_file="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt" ## pairing file for internal sample concordance
-merged_conc1="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gwas_og_plink_chr/filtered_merged_LL_GWAS" ## merged file 1, for the previous gwas study
-merged_conc2="/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gonl_og_plink_chr/filtered_merged_goNL_OG" ## merged file 2, for the goNL study
 
 ###create working directories
 mkdir -p "${GeneralQCDir}/"
@@ -273,13 +269,9 @@ ${GeneralQCDir}/5_Relatedness/proc/full_autosomal_rel.temp.bim > ${GeneralQCDir}
        --make-bed \
        --out ${GeneralQCDir}/5_Relatedness/proc/full_data
 
-
 ## exclude intentionally duplicated samples
-## change script location
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_sample_duplicates.R \
-        -w ${GeneralQCDir}/5_Relatedness/proc/ \
-        -r $all_pairing_file
-        
+Rscript ${codedir}/sub_sample_duplicates.R -w ${GeneralQCDir}/5_Relatedness/proc/ -r ${intended_dup_samples_file}
+
 ## apply filters to reduce SNP number
  plink --bfile ${GeneralQCDir}/5_Relatedness/proc/full_data \
        --remove ${GeneralQCDir}/5_Relatedness/proc/intended.duplicates \
@@ -287,17 +279,15 @@ Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_sample_duplicates.R \
        --out ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup
 
 ### genetic family concordance
-##### change script location
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_fam_check.R \ 
-                              -p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \ 
-                              -c ${pairing_ID} \
-                              -i ${pedigree_ref} \
-                              -k ${king_tool} \
-                              -d ${dummy_pedigree} \
-                              -C ${cranefoot_tool} \
-                              -w ${GeneralQCDir}/5_Relatedness/proc2/ \
-                              -M TRUE \
-                              -o ${GeneralQCDir}/plots/
+Rscript ${codedir}/sub_fam_check.R \ 
+ -p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \ 
+ -i ${pedigree_ref} \
+ -k ${king_tool} \
+ -C ${cranefoot_tool} \
+ -w ${GeneralQCDir}/5_Relatedness/proc2/ \
+ -c ${pairing_ID} \
+ -M FALSE \ ### change to TRUE to draw pedigrees, but be sure to have pairing file (-c)
+ -o ${GeneralQCDir}/plots/
 
 
 #remove temp files
@@ -342,7 +332,7 @@ cat ${GeneralQCDir}/X_QC/1_CR80/chr_*.extr80_var > ${GeneralQCDir}/X_QC/1_CR80/e
 # exclude SNPs with a call rate < 80%
 plink --bfile ${GeneralQCDir}/X_QC/1_CR80/chr_X  \
      --make-bed \
-     --exclude ${GeneralQCDir}/X_QC/1_CR80/extr80.vars\
+     --exclude ${GeneralQCDir}/X_QC/1_CR80/extr80.vars \
      --out ${GeneralQCDir}/X_QC/1_CR80/chr_X.2
 
 #calculates callrate stats from the previously filtered datafile (removed SNPS with call rate < 80%)
@@ -371,14 +361,13 @@ cat ${GeneralQCDir}/X_QC/2_CR_high/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/X
 plink --bfile  ${GeneralQCDir}/X_QC/2_CR_high/chr_X  --impute-sex --make-bed --out ${GeneralQCDir}/X_QC/0_pre/imputed
 
 ###call the Rscript for plotting sex concordance
-### change script location
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
-                              -p ${pairing_ID}  \
-                              -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
-                              -o ${GeneralQCDir}/plots
+echo "[WARNING]: this script is designed to work with plate position information, do not use directly if this is not included"
+Rscript ${codedir}/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
+ -p ${pairing_ID}  \
+ -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
+ -o ${GeneralQCDir}/plots
 
 grep -E 'Non concordant|Failed'  ${GeneralQCDir}/plots/sex_check/all.samples.concordance*.txt| awk '{{print $4, $4}}' > ${GeneralQCDir}/X_QC/sex.flagged
-
 ####################Filter out SNPs based on HW and MAF#############################
 ### X chromosome HWE QC is done in a separate script afer family and sex correction
 ### see sub_MendelianErrors_FounderStats.R afeter second iteration
@@ -390,11 +379,6 @@ grep -E 'Non concordant|Failed'  ${GeneralQCDir}/plots/sex_check/all.samples.con
        --extract  ${commonSNPs} \
        --make-bed \
        --out ${GeneralQCDir}/6_PCA/proc/thg
-
- plink --bfile ${gonlref} \
-       --extract  ${commonSNPs}  \
-       --make-bed \
-       --out ${GeneralQCDir}/6_PCA/proc/goref
        
 
 ## filter also the cohort by common snps
@@ -403,11 +387,9 @@ grep -E 'Non concordant|Failed'  ${GeneralQCDir}/plots/sex_check/all.samples.con
        --make-bed \
        --out ${GeneralQCDir}/6_PCA/proc2/allchr_join
 
-
 ## make list of individuals to merge 
 echo "${GeneralQCDir}/6_PCA/proc2/allchr_join" >> ${GeneralQCDir}/6_PCA/proc2/allfiles.list
 echo "${GeneralQCDir}/6_PCA/proc/thg" >> ${GeneralQCDir}/6_PCA/proc2/allfiles.list
-echo "${GeneralQCDir}/6_PCA/proc/goref" >> ${GeneralQCDir}/6_PCA/proc2/allfiles.list
 
 ###merge all data
  plink --merge-list ${GeneralQCDir}/6_PCA/proc2/allfiles.list \
@@ -457,10 +439,10 @@ awk 'BEGIN { FS=" " ;} {if ($2 ~ /DNA/) print $0 " Cohort"; else if($2 ~ /gonl/)
 plink -bfile ${GeneralQCDir}/6_PCA/PCA_data1 --within ${GeneralQCDir}/6_PCA/proc2/clusters --pca --pca-cluster-names 1000G GoNl --out ${GeneralQCDir}/6_PCA/PCA_1000G
 
 ###first PCA plot
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
- -f "PCA_1000G.eigenvec" \
- -o ${GeneralQCDir}/plots \
- -r "1st."
+Rscript ${codedir}/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
+-f "PCA_1000G.eigenvec" \
+-o ${GeneralQCDir}/plots \
+-r "1st."
 
 ### 2.nd PCA 
 ##extract selected samples by PCA
@@ -480,30 +462,31 @@ grep -f ${GeneralQCDir}/6_PCA/second_PCA.samples ${GeneralQCDir}/6_PCA/proc2/clu
 plink -bfile ${GeneralQCDir}/6_PCA/PCA_data2 --within ${GeneralQCDir}/6_PCA/second_clusters --pca --pca-cluster-names GoNl 1000G --out ${GeneralQCDir}/6_PCA/second_PCA
 
 #Rscript PCA1_v1.R -i ${GeneralQCDir}/6_PCA \
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
- -f "second_PCA.eigenvec" \
- -o ${GeneralQCDir}/plots \
- -r "2nd."
+Rscript ${codedir}/sub_PCA.R -i ${GeneralQCDir}/6_PCA \
+-f "second_PCA.eigenvec" \
+-o ${GeneralQCDir}/plots \
+-r "2nd."
 
 cat ${GeneralQCDir}/6_PCA/1st.excl.samples ${GeneralQCDir}/6_PCA/2nd.excl.samples > ${GeneralQCDir}/6_PCA/excl_PCA.samples
 
-for chr in {1..22} "XY"
- do
+## activate if you want to remove population outliers
+#for chr in {1..22} "XY"
+# do
  ##extract selected samples by secondPCA
- plink --bfile ${GeneralQCDir}/4_Het/chr_${chr} \
-       --keep ${GeneralQCDir}/6_PCA/2nd.incl.samples \
-       --make-bed \
-       --freq \
-       --out ${GeneralQCDir}/6_PCA/chr_${chr}
+# plink --bfile ${GeneralQCDir}/4_Het/chr_${chr} \
+#       --keep ${GeneralQCDir}/6_PCA/2nd.incl.samples \
+#       --make-bed \
+#       --freq \
+#       --out ${GeneralQCDir}/6_PCA/chr_${chr}
 
- done
+# done
 
 #######################################################
 #################plot results###########################
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_plots_reports.R -i ${GeneralQCDir} \
- -o ${GeneralQCDir}/plots \
- -n "batch${UGLIbatch}" \
- -r ${MAFref} \
+Rscript ${codedir}/sub_plots_reports.R -i ${GeneralQCDir} \
+-o ${GeneralQCDir}/plots \
+-n "batch_name" \
+-r ${MAFref} \
 
 #########################################################
 ### Samples internal concordance###
