@@ -34,3 +34,4 @@ PennCNV_reportDir,${intermediateDir}/PennCNV_reports/
 CallrateDir,${intermediateDir}/Callrate/
 FinalReportDir,${intermediateDir}/FinalReport/
 CalculateSDDir,${intermediateDir}/CalculateSD/
+GenderCheckDir,${intermediateDir}/GenderCheck/
