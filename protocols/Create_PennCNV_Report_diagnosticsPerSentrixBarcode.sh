@@ -9,7 +9,7 @@
 #string Project
 #string SentrixBarcode_A
 #list SentrixPosition_A
-#string PennCNV_reportDir
+#string pennCNV_reportDir
 #list Sample_ID
 #string gapVersion
 #string resultDir
@@ -22,10 +22,10 @@ module load "${gapVersion}"
 module list
 
 
-mkdir -p "${PennCNV_reportDir}"
+mkdir -p "${pennCNV_reportDir}"
 mkdir -p "${resultDir}/PennCNV_reports/"
 
-makeTmpDir "${PennCNV_reportDir}"
+makeTmpDir "${pennCNV_reportDir}"
 tmpPennCNV_reportDir="${MC_tmpFile}"
 
 ## Make a list of all samples to be processed per SentrixBarcode

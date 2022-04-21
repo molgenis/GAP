@@ -11,7 +11,7 @@
 #string SentrixBarcode_A
 #list SentrixPosition_A
 #string pipeline
-#string CallrateDir
+#string callrateDir
 #string gapVersion
 #string logsDir
 #string intermediateDir
@@ -38,9 +38,9 @@ module list
 set -e
 set -u
 
-mkdir -p "${CallrateDir}/"
+mkdir -p "${callrateDir}/"
 
-makeTmpDir "${CallrateDir}/"
+makeTmpDir "${callrateDir}/"
 tmpCallrateDir="${MC_tmpFile}"
 
 
@@ -76,5 +76,5 @@ done
 
 # Move results from tmp to intermediateDir
 
-echo "mv ${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt ${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
-mv "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt" "${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
+echo "mv ${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt ${callrateDir}/Callrates_${SentrixBarcode_A}.txt"
+mv "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt" "${callrateDir}/Callrates_${SentrixBarcode_A}.txt"
