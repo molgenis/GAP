@@ -21,12 +21,12 @@
 #string tmpTmpdir
 #string HTSlibVersion
 #string resultDir
-#string CalculateSDDir
-#string PennCNV_reportDir
+#string calculateSDDir
+#string pennCNV_reportDir
 
-mkdir -p "${CalculateSDDir}/"
+mkdir -p "${calculateSDDir}/"
 
-makeTmpDir "${CalculateSDDir}/"
+makeTmpDir "${calculateSDDir}/"
 tmpCalculateSDDir="${MC_tmpFile}"
 
 module load "${pythonVersion}"

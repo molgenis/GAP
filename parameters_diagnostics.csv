@@ -30,8 +30,8 @@ GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
 vcfDir,${resultDir}/VCF/
-PennCNV_reportDir,${intermediateDir}/PennCNV_reports/
-CallrateDir,${intermediateDir}/Callrate/
-FinalReportDir,${intermediateDir}/FinalReport/
-CalculateSDDir,${intermediateDir}/CalculateSD/
-GenderCheckDir,${intermediateDir}/GenderCheck/
+pennCNV_reportDir,${intermediateDir}/PennCNV_reports/
+callrateDir,${intermediateDir}/Callrate/
+finalReportDir,${intermediateDir}/FinalReport/
+calculateSDDir,${intermediateDir}/CalculateSD/
+genderCheckDir,${intermediateDir}/GenderCheck/
