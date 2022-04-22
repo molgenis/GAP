@@ -1,0 +1,17 @@
+### these are the values used in the first QC round in the gearshift cluster
+
+##input and output variables
+InputDir="/groups/umcg-gdio/tmp01/projects/2021001/rawdata/project/results/gensamplefiles" ##directory with the location for gen-sample files
+GeneralQCDir="/groups/umcg-gdio/tmp01/umcg-elopera/general_qc"  ###name & allocate your results directory
+codedir="/groups/umcg-gdio/tmp01/umcg-elopera/scripts/GAP/scripts/Autosomal_QC" 
+
+### Reference files
+intended_dup_samples_file="/groups/umcg-gdio/tmp01/projects/2021001/rawdata/project/results/duplicate_IDs_GD_renamed.txt" ### file with intentional duplicates in the genotyping process (make sure it's without header, and the format is [samplename]_[0-9])
+pedigree_ref="/groups/umcg-wijmenga/tmp01/projects/pgx-pipeline/data/gsa-batch1-genotyping/next_20220325.fam" ## pedigree information
+MAFref="/groups/umcg-gdio/tmp01/umcg-elopera/tools/af.ref.data.txt" ## reference for external marker concordance
+ref1000G="/apps/data/1000G/phase3/1000G_all" ## reference for PCA from 1000genomes
+commonSNPs="/groups/umcg-gdio/tmp01/umcg-elopera/tools/gonl_1KGenomes_GSA_common_SNPs" ## PCA reference of common snps from GoNL and 1000G, prunned according to doi:10.1038/ejhg.2014.19
+
+### Tools
+king_tool="/groups/umcg-gdio/tmp01/umcg-elopera/tools/king" ## exact location of the KING executable
+cranefoot_tool="/groups/umcg-gdio/tmp01/umcg-elopera/tools/cranefoot" ## exact location of the Cranefoot executable
