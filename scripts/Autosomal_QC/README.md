@@ -3,18 +3,15 @@ Created by: Raul Aguirre-Gamboa, Esteban Lopera-Maya. \
 Contact information: e.a.lopera.maya@umcg.nl. 
 
 # Pipeline structure
-Important note: this is a self-contained and specific pipeline to work on the UMCG HPC. This means, that at the time it is not fully automated to work in completeness in every kind of data and every kind of server, and many steps might be specifically designed for the UGLI data alone. You are welcome, however, to take any individual step and/or code snippet to addapt to your own conditions. \
+Important note: this is a self-contained and specific pipeline to work on the UMCG HPC. This means, that at the time it is not fully automated to work in completeness in every kind of data and every kind of server, and many steps might be specifically designed for the original data alone. You are welcome, however, to take any individual step and/or code snippet to addapt to your own conditions. \
 \
 This pipeline is designed to work in three main steps as indicated by the numeration in front of the name of the main scripts. Numbered scripts should be called by the user independently one after the other. All the scripts with the prefix "sub_" in the front of the name are automatically called by the numbered scripts. \
 A feedback loop should be done manually by the user, after processing also manually the output of step 2 (script 2.) to remove familial errors (as these cannot be removed automatically), the data resulting from this should go through step 2 a second time. Special adittional "sub_" scripts contain also the suffix "second_it". These should replace their counterparts in the second iteration of step 2. 
 
 #  content
 
-1.merge_genotype_batches.sh: This script has 2 functions 
+2.QC_autosomes_launch.sh: Main script. It launches all quality control steps and uses most of the required and other reference files
 - Transform oxford files into plink format 
-- Search and and merge different batches into a single big batch 
-
-2.QC_autosomes_launch.sh: Main script. It launches all quality control steps and uses most of the required and other reference files 
 - Loads tools and reference files for all steps 
 - Corrects possible sample ID differences 
 - Performs call rate filtering and removes/renames duplicated SNPs 
@@ -39,6 +36,10 @@ A feedback loop should be done manually by the user, after processing also manua
 - Remove duplicated snps (same position SNPS) (script with number 2) 
 - transform to VCF and format for imputation, fix reference and alternative alleles in each SNP (use fixref plugin form BCFtools)
 ***Important note: post-imputation quality control steps are not included here. This included only internal concordance evaluation with internal biobanks data. A posterior evaluation of the resulting allelic frequencies with HRC revealed ~5K SNPs with wrong reference allele asignation. These need to be removed form the current data imputed and can be found in the gearshift cluster at: "/groups/umcg-lifelines/prm03/releases/gsa_genotypes/v1/UGLI_imputed_outliers.list"
+  
+5. How to use (loosely):
+  fill in the variables for the main script, change the SBATCH parameters according to your data size (i.e 10GB and 30min are more than enough for 750k SNPs in 3000 samples) and then run the script.
+  Original values for the variables cna be found in the original_values.txt file
   
 Acknowledgements:
 This pipeline was elaborated with the financial aid from UMCG-HAP2017 as part of the project, as well as the Conacyt Fellowship, which supported RAG, and Colciencias Fellowship, which supported ELM.
