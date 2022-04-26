@@ -285,7 +285,6 @@ Rscript ${codedir}/sub_fam_check.R \
  -k ${king_tool} \
  -C ${cranefoot_tool} \
  -w ${GeneralQCDir}/5_Relatedness/proc2/ \
- -c ${pairing_ID} \
  -M FALSE \ ### change to TRUE to draw pedigrees, but be sure to have pairing file (-c)
  -o ${GeneralQCDir}/plots/
 
