@@ -24,12 +24,6 @@ library(data.table)
 library(dplyr)
 library(optparse)
 
-##Arguments
-codextract <- function(x) {
-  x <- as.character(x)
-  return(substr(x,nchar(x)-9,nchar(x)))
-}
-
 #########################################################################################################
 option_list = list(
   make_option(c("-w", "--wd"), type="character", default=NULL, 
@@ -51,22 +45,28 @@ if (is.null(opt$out)){opt$out<-opt$input}
 
 ################### Main ###########################################################
 ##read files
-dup.file<-fread(opt$ref,data.table=F,header=T)
+##read chromosome files  
+dup.file<-fread(opt$ref,data.table=F,header=F)
 frq_file<-file.path(opt$wd,"full_autosomal_rel.temp.imiss")
-frq.file<-fread(frq_file,data.table=F,header=T)
-## name columns on dataframe to match
-colnames(dup.file)<-c("PSEUDOID", "Sample_ID", "clean_ID","GWASID","GONL_ID")
-frq.file$clean_ID<-sapply(frq.file$IID,FUN=codextract)
+frq.data<-fread(frq_file,data.table=F,header=T)
+
+## create clean (non-duplicated) IDs
+frq.data$clean_ID<-gsub(frq.data$IID,pattern="_[0-9]",replacement = "")
+dup.file$clean_ID<-gsub(dup.file$V1,pattern="_[0-9]",replacement = "")
+
 ##JOIN THE DATAFRAMES
-datfile<-left_join(dup.file, frq.file,by="clean_ID")
+datfile<-left_join( dup.file,frq.data ,by="clean_ID")
+
 #make Exclude list with all duplicates with less call rate
-datfile<-datfile%>%group_by(PSEUDOID)%>%mutate(keepCR=min(F_MISS))%>%as.data.frame()
+datfile<-datfile%>%group_by(clean_ID)%>%mutate(keepCR=min(F_MISS))%>%as.data.frame()
 excl.less.duplicates<-datfile[which(!is.na(datfile$F_MISS) &datfile$F_MISS>datfile$keepCR),c("IID","FID")]
+
 #make list of duplicates with the same call rate
 undup<-datfile %>%filter(!IID %in% excl.less.duplicates[,"IID"])
 excl.s.duplicates<-undup[duplicated(undup$PSEUDOID),c("IID","FID")]
 #make list of all the duplicates
 excl.duplicates<-rbind(excl.less.duplicates,excl.s.duplicates)
+
 excl.file <- file.path(opt$wd, "intended.duplicates")
 ##output files
 write.table(excl.duplicates,excl.file, quote=F,row.names = F,col.names = F)
