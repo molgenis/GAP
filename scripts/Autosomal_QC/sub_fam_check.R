@@ -24,9 +24,6 @@ option_list = list(
   make_option(c("-p", "--plink"), type="character", default=NULL, 
               help="Path to plink files index, it assumes a bed, bim and fam file with the same file name", metavar="character"),
   
-  make_option(c("-c", "--code"), type="character", default=NULL, 
-              help="Path to pairing ID's file", metavar="character"),
-  
   make_option(c("-i", "--info"), type="character", default=NULL, 
               help="Phenotype and pedigree information file", metavar="character"),
   
@@ -61,9 +58,7 @@ opt <- parse_args(opt_parser)
 #########################################################################################################
 
 # routine check if files exists 
-if(file.exists(opt$code) == FALSE){
-  stop(paste0("[ERROR]\t Pairing file does not exist, input file:\n", opt$code, "\n"))
-} else if (all(file.exists(paste0(opt$plink, c(".bim", ".fam", ".bed")))) == FALSE){
+if (all(file.exists(paste0(opt$plink, c(".bim", ".fam", ".bed")))) == FALSE){
   stop(paste0("[ERROR]\t At least one of the plink files (.bim .fam .bed) does not exist:\n", opt$plink, "\n"))
 }else if (file.exists(opt$info) == FALSE){
   stop(paste0("[ERROR]\t Info/Phenotype files does not exist, input file:\n", opt$info, "\n"))
@@ -77,7 +72,7 @@ cat("[INFO]\t Reading input files")
 info.table <- fread(opt$info, data.table=F)
 fam.table <- fread(file = paste0(opt$plink,".fam"))
 
-# Matching sample IDs from ".fam" file and "opt$code"  file. Remove duplicate indicator
+# Matching sample IDs from ".fam" file info  file. Remove duplicate indicator
 fam.table$sust <- gsub(fam.table$V2,pattern="_[0-9]",replacement = "")
 info.table$sust<-gsub(info.table$V2,pattern="_[0-9]",replacement = "")
 # merge infor table with .fam file. 
