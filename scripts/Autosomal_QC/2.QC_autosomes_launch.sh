@@ -9,6 +9,7 @@ module load RPlus
 
 
 ### input and output variables
+## make sure the samples have the same pairing IDs in all the files they appear in
 InputDir="" ##directory with the location for gen-sample files
 GeneralQCDir=""  ##name & allocate your results directory
 codedir="" ##allocate your scripts directory 
@@ -20,7 +21,6 @@ MAFref="" ## reference for external marker concordance
 ref1000G="" ## reference for PCA from 1000genomes
 commonSNPs="" ## PCA reference of common snps from GoNL and 1000G, prunned according to doi:10.1038/ejhg.2014.19
 samplesheet="" ## Identifier list for samples
-pairing_ID="" ## pairing file for the IDs of family and samples (when needed)
 
 ### Tools
 king_tool="" ## exact location of the KING executable
