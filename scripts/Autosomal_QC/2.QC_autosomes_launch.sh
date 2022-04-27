@@ -270,10 +270,10 @@ ${GeneralQCDir}/5_Relatedness/proc/full_autosomal_rel.temp.bim > ${GeneralQCDir}
        --make-bed \
        --out ${GeneralQCDir}/5_Relatedness/proc/full_data
 
-## exclude intentionally duplicated samples
+## create file to exclude intentionally duplicated samples
 Rscript ${codedir}/sub_sample_duplicates.R -w ${GeneralQCDir}/5_Relatedness/proc/ -r ${intended_dup_samples_file}
 
-## apply filters to reduce SNP number
+## apply filters to remove intentionally ducplicated samples
  plink --bfile ${GeneralQCDir}/5_Relatedness/proc/full_data \
        --remove ${GeneralQCDir}/5_Relatedness/proc/intended.duplicates \
        --make-bed \
