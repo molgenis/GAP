@@ -21,7 +21,7 @@ umask 0007
 module load ${computeVersion}
 module list
 
-array_contains () {
+array_contains_missingSamples () {
 	local array="$1[@]"
 	local seeking="${2}"
 	local in=1
@@ -35,23 +35,39 @@ array_contains () {
 	done
 }
 
+array_contains () {
+	local array="$1[@]"
+	local seeking="${2}"
+	local in=1
+	for element in "${!array-}"; do
+		if [[ "${element}" == "${seeking}" ]]; then
+			in=0
+			break
+		fi
+	done
+	return "${in}"
+}
+
 #Create ProjectDirs
 mkdir -p -m 2770 "${intermediateDir}"
 mkdir -p -m 2770 "${resultDir}"
 mkdir -p -m 2770 "${projectJobsDir}"
 mkdir -p -m 2770 "${projectRawTmpDataDir}"
 
-declare -a arrayMissingSampleNames
-
-#Create Symlinks
-
 rocketPoint=$(pwd)
 host=$(hostname -s)
 
-cd "${projectRawTmpDataDir}"
 
-max_index=${#SentrixPosition_A[@]}-1
-for i in "${SentrixBarcode_A[@]}"
+declare -a arrayUniqueMissingSampleNames
+
+for sample in "${SentrixBarcode_A[@]}"
+do
+	array_contains arrayUniqueMissingSampleNames "${sample}" || arrayUniqueMissingSampleNames+=("${sample}")
+done
+	
+declare -a arrayMissingSampleNames
+cd "${projectRawTmpDataDir}"
+for i in "${arrayUniqueMissingSampleNames[@]}"
 do
 	if [[ -f "../../../../../rawdata/array/GTC/${i}/missingIDATs.txt" ]]
 	then
@@ -66,11 +82,14 @@ do
 	fi
 done
 
+max_index=${#SentrixBarcode_A[@]}-1
+
+
 if [ "${pipeline}" == 'diagnostics' ] 
 then
 	for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 	do
-		array_contains arrayMissingPosition "${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}"
+		array_contains_missingSamples arrayMissingPosition "${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}"
 		if [ "${missing}" == "false" ]
 		then
 			ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
@@ -97,6 +116,7 @@ fi
 sampleSheetCsv="${genScripts}/${Project}.csv"
 perl -pi -e 's/\r(?!\n)//g' "${sampleSheetCsv}"
 
+cd "${rocketPoint}"
 
 if [[ "${#arrayMissingSampleNames[@]:-0}" -ne "0" ]]
 then

@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=8gb ppn=1
 
 #string pythonVersion
