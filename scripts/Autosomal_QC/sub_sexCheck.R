@@ -33,7 +33,7 @@ option_list = list(
               help="Output path to save report", metavar="character"),
   
   make_option(c("-p", "--phenotypes"), type="character", default=NULL, 
-              help="path to sample info spreadsheet", metavar="character"),
+              help="pedigree file with sex info", metavar="character"),
   
   make_option(c("-d", "--dup"), type="character", default=NULL, 
               help="path to the duplicates file", metavar="character")
