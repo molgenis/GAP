@@ -362,7 +362,8 @@ cat ${GeneralQCDir}/X_QC/2_CR_high/chr_*.bim|awk '{print$2}' > ${GeneralQCDir}/X
 plink --bfile  ${GeneralQCDir}/X_QC/2_CR_high/chr_X  --impute-sex --make-bed --out ${GeneralQCDir}/X_QC/0_pre/imputed
 
 ###call the Rscript for plotting sex concordance
-echo "[WARNING]: this script is designed to work with plate position information, do not use directly if this is not included"
+## pedigree file should contain sex information in the 5th column coded as in plink
+## make sure pedigree file does not contain header
 Rscript ${codedir}/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
 -p ${pedigree_ref}\
 -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
