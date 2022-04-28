@@ -6,7 +6,8 @@
 
 module load PLINK/1.9-beta6-20190617
 module load RPlus
-
+set -u
+set -e
 
 ### input and output variables
 ## make sure the samples have the same pairing IDs in all the files they appear in
@@ -280,15 +281,15 @@ Rscript ${codedir}/sub_sample_duplicates.R -w ${GeneralQCDir}/5_Relatedness/proc
        --out ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup
 
 ### genetic family concordance
-Rscript ${codedir}/sub_fam_check.R \ 
- -p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \ 
- -i ${pedigree_ref} \
+Rscript ${codedir}/sub_fam_check.R \
+-p ${GeneralQCDir}/5_Relatedness/proc/full_data.no.dup \
+-i ${pedigree_ref} \
  -k ${king_tool} \
  -C ${cranefoot_tool} \
  -w ${GeneralQCDir}/5_Relatedness/proc2/ \
- -M FALSE \ ### change to TRUE to draw pedigrees, but be sure to have pairing file (-c)
+ -M FALSE \
  -o ${GeneralQCDir}/plots/
-
+### change M to TRUE to draw pedigrees, but be sure to have pairing file (-c)
 
 #remove temp files
 rm ${GeneralQCDir}/5_Relatedness/proc/*temp*
