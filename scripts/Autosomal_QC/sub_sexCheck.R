@@ -74,5 +74,5 @@ nonna<-which(!is.na(plink.sex$sex.concordance))
 conc<-length(which(plink.sex$sex.concordance==T))
 
 report<-c("samples with sex information:"=nonna,"samples with concordant sex:"=conc,"concordance rate:"=length(conc)/length(nonna))
-write.table(report,paste0(opt$output,"sex_concordance.rep"),sep='\t',quote = =F,row.names = F)
+write.table(report,paste0(opt$output,"sex_concordance.rep"),sep='\t',quote=F,row.names = F)
 
