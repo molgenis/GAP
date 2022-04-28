@@ -16,7 +16,7 @@ GeneralQCDir=""  ##name & allocate your results directory
 codedir="" ##allocate your scripts directory 
 
 ### Reference files
-intended_dup_samples_file="" ### file with intentional duplicates in the genotyping process (make sure it's without header, and the format is [samplename]_[0-9])
+intended_dup_samples_file="" ### file with intentional duplicates in the genotyping process (make sure it's without header, and the format is [samplename]_[0-9]). Be sire to include all duplicates, otherwise KING will fail
 pedigree_ref="" ## pedigree information
 MAFref="" ## reference for external marker concordance
 ref1000G="" ## reference for PCA from 1000genomes
