@@ -317,7 +317,7 @@ plink --bfile ${GeneralQCDir}/X_QC/chr_X \
 
 ## generate list of duplicated SNPs (selecting the one with best call rate).
 ### change script location
-Rscript /groups/umcg-aad/tmp04/umcg-elopera/sub_position_duplicates.R -i ${GeneralQCDir}/X_QC/0_pre 
+Rscript ${codedir}/sub_position_duplicates.R -i ${GeneralQCDir}/X_QC/0_pre 
 
 ##creates list of individuals and dup snps excluded for the X chromosome
 cat ${GeneralQCDir}/X_QC/0_pre/chr_X.excl.duplicates > ${GeneralQCDir}/X_QC/0_pre/extr.dups
