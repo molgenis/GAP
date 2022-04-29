@@ -435,7 +435,8 @@ echo "${GeneralQCDir}/6_PCA/proc/thg" >> ${GeneralQCDir}/6_PCA/proc2/allfiles.li
 
 ###define sample cluster to project on
 awk '{print $1,$2}' ${GeneralQCDir}/6_PCA/proc2/full_data.fam > ${GeneralQCDir}/6_PCA/proc2/merged_samples
-awk 'BEGIN { FS=" " ;} {if ($2 ~ /DNA/) print $0 " Cohort"; else if($2 ~ /gonl/) print $0 " GoNl" ; else print $0 " 1000G" }' ${GeneralQCDir}/6_PCA/proc2/merged_samples> ${GeneralQCDir}/6_PCA/proc2/clusters
+### be sure that your cohort samples do NOT start with "HG", "NA" or "goNL" as those are names used specifically to define cohorts
+awk 'BEGIN { FS=" " ;} {if ($2 ~ /gonl/) print $0 " GoNl" ; else if ($2 ~ /^HG/ || $2 ~ /^NA/)  print $0 " 1000G" ; else print $0 " Cohort" }' ${GeneralQCDir}/6_PCA/proc2/merged_samples> ${GeneralQCDir}/6_PCA/proc2/clusters
 
 ###make pca on ggonl thousand genomes and [plot PCA of cohort ]project chorot on them
 plink -bfile ${GeneralQCDir}/6_PCA/PCA_data1 --within ${GeneralQCDir}/6_PCA/proc2/clusters --pca --pca-cluster-names 1000G GoNl --out ${GeneralQCDir}/6_PCA/PCA_1000G
