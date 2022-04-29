@@ -764,7 +764,7 @@ dev.off()
 ############### MAF after PCA########
 
 maf.path <- file.path(opt$input, "6_PCA/")
-#maf.path <- "/groups/umcg-aad/tmp04/umcg-elopera/Autosome_QC_B_part8/6_PCA/"
+if (file.exists(paste0(maf.path,"chr_1.frq"))){ 
 
 maf.files <- list.files(maf.path, pattern = ".frq$", full.names = TRUE)
 
@@ -801,7 +801,7 @@ tiff(maf.final.tiff.file, width = 2500, height = 1500, units = "px", res = 300, 
 grid.arrange(maf.dist.plot.chr, maf.dist.plot.all, 
              ncol=2, top=maf.title)
 dev.off()
-
+}
 ############################END################################
 cat("\n[INFO]\t Finished plotting QC report")
 
