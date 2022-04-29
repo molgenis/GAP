@@ -489,4 +489,4 @@ cat ${GeneralQCDir}/6_PCA/1st.excl.samples ${GeneralQCDir}/6_PCA/2nd.excl.sample
 Rscript ${codedir}/sub_plots_reports.R -i ${GeneralQCDir} \
 -o ${GeneralQCDir}/plots \
 -n "batch_name" \
--r ${MAFref} \
+-r ${MAFref}
