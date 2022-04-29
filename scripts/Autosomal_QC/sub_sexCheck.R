@@ -59,20 +59,31 @@ bar.plot.width.factor <- 123
 ### Main
 #########################################################################################################
 ## Read phenotypes, we are currently using the info from the spreadsheets.
-phenos <- fread(opt$phenotypes, data.table = FALSE)
+phenos <- fread(opt$phenotypes, data.table = FALSE,header=F)
 plink.sex <- fread(opt$input, data.table=FALSE)
-
+head(phenos)
 ##harmonize names
 phenos$Sample_ID<- gsub(phenos$V2,pattern="_[0-9]",replacement = "")
 plink.sex$IID<-gsub(plink.sex$IID,pattern="_[0-9]",replacement = "")
 ## see concordance
 plink.sex$pheno.sex <- phenos$V5[match(plink.sex$IID, phenos$Sample_ID)]
+
 plink.sex$plink.sex <- ifelse(plink.sex$SNPSEX == 0, NA, ifelse(plink.sex$SNPSEX == 1, "M", "F"))
 plink.sex$sex.concordance <- plink.sex$SNPSEX == plink.sex$pheno.sex
-##calculate results
-nonna<-which(!is.na(plink.sex$sex.concordance))
+##calculate results for summary report
+nonna<-length(which(!is.na(plink.sex$sex.concordance)))
 conc<-length(which(plink.sex$sex.concordance==T))
+### flag samples
+plink.sex$sex.concordance[which(plink.sex$sex.concordance == "FALSE")] <- "Non concordant"
+plink.sex$sex.concordance[which(is.na(plink.sex$pheno.sex))] <- "No data in pedigree file"
+plink.sex$sex.concordance[which(plink.sex$sex.concordance == "TRUE")] <- "OK"
+plink.sex$sex.concordance[which(plink.sex$SNPSEX==0)] <- "Failed genetic imputation"
+table(plink.sex$sex.concordance)
 
-report<-c("samples with sex information:"=nonna,"samples with concordant sex:"=conc,"concordance rate:"=length(conc)/length(nonna))
-write.table(report,paste0(opt$output,"sex_concordance.rep"),sep='\t',quote=F,row.names = F)
+### write reports
+report<-data.frame(cbind("samples with sex information:"=nonna,"samples with concordant sex:"=conc,"concordance rate:"=conc/nonna))
+
+write.table(report,paste0(opt$output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F,col.names = F)
+write.table(plink.sex,paste0(opt$output,"all.samples.concordance"),sep='\t',quote = F,row.names = F)
+
 
