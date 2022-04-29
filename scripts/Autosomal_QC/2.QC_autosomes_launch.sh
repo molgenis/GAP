@@ -367,9 +367,9 @@ plink --bfile  ${GeneralQCDir}/X_QC/2_CR_high/chr_X  --impute-sex --make-bed --o
 Rscript ${codedir}/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck \
 -p ${pedigree_ref} \
 -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
- -o ${GeneralQCDir}/plots
+ -o ${GeneralQCDir}/X_QC/
 
-grep -E 'Non concordant|Failed'  ${GeneralQCDir}/plots/sex_check/all.samples.concordance.txt| awk '{{print $2, $2}}' > ${GeneralQCDir}/X_QC/sex.flagged
+grep -E 'Non concordant|Failed'  ${GeneralQCDir}/X_QC/sex_check/all.samples.concordance.txt| awk '{{print $2, $2}}' > ${GeneralQCDir}/X_QC/sex.flagged
 ####################Filter out SNPs based on HW and MAF#############################
 ### X chromosome HWE QC is done in a separate script afer family and sex correction
 ### see sub_MendelianErrors_FounderStats.R afeter second iteration
