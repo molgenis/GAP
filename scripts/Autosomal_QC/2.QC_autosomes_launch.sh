@@ -369,7 +369,7 @@ Rscript ${codedir}/sub_sexCheck.R -i ${GeneralQCDir}/X_QC/0_pre/imputed.sexcheck
 -d ${GeneralQCDir}/5_Relatedness/proc2/equal.samples \
  -o ${GeneralQCDir}/X_QC/
 
-grep -E 'Non concordant|Failed'  ${GeneralQCDir}/X_QC/sex_check/all.samples.concordance.txt| awk -F'\t' {{print $2, $9}}' > ${GeneralQCDir}/X_QC/sex.flagged
+grep -E 'Non concordant|Failed'  ${GeneralQCDir}/X_QC/sex_check/all.samples.concordance.txt| awk -F'\t' '{{print $2, $9}}' > ${GeneralQCDir}/X_QC/sex.flagged
 ####################Filter out SNPs based on HW and MAF#############################
 ### X chromosome HWE QC is done in a separate script afer family and sex correction
 ### see sub_MendelianErrors_FounderStats.R afeter second iteration
