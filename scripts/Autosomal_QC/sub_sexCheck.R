@@ -81,7 +81,7 @@ report[5]<-c(nonna)
 names(report)[5]<-"samples with sex information from pedigree file"
 report<-as.matrix(report)
 ### write reports
-write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F,col.names = F)
+write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,col.names = F)
 write.table(plink.sex,paste0(output,"all.samples.concordance.txt"),sep='\t',quote = F,row.names = F)
 
 
