@@ -76,11 +76,12 @@ plink.sex$sex.concordance[which(plink.sex$sex.concordance == "FALSE")] <- "Non c
 plink.sex$sex.concordance[which(is.na(plink.sex$pheno.sex))] <- "No data in pedigree file"
 plink.sex$sex.concordance[which(plink.sex$sex.concordance == "TRUE")] <- "OK"
 plink.sex$sex.concordance[which(plink.sex$SNPSEX==0)] <- "Failed genetic imputation"
-table(plink.sex$sex.concordance)
-
+report<-table(plink.sex$sex.concordance)
+report[c(5,6)]<-c("samples with sex information:"=nonna,"concordance rate:"=conc/nonna)
 ### write reports
-report<-data.frame(cbind("samples with sex information:"=nonna,"samples with concordant sex:"=conc,"concordance rate:"=conc/nonna))
-write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F,col.names = F)
+#report<-data.frame(cbind("samples with sex information:"=nonna,"concordance rate:"=conc/nonna))
+write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F)
+write.table(plink.sex,paste0(output,"all.samples.concordance.txt"),sep='\t',quote = F,row.names = F)
 write.table(plink.sex,paste0(output,"all.samples.concordance.txt"),sep='\t',quote = F,row.names = F)
 
 
