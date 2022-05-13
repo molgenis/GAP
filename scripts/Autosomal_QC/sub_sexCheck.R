@@ -82,6 +82,5 @@ report[c(5,6)]<-c("samples with sex information:"=nonna,"concordance rate:"=conc
 #report<-data.frame(cbind("samples with sex information:"=nonna,"concordance rate:"=conc/nonna))
 write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F)
 write.table(plink.sex,paste0(output,"all.samples.concordance.txt"),sep='\t',quote = F,row.names = F)
-write.table(plink.sex,paste0(output,"all.samples.concordance.txt"),sep='\t',quote = F,row.names = F)
 
 
