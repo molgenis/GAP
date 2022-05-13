@@ -78,6 +78,7 @@ plink.sex$sex.concordance[which(plink.sex$sex.concordance == "TRUE")] <- "OK"
 plink.sex$sex.concordance[which(plink.sex$SNPSEX==0)] <- "Failed genetic imputation"
 report<-table(plink.sex$sex.concordance)
 report[c(5,6)]<-c("samples with sex information:"=nonna,"concordance rate:"=conc/nonna)
+report<-data.frame(report)
 ### write reports
 #report<-data.frame(cbind("samples with sex information:"=nonna,"concordance rate:"=conc/nonna))
 write.table(report,paste0(output,"sex_concordance.rep"),sep='\t',quote = F,row.names = F)
