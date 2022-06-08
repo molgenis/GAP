@@ -38,18 +38,17 @@ python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnostics.py" "${bpmFile}" "$
 
 barcodelist=()
 
-n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
 	barcodelist+=("${Sample_ID[samplenumber]}:${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}")
 done
 
-for i in ${barcodelist[@]}
+for i in "${barcodelist[@]}"
 do
-        echo "processing $i"
-        barcodeCombined=$(echo ${i} | awk 'BEGIN {FS=":"}{print $2}')
-        echo "${barcodeCombined}"
-        echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
-        mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
+	echo "processing $i"
+	barcodeCombined=$(echo "${i}" | awk 'BEGIN {FS=":"}{print $2}')
+	echo "${barcodeCombined}"
+	echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt ${PennCNV_reportDir}"
+	mv "${tmpPennCNV_reportDir}/${barcodeCombined}.gtc.txt" "${PennCNV_reportDir}"
 done

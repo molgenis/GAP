@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string Project
@@ -9,7 +11,7 @@
 #string SentrixBarcode_A
 #list SentrixPosition_A
 #string pipeline
-#string CallrateDir
+#string callrateDir
 #string gapVersion
 #string logsDir
 #string intermediateDir
@@ -36,9 +38,9 @@ module list
 set -e
 set -u
 
-mkdir -p "${CallrateDir}/"
+mkdir -p "${callrateDir}/"
 
-makeTmpDir "${CallrateDir}/"
+makeTmpDir "${callrateDir}/"
 tmpCallrateDir="${MC_tmpFile}"
 
 
@@ -49,24 +51,7 @@ do
 	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # If GTCfile does not exist in array add it
 done
 
-
-if [ "${pipeline}" == 'research' ]
-then
-	for i in "${INPUTARRAYS[@]}"
-	do
-		python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}/${i}/" "${tmpCallrateDir}/${i}_callratedata_project.txt"
-	done
-
-
-	rm -f "${tmpCallrateDir}/callratedata_project.txt"
-	for j in ${INPUTARRAYS[@]}
-	do
-		echo "cat ${tmpCallrateDir}/${j}_callratedata_project.txt >> ${tmpCallrateDir}/callratedata_project.txt"
-		cat "${tmpCallrateDir}/${j}_callratedata_project.txt" >> "${tmpCallrateDir}/callratedata_project.txt"
-	done
-else
-	python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
-fi
+python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
 
 #Create header for callrate report
 echo -en "Sample ID\tCall Rate\tGender" > "${tmpCallrateDir}/callrate_header.txt"
@@ -82,9 +67,6 @@ perl -pi -e 's|U|Unknown|g' "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt
 
 #Replace barcode with sampleid
 
-barcodelist=()
-
-n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
@@ -94,8 +76,5 @@ done
 
 # Move results from tmp to intermediateDir
 
-echo "mv ${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt ${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
-mv "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt" "${CallrateDir}/Callrates_${SentrixBarcode_A}.txt"
-
-
-
+echo "mv ${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt ${callrateDir}/Callrates_${SentrixBarcode_A}.txt"
+mv "${tmpCallrateDir}/Callrates_${SentrixBarcode_A}.txt" "${callrateDir}/Callrates_${SentrixBarcode_A}.txt"

@@ -19,12 +19,12 @@
 #string tmpTmpdir
 #string HTSlibVersion
 #string resultDir
-#string CalculateSDDir
-#string PennCNV_reportDir
+#string calculateSDDir
+#string pennCNV_reportDir
 
-mkdir -p "${CalculateSDDir}/"
+mkdir -p "${calculateSDDir}/"
 
-makeTmpDir "${CalculateSDDir}/"
+makeTmpDir "${calculateSDDir}/"
 tmpCalculateSDDir="${MC_tmpFile}"
 
 module load "${pythonVersion}"
@@ -43,12 +43,13 @@ python "${EBROOTGTCTOVCF}/gtc_to_vcf.py" \
 --skip-indels \
 --log-file "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}_GTCtoVCF.log.txt"
 
-log_ratios=$(awk '{if ($3 != "X" && $3 != "Y" && $3 != "XY" ) print $6}' "${PennCNV_reportDir}/${SentrixBarcode_A}_${SentrixPosition_A}.gtc.txt")
+log_ratios=$(awk '{if (NR>10){if ($3 != "X" && $3 != "Y" && $3 != "XY" ){ print $5}}}' "${resultDir}/PennCNV_reports/${Sample_ID}.txt")s
+
 sd=$(echo "${log_ratios[@]}" | awk '{sum+=$1; sumsq+=$1*$1}END{print sqrt(sumsq/NR - (sum/NR)**2)}')
 echo "${sd}" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf.sd"
 
 mv "${tmpCalculateSDDir}/${SentrixBarcode_A}_${SentrixPosition_A}.vcf" "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf"
-awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
+awk '{OFS="\t"}{if ($0 ~ "#CHROM" ){ print $1,$2,$3,$4,$5,$6,$7,$8,$9,"'"${Sample_ID}"_"${SentrixBarcode_A}"_"${SentrixPosition_A}"'"} else {print $0}}' "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.vcf" > "${tmpCalculateSDDir}/${Sample_ID}_${SentrixBarcode_A}_${SentrixPosition_A}.FINAL.vcf"
 
 #Copy VCF to resultsdir
 mkdir -p "${resultDir}/vcf/"

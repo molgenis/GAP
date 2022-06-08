@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string Project
@@ -5,7 +7,7 @@
 #list SentrixBarcode_A
 #list SentrixPosition_A
 #string resultDir
-#string CallrateDir
+#string callrateDir
 #string gapVersion
 #string logsDir
 #string intermediateDir
@@ -36,17 +38,17 @@ do
 done
 
 ## Merge all Callrate files from different SentrixBarcode_A to one project Callrate file.
-echo -e "Sample ID\tCall Rate\tGender" > "${CallrateDir}/Callrates_${Project}.txt"
+echo -e "Sample ID\tCall Rate\tGender" > "${callrateDir}/Callrates_${Project}.txt"
 
 for i in "${INPUTARRAYS[@]}"
 do
-	echo "${CallrateDir}/Callrates_${i}.txt"
-	awk 'FNR>1' "${CallrateDir}/Callrates_${i}.txt" >> "${CallrateDir}/Callrates_${Project}.txt"
+	echo "${callrateDir}/Callrates_${i}.txt"
+	awk 'FNR>1' "${callrateDir}/Callrates_${i}.txt" >> "${callrateDir}/Callrates_${Project}.txt"
 done
 
 
 #Put results in resultsfolder
-rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${resultDir}"
+rsync -a "${callrateDir}/Callrates_${Project}.txt" "${resultDir}"
 
 #rsync to DiagnosticOutput folder, can be removed when data is stored on shared isilon storage.
-rsync -a "${CallrateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}/"
+rsync -a "${callrateDir}/Callrates_${Project}.txt" "${diagnosticOutputFolder}/${Project}/"

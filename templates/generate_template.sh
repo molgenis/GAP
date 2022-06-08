@@ -40,7 +40,7 @@ if [[ -z "${tmpDirectory:-}" ]]; then tmpDirectory=$(basename $(cd ../../ && pwd
 if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../ && pwd )) ; fi ; echo "group=${group}"
 if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi ; echo "workDir=${workDir}"
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
-if [[ -z "${project:-}" ]]; then project=$(basename $(pwd )) ; fi ; echo "project=${project}"
+if [[ -z "${Project:-}" ]]; then Project=$(basename $(pwd )) ; fi ; echo "Project=${Project}"
 if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
 if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
 genScripts="${workDir}/generatedscripts/${filePrefix}/"
@@ -71,6 +71,7 @@ host=$(hostname -s)
 echo "${host}"
 
 projectDir="${workDir}/projects/${filePrefix}/${runID}/jobs/"
+workflow=${EBROOTGAP}/workflow_diagnostics.csv
 
 mkdir -p -m 2770 "${workDir}/projects/"
 mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
@@ -92,11 +93,12 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --generate \
 -rundir "${genScripts}/scripts" \
 --runid "${runID}" \
--o "outputdir=scripts/jobs;\
+-o workflowpath="${workflow};\
+outputdir=scripts/jobs;\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
 gapVersion=$(module list | grep -o -P 'GAP(.+)');\
-Project=${project};\
+Project=${Project};\
 pipeline=${pipeline};\
 runID=${runID};\
 excludeGTCsFile=${excludeGTCsFile:-};"
