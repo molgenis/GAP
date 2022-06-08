@@ -1,0 +1,41 @@
+#Tools
+pythonVersion,Python/2.7.11-foss-2015b
+perlVersion,Perl/5.22.0-foss-2015b-bare
+beadArrayVersion,BeadArrayFiles/1.3.1-foss-2015b-Python-2.7.11
+computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
+pennCNVVersion,PennCNV/1.0.4-foss-2015b
+optiCallVersion,opticall/0.7.0-foss-2015b
+RPlusVersion,RPlus/3.4.4-foss-2015b-v19.01.1
+plinkVersion,plink/1.9-foss-2015b
+
+zCallVersion,opticall/0.7.0-foss-2015b
+GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
+
+#references
+bpmFile,/apps/data/GSAarray/GSAMD-24v1-0_20011747_A5.bpm
+hmmFile,hhall.hmm
+pfbFile,/apps/data/GSAarray/GSA-MD_pfb.pfb
+MAFref,/groups/umcg-wijmenga/tmp04/umcg-raguirre/pln_ugli/af.ref.data.txt
+ref1000G,/apps/data/1000G/phase3
+pops1000G,/apps/data/1000G/populationInfo/20130606_sample_info_pop_superpop.xlsx
+gonlref,/groups/umcg-aad/tmp04/umcg-elopera/thgref
+
+### Reference files
+#samplesheet,/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/sampleinfo.full
+PCAref,/groups/umcg-aad/tmp04/umcg-elopera/generalized_QC/GSA_specific_PCA_ref/GSA_specific_GoNL_1Kgenomes
+#populations1KG,/groups/umcg-aad/tmp04/umcg-elopera/generalized_QC/GSA_specific_PCA_ref/GSA_specific_GoNL_1Kgenomes/pop.refs.txt
+
+##input and output variables
+#InputDir,/groups/umcg-aad/tmp04/project/${projectName}
+GeneralQCDir,/groups/umcg-aad/tmp04/project/${projectName}/test_generalized_result
+
+### tools
+king_tool,/groups/umcg-aad/tmp04/umcg-elopera/tools/KING/king
+cranefoot_tool,/groups/umcg-aad/tmp04/umcg-elopera/tools/Cranefoot/example/cranefoot
+pedigree_ref,/groups/umcg-aad/tmp04/umcg-elopera/ugli_blood_gsa/LifeLines_Corrected_family_info.dat
+all_pairing_file,/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/ugli.final.pairing.concordanceCheck.txt
+merged_conc1,/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gwas_og_plink_chr/filtered_merged_LL_GWAS
+merged_conc2,/groups/umcg-aad/tmp04/umcg-elopera/concordanceCheck/gonl_og_plink_chr/filtered_merged_goNL_OG
+
+## 
+callrateCutoff,0.01
