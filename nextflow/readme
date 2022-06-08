@@ -1,0 +1,13 @@
+#module
+module load nextflow/21.10.4-Java-11-LTS
+
+# nextflow command
+nextflow run \
+-profile local \ <slurm | local>
+--samplesheet samplesheet.csv (Default gap samplesheet.)
+main.nf (path the main nf script)
+
+# optionals:
+-resume  (Resume a prevouisly crashed run )
+-with-report [file name] (Metrics about a workflow execution.)
+-with-timeline [file name] (Timeline for all processes executed in your pipeline.)
