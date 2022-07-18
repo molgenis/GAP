@@ -22,7 +22,11 @@ do
 
 	if [[ "${genderColumn1}" != "${genderColumn2}" ]]
 	then
-		echo -e "gender check for sample ${genderIDColumn1} failed: gender from adlas:${genderColumn1}, gender callculated:${genderColumn2}" >> "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
+		printf 'Gender check for sample %s failed: gender from adlas is %s, but callculated gender from array is %s.\r\n' \
+			"${genderIDColumn1}" \
+			"${genderColumn1}" \
+			"${genderColumn2}" \
+			>> "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
 	fi
 
 done<"${genderCheckDir}/callratedata_${Project}.txt"
