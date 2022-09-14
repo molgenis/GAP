@@ -15,10 +15,10 @@ pipeline {
 	    when {
                   branch 'test-jenkins'
             	 }
-            stage {
-                 'Checkout'
-            }
-       }
+            steps{
+		'Checkout'
+       		}
+	}
    
 		stage('ShellCheck') {
 			steps {
