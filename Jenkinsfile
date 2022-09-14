@@ -6,13 +6,19 @@ pipeline {
             when {
                   changeRequest()
             	 }
+            stage {
+                 'Checkout'
             }
+        }
         
         stage('Build: [ master ]') {
 	    when {
                   branch 'test-jenkins'
             	 }
+            stage {
+                 'Checkout'
             }
+       }
    
 		stage('ShellCheck') {
 			steps {
