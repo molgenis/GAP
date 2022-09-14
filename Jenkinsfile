@@ -1,41 +1,12 @@
 pipeline {
-
 	agent any
 
-	stages {
-        	stage('Build: [ pull request ]') {
-        	    	when {
-                		changeRequest()
-            	 	}
-            	}
-        
-        	stage('Build: [ master ]') {
-	            	when {
-                		branch 'test-jenkins'
-            	     	}
-            	}
-   
-		stage('ShellCheck') {
-			steps {
-				sh "check/shellcheck.sh"
-			}
-		}
-		stage('IndentationCheck') {
-			steps {
-				sh "check/indentationcheck.sh"
-			}
-		}
+	stage('Build PR') {
+	when {
+		changeRequest()
 	}
-	post {
-		always {
-			script {
-				recordIssues (enabledForFailure: true, failOnError: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]], tools: [checkStyle(name: 'ShellCheck')], trendChartType: 'NONE')
-			}
-		}
-		//failure {
-		//	mail to: 'hpc.helpdesk@umcg.nl',
-		//		subject: "Failed Jenkins build: ${currentBuild.fullDisplayName}",
-		//		body: "Something is wrong with ${env.BUILD_URL}"
-		//}
+    	steps {
+        	checkout scm
+    		}
 	}
 }
