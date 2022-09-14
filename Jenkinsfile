@@ -6,7 +6,7 @@ pipeline {
             when {
                   changeRequest()
             	 }
-            stage {
+            steps {
                  'Checkout'
             }
         }
