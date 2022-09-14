@@ -1,19 +1,18 @@
 pipeline {
+    agent any
 
-	agent any
-
-	stages {
-        	stage('Build: [ pull request ]') {
-        	    	when {
-                		changeRequest()
-            	 	}
-            	}
+    stages {
+        stage('Build: [ pull request ]') {
+            when {
+                  changeRequest()
+            	 }
+            }
         
-        	stage('Build: [ master ]') {
-	            	when {
-                		branch 'test-jenkins'
-            	     	}
-            	}
+        stage('Build: [ master ]') {
+	    when {
+                  branch 'test-jenkins'
+            	 }
+            }
    
 		stage('ShellCheck') {
 			steps {
