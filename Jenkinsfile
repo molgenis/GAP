@@ -6,6 +6,9 @@ stages {
     		node {
         		checkout scm
     			}
+		steps {
+			sh "test/autoTestGAP.sh"
+		}
 		}
 	stage('ShellCheck') {
 		steps {
