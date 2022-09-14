@@ -3,7 +3,7 @@ pipeline {
 
 stages {
 	stage('Build PR') {
-    		steps {
+    		node {
         		checkout scm
     			}
 		}
