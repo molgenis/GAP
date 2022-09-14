@@ -1,6 +1,7 @@
 pipeline {
 	agent any
 
+stages {
 	stage('Build PR') {
 	when {
 		changeRequest()
@@ -9,4 +10,5 @@ pipeline {
         	checkout scm
     		}
 	}
+}
 }
