@@ -3,12 +3,10 @@ pipeline {
 
 stages {
 	stage('Build PR') {
-    		node {
+    		steps {
         		checkout scm
-    			}
-		steps {
 			sh "test/autoTestGAP.sh"
-		}
+    			}
 		}
 	stage('ShellCheck') {
 		steps {
