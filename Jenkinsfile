@@ -4,7 +4,9 @@ pipeline {
 	stages {
 		stage ('Checkout SCM'){
 			steps {
-    				checkout([$class: 'GitSCM'])
+    				checkout([$class: 'GitSCM'],
+					  [branches: [name: 'jenkins-test']]
+            			])
 			}
 			
 		}
