@@ -2,14 +2,14 @@ pipeline {
 	agent any
 	
 	stages {
-		stage ('Checkout SCM'){
-			steps {
-    				checkout([$class: 'GitSCM'],
-					  [branches: [name: 'jenkins-test']]
-            			])
+		stage('Code Checkout') {
+            		steps {
+                		checkout([
+                    		$class: 'GitSCM', 
+                    		branches: [[name: '*/test-jenkins']], 
+                    		userRemoteConfigs: [[url: 'https://github.com/molgenis/GAP.git']]
+                		])
 			}
-			
 		}
-		
 	}
 }
