@@ -1,14 +1,13 @@
 pipeline {
 	agent any
-
-stages {
-	stage('Build PR') {
-	when {
-		changeRequest()
+	
+	stages {
+		stage ('Checkout SCM'){
+			steps {
+    				checkout([$class: 'GitSCM'])
+			}
+			
+		}
+		
 	}
-    	node {
-        	checkout scm
-    	}
-	}
-}
 }
