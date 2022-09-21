@@ -6,9 +6,9 @@ stages {
 	when {
 		changeRequest()
 	}
-    	steps {
+    	node {
         	checkout scm
-    		}
+    	}
 	}
 }
 }
