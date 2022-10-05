@@ -1,5 +1,3 @@
-stage('Checkout') {
-	steps {
-        	git branch: 'jenkins-test'
-        }
+node {
+	checkout scm
 }
