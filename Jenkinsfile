@@ -1,7 +1,6 @@
 node {
 	checkout scm
-}
-stages {
+
 	stage('ShellCheck') {
 		steps {
 			sh "check/shellcheck.sh"
