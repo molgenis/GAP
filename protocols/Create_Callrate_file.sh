@@ -24,12 +24,12 @@ array_contains () {
 	local seeking=$2
 	local in=1
 	for element in "${!array-}"; do
-		if [[ "$element" == "$seeking" ]]; then
+		if [[ "${element}" == "${seeking}" ]]; then
 		in=0
 		break
 	fi
 	done
-	return $in
+	return "${in}"
 }
 
 module load "${pythonVersion}"
@@ -51,20 +51,20 @@ INPUTARRAYS=()
 
 for array in "${SentrixBarcode_A[@]}"
 do
-	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # If bamFile does not exist in array add it
+	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("${array}")    # If bamFile does not exist in array add it
 done
 
 
-if [ ${pipeline} == 'research' ]
+if [[ "${pipeline}" == 'research' ]]
 then
-	for i in ${INPUTARRAYS[@]}
+	for i in "${INPUTARRAYS[@]}"
 	do
 		python "${EBROOTGAP}/scripts/Make_Callrate_Report.py" "${bpmFile}" "${projectRawTmpDataDir}/${i}/" "${tmpCallrateDir}/${i}_callratedata_project.txt"
 	done
 
 
 	rm -f "${tmpCallrateDir}/callratedata_project.txt"
-	for j in ${INPUTARRAYS[@]}
+	for j in "${INPUTARRAYS[@]}"
 	do
 		echo "cat ${tmpCallrateDir}/${j}_callratedata_project.txt >> ${tmpCallrateDir}/callratedata_project.txt"
 		cat "${tmpCallrateDir}/${j}_callratedata_project.txt" >> "${tmpCallrateDir}/callratedata_project.txt"
@@ -90,10 +90,9 @@ perl -pi -e 's|U|Unknown|g' "${tmpCallrateDir}/Callrates_${Project}.txt"
 
 #Replace barcode with sampleid
 
-barcodelist=()
 
-n_elements=${Sample_ID[@]}
 max_index=${#Sample_ID[@]}-1
+
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do
 echo "	perl -pi -e \"s|${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}|${Sample_ID[samplenumber]}|\" \"${tmpCallrateDir}/Callrates_${Project}.txt\""
