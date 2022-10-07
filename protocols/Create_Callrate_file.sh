@@ -48,12 +48,13 @@ tmpCallrateDir="${MC_tmpFile}"
 mkdir -p "${diagnosticOutputFolder}/${Project}"
 
 INPUTARRAYS=()
-
-for array in "${SentrixBarcode_A[@]}"
+for array in "${SentrixBarcode_A}_${SentrixPosition_A[@]}"
 do
-	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("${array}")    # If bamFile does not exist in array add it
+	element_exists="$(array_contains INPUTARRAYS "${array}")"
+	if [[ "${element_exists}" != '0' ]]; then
+		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
+	fi
 done
-
 
 if [[ "${pipeline}" == 'research' ]]
 then
