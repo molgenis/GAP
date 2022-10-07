@@ -45,7 +45,7 @@ tmpCallrateDir="${MC_tmpFile}"
 
 
 INPUTARRAYS=()
-for array in "${SentrixBarcode_A}_${SentrixPosition_A[@]}"
+for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
 do
 	element_exists="$(array_contains INPUTARRAYS "${array}")"
 	if [[ "${element_exists}" != '0' ]]; then
