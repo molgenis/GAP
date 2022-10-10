@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=01:59:00 mem=10gb ppn=1
 
 #string Project
@@ -38,10 +40,10 @@ fi
 
 	sampleFile="${output}.sample"
 
-	if [ -e $input ]
+	if [ -e "${input}" ]
 	then
 
-		awk -v chr=${chrNr} -v sampleFile="${sampleFile}" '
+		awk -v chr="${chrNr}" -v sampleFile="${sampleFile}" '
 
 		NR == 1 {
 			print "ID_1 ID_2 missing" > sampleFile
@@ -64,7 +66,7 @@ fi
 			ORS="";
 			print "\n"
 		}
-		' < ${input} > ${output}.gen
+		' < "${input}" > "${output}.gen"
 fi
 
 echo "mv ${tmpOutputFolder}/chr_${chrNr}.gen ${outputFolder}/"

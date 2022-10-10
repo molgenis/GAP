@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #list SentrixBarcode_A
 #list SentrixPosition_A
 #string GTCprmDataDir
@@ -13,12 +15,12 @@ array_contains () {
 	local seeking=$2
 	local in=1
 	for element in "${!array-}"; do
-		if [[ "$element" == "$seeking" ]]; then
+		if [[ "${element}" == "${seeking}" ]]; then
 			in=0
 			break
 		fi
 	done
-	return $in
+	return "${in}"
 }
 
 INPUTREPORTS=()
@@ -33,7 +35,7 @@ do
 	mkdir -vp "${GTCtmpDataDir}/${i}"
 	GTC_DIR="${GTCprmDataDir}/${i}"
 
-	if [ "${prmHost}" == "localhost" ]
+	if [[ "${prmHost}" == "localhost" ]]
 	then
 		rsync --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials --checksum \
 		"${GTC_DIR}" \

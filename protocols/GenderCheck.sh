@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=01:59:00 mem=1gb ppn=1
 
 #string callrateDir
@@ -14,7 +16,7 @@ sed -e 1d "${callrateDir}/Callrates_${Project}.txt" > "${genderCheckDir}/callrat
 rm -f "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
 
 # reading callrate file and comparing the gender column
-while read line
+while read -r line
 do
 	genderIDColumn1=$(echo "${line}" | awk 'BEGIN { FS = "\t" } ; { print $1 }')
 	genderColumn1=$(echo "${genderIDColumn1}" | awk 'BEGIN { FS = "_" } ; { print $4 }')
@@ -29,4 +31,4 @@ do
 			>> "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
 	fi
 
-done<"${genderCheckDir}/callratedata_${Project}.txt"
+done <"${genderCheckDir}/callratedata_${Project}.txt"
