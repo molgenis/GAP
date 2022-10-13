@@ -2,6 +2,9 @@ node {
 	stage ('Checkout') {
 		checkout scm
 	}
+	stage ('Automated test') {
+		sh "test/autoTestGAP.sh"
+	}
 	stage('ShellCheck') {
 		sh "check/shellcheck.sh"			
 	}
