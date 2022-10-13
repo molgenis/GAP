@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=02:00:00 mem=2gb ppn=1
 
 #string intermediateDir
@@ -30,7 +32,10 @@ INPUTREPORTS=()
 
 for file in "${arrayFinalReport[@]}"
 do
-	array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("$file")    # If bamFile does not exist in array add it
+	element_exists="$(array_contains INPUTREPORTS "${file}")"
+	if [[ "${element_exists}" != '0' ]]; then
+		 INPUTREPORTS+=("${file}")    # If file does not exist in array add it
+	fi
 done
 
 first="true"
@@ -39,12 +44,12 @@ for i in "${INPUTREPORTS[@]}"
 do
 	if [[ ${first} == "true" ]]
 	then
-		cat ${i} > ${tmpFinalReport}
+		cat "${i}" > "${tmpFinalReport}"
 		first='false'
 		headerNumber=$(( $(head -30 "${i}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+2))
 		echo "headerNumber:${headerNumber}"
 	else
-		cat ${i} | tail -n+${headerNumber} >> ${tmpFinalReport}
+		cat "${i}" | tail -n+"${headerNumber}" >> "${tmpFinalReport}"
 	fi
 done
 

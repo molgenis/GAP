@@ -31,7 +31,7 @@ tmpOptiCallDir="${MC_tmpFile}"
 
 
 cd "${tmpOptiCallDir}"
-bash ${EBROOTGAP}/scripts/GS_to_Opticall.sh -i "${finalReport}" -o "${tmpOptiCallDir}"
+bash "${EBROOTGAP}/scripts/GS_to_Opticall.sh" -i "${finalReport}" -o "${tmpOptiCallDir}"
 cd -
 
 echo "mv ${tmpOptiCallDir}/chr_ ${optiCallDir}"

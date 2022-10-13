@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #MOLGENIS walltime=02:00:00 mem=2gb ppn=1
 
 #string pythonVersion
@@ -27,7 +29,7 @@ module list
 makeTmpDir "${arrayFinalReport}"
 tmpArrayFinalReport="${MC_tmpFile}"
 
-python ${EBROOTGAP}/scripts/gtc_final_report.py \
+python "${EBROOTGAP}/scripts/gtc_final_report.py" \
 --manifest "${bpmFile}" \
 --samplesheet "${samplesheet}" \
 --gtc_directory "${projectRawTmpDataDir}/${SentrixBarcode_A}/" \
