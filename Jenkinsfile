@@ -3,8 +3,7 @@ node {
 	checkout scm
 	}
         sshagent(credentials : ['umcg-molgenis']) {
-            sh 'ssh -A -o StrictHostKeyChecking=no umcg-molgenis@airlock.hpc.rug.nl uptime'
-	    sh 'ssh -vvv -A umcg-molgenis@airlock+gearshift uptime'
+	    sh 'ssh airlock+gearshift uptime'
         }	
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
