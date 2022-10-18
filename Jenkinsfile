@@ -1,13 +1,13 @@
 node {
 	checkout scm
-	
+		
 	def remote = [:]
   	remote.name = 'Gearshift'
   	remote.host = 'gearshift'
   	remote.user = 'umcg-molgenis'
+	remote.allowAnyHosts = true
   	stage('Remote SSH') {
-    	sshCommand remote: remote, command: "echo moi"
-
+    		sshCommand remote: remote, command: "echo moi"
 	}
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
