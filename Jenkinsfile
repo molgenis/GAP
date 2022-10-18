@@ -3,7 +3,7 @@ node {
 	checkout scm
 	}
         sshagent(credentials : ['umcg-molgenis']) {
-            sh 'ssh -o StrictHostKeyChecking=no umcg-molgenis@airlock.hpc.rug.nl uptime'
+            sh 'ssh -vvv -o StrictHostKeyChecking=no umcg-molgenis@airlock.hpc.rug.nl uptime'
 	    sh 'ssh -vvv -A -tt -J umcg-molgenis@airlock.hpc.rug.nl umcg-molgenis@gearshift'
         }	
 	stage ('Automated test') {
