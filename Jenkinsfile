@@ -5,6 +5,9 @@ node {
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
 	}
+	stage ('Automated test') {
+		sh "test/autoTestGAP.sh"
+	}
 	stage('ShellCheck') {
 		sh "check/shellcheck.sh"			
 	}
