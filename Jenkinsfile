@@ -4,7 +4,7 @@ node {
 	}
         sshagent(credentials : ['umcg-molgenis']) {
             sh 'ssh -o StrictHostKeyChecking=no umcg-molgenis@airlock.hpc.rug.nl uptime'
-	    sh 'ssh -J umcg-molgenis@airlock.hpc.rug.nl umcg-molgenis@gearshift'
+	    sh 'ssh -A -t -J umcg-molgenis@airlock.hpc.rug.nl umcg-molgenis@gearshift'
         }	
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
