@@ -1,6 +1,9 @@
 node {
-	stage ('Checkout') {
-		checkout scm
+	triggers { 
+		pollSCM('') 
+	}
+	stage ('Automated test') {
+		sh "test/autoTestGAP.sh"
 	}
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
