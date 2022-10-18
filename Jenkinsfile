@@ -1,6 +1,7 @@
 node {
 	checkout scm
 	
+	def remote = [:]
   	remote.name = 'Gearshift'
   	remote.host = 'gearshift'
   	remote.user = 'umcg-molgenis'
