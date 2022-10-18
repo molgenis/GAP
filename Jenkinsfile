@@ -3,7 +3,7 @@ node {
 	checkout scm
 	}
         sshagent(credentials : ['umcg-molgenis']) {
-	    sh 'ssh airlock+gearshift uptime'
+	    sh 'ssh -A -vvv umcg-molgenis@airlock+gearshift uptime'
         }	
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
