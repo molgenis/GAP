@@ -1,14 +1,11 @@
 node {
 	checkout scm
 		
-	def remote = [:]
-  	remote.name = 'Gearshift'
-  	remote.host = 'gearshift'
-  	remote.user = 'umcg-molgenis'
-	remote.allowAnyHosts = true
-  	stage('Remote SSH') {
-    		sshCommand remote: remote, command: "echo moi"
-	}
+        sshagent(credentials : ['	umcg-molgenis']) {
+            sh 'ssh -o StrictHostKeyChecking=no umcg-molgenis@airlock.hpc.rug.nl uptime'
+            sh 'ssh -v -A umcg-molgenis@airlock.hpc.rug.nl'
+        }
+	
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
 	}
