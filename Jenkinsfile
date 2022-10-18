@@ -1,7 +1,10 @@
-node {
+pipeline {
+	agent any
 	triggers { 
 		pollSCM('') 
 	}
+	
+node {
 	stage ('Automated test') {
 		sh "test/autoTestGAP.sh"
 	}
@@ -20,4 +23,5 @@ node {
 	} finally {
 		recordIssues (enabledForFailure: true, failOnError: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]], tools: [checkStyle(name: 'ShellCheck')], trendChartType: 'NONE')
 	}
+}
 }
