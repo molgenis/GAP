@@ -22,12 +22,12 @@ array_contains () {
 	local seeking=$2
 	local in=1
 	for element in "${!array-}"; do
-		if [[ "$element" == "$seeking" ]]; then
+		if [[ "${element}" == "${seeking}" ]]; then
 			in=0
 			break
 		fi
 	done
-	return $in
+	return "${in}"
 }
 
 module load "${pythonVersion}"
@@ -45,10 +45,12 @@ tmpCallrateDir="${MC_tmpFile}"
 
 
 INPUTARRAYS=()
-
-for array in "${SentrixBarcode_A}_${SentrixPosition_A[@]}"
+for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
 do
-	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # If GTCfile does not exist in array add it
+	element_exists="$(array_contains INPUTARRAYS "${array}")"
+	if [[ "${element_exists}" != '0' ]]; then
+		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
+	fi
 done
 
 python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
