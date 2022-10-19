@@ -6,13 +6,16 @@
 #string	Project
 #string logsDir
 #string intermediateDir
+#string HTSlibVersion
+#string bedToolsVersion
+#string ngsUtilsVersion
 
 set -e
 set -u
 
-module load HTSlib
-module load BEDTools
-module load ngs-utils
+module load "${HTSlibVersion}"
+module load "${bedToolsVersion}"
+module load "${ngsUtilsVersion}"
 module list
 
 ## Filtering of the VCF files from the pipeline
@@ -33,7 +36,7 @@ done
 
 #2 Filtering the VCF using the bedfile
 
-for i in $(ls "/groups/umcg-gsad/tmp03/projects/NIST_TRIO/temp/"*".gz")
+for i in $(ls "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/temp/"*".gz")
 do
 	echo "filtering the vcf file: ${i} ..."
 	file=$(basename "${i}")
@@ -110,22 +113,6 @@ do
         fi
 done
 
-
-
-## Checking the PennCNV project file
-echo "Comparing the Project PennCNV files ... "
-
-diffPennCNVProjectFile="false"
-
-diff -q "/home/umcg-molgenis/GAP/NIST_TRIO_PennCNV_TRUE.txt" "/groups/umcg-gsad/tmp01/projects/NIST_TRIO/run01/results/NIST_TRIO_PennCNV.txt" || diffPennCNVProjectFile="true"
-        if [ "${diffPennCNVProjectFile}" == "true" ]
-        then
-		echo "there are differences in the PennCNV Project files between the test and original data for sample ${sample}"
-                echo "please fix the bug or update this test"
-                exit 1
-        else
-	echo "there are no differences between the PennCNV Project files"
-        fi
 
 ## Checking the callrate file
 echo "Comparing the Project callrate files ... "
