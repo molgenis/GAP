@@ -2,11 +2,13 @@ node {
 	stage ('Checkout') {
 	checkout scm
 	}
-        sshagent(credentials : ['umcg-molgenis']) {
-	    sh 'ssh -A -vvv umcg-molgenis@airlock+gearshift uptime'
-        }	
-	stage ('Automated test') {
-		sh "test/autoTestGAP.sh"
+        stage ('Automated test') {
+		sh '''         
+		echo "Login to Gearshift"
+         	sudo ssh -tt airlock+gearshift
+		echo "Starting automated test"
+		sh test/autoTestGAP.sh
+		'''
 	}
 	stage('ShellCheck') {
 		sh "check/shellcheck.sh"			
