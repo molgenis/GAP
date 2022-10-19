@@ -23,28 +23,24 @@ function preparePipeline(){
 	then
 		rm -rf "${tmpfolder}/tmp/${_projectName}/"
 	fi
+
+	if [ -d "${tmpfolder}/logs/${_projectName}" ]
+        then
+            	rm -rf "${tmpfolder}/logs/${_projectName}/"
+        fi
+
+
 	mkdir "${tmpfolder}/generatedscripts/${_projectName}/"
+	mkdir "${tmpfolder}/logs/${_projectName}/"
 
 	cp "${pipelinefolder}/templates/generate_template.sh" "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
-sudo -u umcg-envsync bash -l << EOF
-
-id
-export SOURCE_HPC_ENV="True"
-. ~/.bashrc
-module load depad-utils
-#module list
-hpc-environment-sync.bash -m GAP/betaAutotest
-exit
-
-EOF
-
 	module load GAP/betaAutotest
-
+	#EBROOTGAP="${pipelinefolder}"
 	## Grep used version of molgenis compute out of the parameters file
 
 	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e "s|/groups/umcg-gsad/tmp03/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
+	perl -pi -e "s|/groups/umcg-gsad/tmp01/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
@@ -54,7 +50,7 @@ EOF
 	sh submit.sh
 
 	cd "${tmpfolder}/projects/${_projectName}/run01/jobs/"
-	sh submit.sh --qos=dev
+	sh submit.sh --qos=regular
 }
 
 function checkIfFinished(){
@@ -87,15 +83,11 @@ function checkIfFinished(){
 	echo "${_projectName} test succeeded!"
 	echo ""
 }
+
 tmpdirectory="tmp01"
 groupName="umcg-gsad"
 
-if [ $(hostname) == "calculon" ]
-then
-	tmpdirectory="tmp04"
-fi
-
-pipelinefolder="/apps/software/GAP/betaAutotest/"
+pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp//GAP/betaAutotest/"
 tmpfolder="/groups/${groupName}/${tmpdirectory}"
 
 if [ -d "${pipelinefolder}" ]
@@ -126,19 +118,18 @@ rm -rf GAP/
 cp "${pipelinefolder}/workflow_diagnostics.csv" test_workflow.csv
 tail -1 workflow_diagnostics.csv | perl -p -e 's|,|\t|g' | awk '{print "s05_autoTestGAPResults,test/protocols/autoTestGAPResults.sh,"$1}' >> test_workflow.csv
 
+
 cd "${pipelinefolder}"
 pwd
+mkdir -p /home/umcg-molgenis/GAP/vcf/
+mkdir -p /home/umcg-molgenis/GAP/PennCNV_reports/
 
-cp "test/results/vcf/"*".vcf"* "/home/umcg-molgenis/GAP/vcf/"
-cp "test/results/PennCNV_reports/"*"_TRUE.txt" "/home/umcg-molgenis/GAP/PennCNV_reports/"
-cp "test/autoTestArray.bed" "/home/umcg-molgenis/GAP/"
+cp "${pipelinefolder}/test/results/vcf/"*".vcf"* "/home/umcg-molgenis/GAP/vcf/"
+cp "${pipelinefolder}/test/results/PennCNV_reports/"*"_TRUE.txt" "/home/umcg-molgenis/GAP/PennCNV_reports/"
+cp "${pipelinefolder}/test/autoTestArray.bed" "/home/umcg-molgenis/GAP/"
 
-
-cp "test/results/Callrates_NIST_TRIO_TRUE.txt" "/home/umcg-molgenis/GAP/"
-cp "test/results/NIST_TRIO_PennCNV_TRUE.txt" "/home/umcg-molgenis/GAP/"
-
-
-
+cp "${pipelinefolder}/test/results/Callrates_NIST_TRIO_TRUE.txt" "/home/umcg-molgenis/GAP/"
+cp "${pipelinefolder}/test/results/NIST_TRIO_PennCNV_TRUE.txt" "/home/umcg-molgenis/GAP/"
 
 preparePipeline
 checkIfFinished

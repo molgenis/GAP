@@ -32,7 +32,7 @@ INPUTREPORTS=()
 
 for file in "${arrayFinalReport[@]}"
 do
-	element_exists="$(array_contains INPUTREPORTS "${file}")"
+	element_exists='$(array_contains INPUTREPORTS "${file}")'
 	if [[ "${element_exists}" != '0' ]]; then
 		 INPUTREPORTS+=("${file}")    # If file does not exist in array add it
 	fi
