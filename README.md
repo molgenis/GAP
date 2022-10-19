@@ -1,4 +1,5 @@
-# GAP  
+# GAP
+
    Short for Genotyping Array Pipeline.
    Consist of the following workflow:
 
