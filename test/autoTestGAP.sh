@@ -26,7 +26,7 @@ function preparePipeline(){
 
 	if [ -d "${tmpfolder}/logs/${_projectName}" ]
         then
-            	rm -rf "${tmpfolder}/tmp/${_projectName}/"
+            	rm -rf "${tmpfolder}/logs/${_projectName}/"
         fi
 
 
@@ -40,7 +40,7 @@ function preparePipeline(){
 	## Grep used version of molgenis compute out of the parameters file
 
 	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e "s|/groups/umcg-gsad/tmp08/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
+	perl -pi -e "s|/groups/umcg-gsad/tmp01/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
 	cd "${tmpfolder}/generatedscripts/${_projectName}/"
 	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
 
@@ -83,13 +83,9 @@ function checkIfFinished(){
 	echo "${_projectName} test succeeded!"
 	echo ""
 }
+
 tmpdirectory="tmp01"
 groupName="umcg-gsad"
-
-if [ $(hostname) == "calculon" ]
-then
-	tmpdirectory="tmp04"
-fi
 
 pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp//GAP/betaAutotest/"
 tmpfolder="/groups/${groupName}/${tmpdirectory}"
