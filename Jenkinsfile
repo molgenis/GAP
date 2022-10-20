@@ -3,11 +3,14 @@ node {
 	checkout scm
 	}
         stage ('Automated test') {
-		sh '''         
+		sh '''
+		echo "ghprbPullId=$ghprbPullId"
+        echo "sha1=$sha1"
+
 		echo "Login to Gearshift"
          	sudo ssh -tt airlock+gearshift 'bash -s << 'ENDSSH'
 		echo "Starting automated test"
-		sh test/autoTestGAP.sh
+		sh /home/umcg-molgenis/test_GAP.sh ${env.CHANGE_ID}
 		ENDSSH'
 		'''
 	}
