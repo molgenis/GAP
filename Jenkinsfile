@@ -1,6 +1,6 @@
 node {
 	stage ('Checkout') {
-	checkout scm
+		checkout scm
 	}
         stage ('Automated test') {
 		sh '''
@@ -8,7 +8,7 @@ node {
          	sudo ssh -tt airlock+gearshift 'bash -s << 'ENDSSH'
 		echo "Starting automated test"
 		sh "/home/umcg-molgenis/test_GAP.sh" "${env.CHANGE_ID}"
-		ENDSSH'
+ENDSSH'
 		'''
 	}
 	stage('ShellCheck') {
