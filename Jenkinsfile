@@ -5,9 +5,10 @@ node {
         stage ('Automated test') {
 		sh '''         
 		echo "Login to Gearshift"
-         	sudo ssh -tt airlock+gearshift 'bash -s << 'ENDSSH'
+         	sudo ssh -tt airlock+gearshift 'PR_number=${env.CHANGE_ID} bash -s << 'ENDSSH'
 		echo "Starting automated test"
-		sh test/autoTestGAP.sh
+		echo "PR number is $PR_number"
+		sh test/autoTestGAP.sh $PR_number
 		ENDSSH'
 		'''
 	}
