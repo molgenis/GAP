@@ -47,7 +47,7 @@ tmpCallrateDir="${MC_tmpFile}"
 INPUTARRAYS=()
 for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
 do
-	element_exists="$(array_contains INPUTARRAYS "${array}")"
+	element_exists='$(array_contains INPUTARRAYS "${array}")'
 	if [[ "${element_exists}" != '0' ]]; then
 		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
 	fi
