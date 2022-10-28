@@ -32,7 +32,7 @@
    ⎝______________________________________________________________________________________⎠
 ```
 
-#### GAP Pipeline 
+  #### GAP Pipeline 
 
 The GAP pipeline consist of 7 steps:
 1: Create_PennCNV_Report_diagnostics
