@@ -1,8 +1,7 @@
 #list SentrixBarcode_A
 #list SentrixPosition_A
-#string GTCprmDataDir
 #string GTCtmpDataDir
-#string prmHost
+#string intermediateDir
 #string ateambotUser
 #string Project
 #string logsDir
@@ -51,7 +50,6 @@ done
 	
 declare -a arrayMissingSampleNames
 
-
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do	
 	dataProcessingStarted='false'
@@ -96,7 +94,6 @@ do
 	else
 		echo -e "Sample is not in original data: ${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc, skipped"
 	fi
-	
 done
 
 if [[ "${allRawDataAvailable}" == 'true' ]]
@@ -106,10 +103,12 @@ then
 	then
 		mv "${logsDir}/${Project}/${Project}.data."{started,finished}
 	else
+		
 		touch "${logsDir}/${Project}/${Project}.data.finished"
 	fi
 else
 	echo "all Data is not yet available, exiting"
+	rm -f "${logsDir}/${Project}/${Project}.data.finished"
 	trap - EXIT
 	exit 0
 fi

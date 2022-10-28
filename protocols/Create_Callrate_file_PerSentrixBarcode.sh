@@ -17,18 +17,6 @@
 #string intermediateDir
 
 #Function to check if array contains value
-array_contains () {
-	local array="$1[@]"
-	local seeking=$2
-	local in=1
-	for element in "${!array-}"; do
-		if [[ "${element}" == "${seeking}" ]]; then
-			in=0
-			break
-		fi
-	done
-	return "${in}"
-}
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
@@ -42,16 +30,6 @@ mkdir -p "${callrateDir}/"
 
 makeTmpDir "${callrateDir}/"
 tmpCallrateDir="${MC_tmpFile}"
-
-
-INPUTARRAYS=()
-for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
-do
-	element_exists='$(array_contains INPUTARRAYS "${array}")'
-	if [[ "${element_exists}" != '0' ]]; then
-		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
-	fi
-done
 
 python "${EBROOTGAP}/scripts/Make_Callrate_Report_PerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${SentrixBarcode_A}" "${tmpCallrateDir}/callratedata_project.txt"
 
