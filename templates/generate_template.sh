@@ -73,7 +73,7 @@ echo "${host}"
 projectDir="${workDir}/projects/GAP/${filePrefix}/${runID}/jobs/"
 workflow=${EBROOTGAP}/workflow_diagnostics.csv
 
-mkdir -p -m 2770 "${workDir}/projects/GAP/${filePrefix}/${runID}/jobs/"
+mkdir -p -m 2770 "${projectDir}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${genScripts}/parameters_group_converted.csv"
