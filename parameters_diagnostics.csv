@@ -1,10 +1,10 @@
 #Tools
-pythonVersion,Python/2.7.11-foss-2015b
-perlVersion,Perl/5.22.0-foss-2015b-bare
-beadArrayVersion,BeadArrayFiles/1.3.1-foss-2015b-Python-2.7.11
-computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74
-GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
-HTSlibVersion,HTSlib/1.3.2-foss-2015b
+pythonVersion,Python/2.7.16-GCCcore-7.3.0-bare
+perlVersion,Perl/5.30.0-GCCcore-7.3.0-bare
+beadArrayVersion,BeadArrayFiles/1.3.1-foss-2018b-Python-2.7.16
+computeVersion,Molgenis-Compute/v19.01.1-Java-11-LTS
+GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2018b-Python-2.7.16
+HTSlibVersion,HTSlib/1.14-foss-2018b
 
 #references
 bpmFile,/apps/data/GSAarray/${manifest}
@@ -15,16 +15,14 @@ root,/
 appsDir,${root}/apps/
 workDir,/groups/${group}/
 tmpDir,${workDir}/${tmpName}/
-tmpTmpdir,${tmpDir}/tmp/
+tmpTmpdir,${tmpDir}/tmp/GAP/
 intermediateDir,${tmpTmpdir}/${Project}/${runid}/
-projectDir,${workDir}/${tmpName}/projects/
+projectDir,${workDir}/${tmpName}/projects/GAP/
 resultDir,${projectDir}/${Project}/${runid}/results/
 projectJobsDir,${projectDir}/${Project}/${runid}/jobs/
-genScripts,${tmpDir}/generatedscripts/${Project}
+genScripts,${tmpDir}/generatedscripts/GAP/${Project}
 diagnosticOutputFolder,${tmpDir}/DiagnosticOutput
 projectRawTmpDataDir,${projectDir}/${Project}/${runid}/rawdata/array/
-IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
-GTCprmDataDir,${workDir}/${prmName}/rawdata/array/GTC/
 IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,${group}-ateambot

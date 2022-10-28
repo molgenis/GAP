@@ -6,6 +6,7 @@
 #string Project
 #string projectJobsDir
 #string projectRawTmpDataDir
+#string intermediateDir
 #string genScripts
 #string pipeline
 #string runID
@@ -69,7 +70,7 @@ declare -a arrayMissingSampleNames
 cd "${projectRawTmpDataDir}"
 for i in "${arrayUniqueMissingSampleNames[@]}"
 do
-	if [[ -f "../../../../../rawdata/array/GTC/${i}/missingIDATs.txt" ]]
+	if [[ -f "../../../../../../rawdata/array/GTC/${i}/missingIDATs.txt" ]]
 	then
 		arrayRejected=()
 		while read line
@@ -78,7 +79,7 @@ do
 			missingSampleName=$(echo "${line}" | awk 'BEGIN {FS=":"}{print $1}')
 			arrayMissingPosition+=("${missingPosition}")
 			arrayMissingSampleNames+=("${missingSampleName}")
-		done<"../../../../../rawdata/array/GTC/${i}/missingIDATs.txt"
+		done<"../../../../../../rawdata/array/GTC/${i}/missingIDATs.txt"
 	fi
 done
 
@@ -92,11 +93,11 @@ then
 		array_contains_missingSamples arrayMissingPosition "${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}"
 		if [ "${missing}" == "false" ]
 		then
-			ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
+			ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
 				"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
 
-			ln -sf "../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
-			"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
+			ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
+			"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5"
 		else
 			echo -e "\n SAMPLE IS MISSING: ${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}"
 		fi
@@ -108,8 +109,8 @@ else
 		ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
 			"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
 
-		ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5" \
-		"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.md5"
+		ln -sf "../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
+		"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5"
 	done
 fi
 
@@ -151,7 +152,7 @@ cp "${sampleSheetCsv}" "${resultDir}/${Project}.csv"
 #
 # Execute MOLGENIS/compute to create job scripts to analyse this project.
 #
-
+module load "${gapVersion}"
 cd "${rocketPoint}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${rocketPoint}/parameters_host_converted.csv"
