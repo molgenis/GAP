@@ -1,27 +1,28 @@
 node {
 	stage ('Checkout') {
-	checkout scm
+		checkout scm
 	}
-        stage ('Automated test') {
-		sh '''         
-		echo "Login to Gearshift"
-         	sudo ssh -tt airlock+gearshift 'PR_number=${env.CHANGE_ID} bash -s << 'ENDSSH'
+    stage ('Automated test') {
+        
+        echo "Copy test from repo to molgenis home on Gearshift"
+        sh "sudo scp test/autoTestGAP.sh airlock+gearshift:/home/umcg-molgenis/"
+        
+        echo "Login to Gearshift"
+        sh '''sudo ssh -T airlock+gearshift <<ENDSSH
 		echo "Starting automated test"
-		echo "PR number is $PR_number"
-		sh test/autoTestGAP.sh $PR_number
-		ENDSSH'
-		'''
+		sh autoTestGAP.sh '''+env.CHANGE_ID+'''
+ENDSSH
+'''
 	}
 	stage('ShellCheck') {
 		sh "check/shellcheck.sh"			
 	}
 	stage('IndentationCheck') {
 		sh "check/indentationcheck.sh"
-	}
-	
-	try {
-		echo "TEST SUCCESSFULL"
-	} finally {
+	}	
+	post {
+		always {
 		recordIssues (enabledForFailure: true, failOnError: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]], tools: [checkStyle(name: 'ShellCheck')], trendChartType: 'NONE')
+		}
 	}
 }
