@@ -51,12 +51,6 @@ function preparePipeline(){
 	sed -i 's|gapVersion.*|gapVersion=GAP/betaAutotest;\\|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"		
 
 	# changing values in the diagnostics parameters file
-	perl -pi -e 's|pythonVersion,Python/2.7.11-foss-2015b|pythonVersion, Python/2.7.16-GCCcore-7.3.0-bare|'  "${pipelinefolder}/parameters_diagnostics.csv"
-	perl -pi -e 's|perlVersion,Perl/5.22.0-foss-2015b-bare|perlVersion,Perl/5.28.0-GCCcore-7.3.0|'  "${pipelinefolder}/parameters_diagnostics.csv"
-	perl -pi -e 's|beadArrayVersion,BeadArrayFiles/1.3.1-foss-2015b-Python-2.7.11|beadArrayVersion,BeadArrayFiles/1.3.1-foss-2018b-Python-2.7.16|'  "${pipelinefolder}/parameters_diagnostics.csv"
-	perl -pi -e 's|computeVersion,Molgenis-Compute/v17.08.1-Java-1.8.0_74|computeVersion,Molgenis-Compute/v19.01.1-Java-11-LTS  |'  "${pipelinefolder}/parameters_diagnostics.csv"
-	perl -pi -e 's|GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11|GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2018b-Python-2.7.16|'  "${pipelinefolder}/parameters_diagnostics.csv"
-	perl -pi -e 's|HTSlibVersion,HTSlib/1.3.2-foss-2015b|HTSlibVersion,HTSlib/1.16-GCCcore-7.3.0|'  "${pipelinefolder}/parameters_diagnostics.csv"
 	echo "bedToolsVersion,BEDTools/2.28.0-GCCcore-7.3.0" >> "${pipelinefolder}/parameters_diagnostics.csv"
 	echo "ngsUtilsVersion,ngs-utils/21.04.2" >> "${pipelinefolder}/parameters_diagnostics.csv"
 
