@@ -9,45 +9,33 @@ function preparePipeline(){
 	pwd
 	rsync -r --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials ${pipelinefolder}/test/rawdata/203693990030 ${tmpfolder}/rawdata/array/GTC/
 
-	if [ -d "${tmpfolder}/generatedscripts/${_projectName}" ]
-	then
-		rm -rf "${tmpfolder}/generatedscripts/${_projectName}/"
-	fi
+	rm -rf "${tmpfolder}/generatedscripts/GAP/${_projectName}/"
 
-	if [ -d "${tmpfolder}/projects/${_projectName}" ]
-	then
-		rm -rf "${tmpfolder}/projects/${_projectName}/"
-	fi
+	rm -rf "${tmpfolder}/projects/GAP/${_projectName}/"
 
-	if [ -d "${tmpfolder}/tmp/${_projectName}" ]
-	then
-		rm -rf "${tmpfolder}/tmp/${_projectName}/"
-	fi
+	rm -rf "${tmpfolder}/tmp/GAP/${_projectName}/"
 
-	if [ -d "${tmpfolder}/logs/${_projectName}" ]
-        then
-            	rm -rf "${tmpfolder}/logs/${_projectName}/"
-        fi
+	rm -rf "${tmpfolder}/logs/${_projectName}/"
 
-
-	mkdir "${tmpfolder}/generatedscripts/${_projectName}/"
+	genFolder="${tmpfolder}/generatedscripts/GAP/${_projectName}/"
+	mkdir "${genFolder}"
 	mkdir "${tmpfolder}/logs/${_projectName}/"
 
-	cp "${pipelinefolder}/templates/generate_template.sh" "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
+	cp "${pipelinefolder}/templates/generate_template.sh" "${genFolder}/generate_template.sh"
 
 	EBROOTGAP="${pipelinefolder}"
 	echo "${EBROOTGAP}" 
 	## Grep used version of molgenis compute out of the parameters file
 
-	cp "${pipelinefolder}/test/${_projectName}.csv" "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e "s|/groups/umcg-gsad/tmp01/|${tmpfolder}/|g" "${tmpfolder}/generatedscripts/${_projectName}/${_projectName}.csv"
+	cp "${pipelinefolder}/test/${_projectName}.csv" "${genFolder}"
+	perl -pi -e "s|/groups/umcg-gsad/tmp01/|${tmpfolder}/|g" "${genFolder}/${_projectName}.csv"
 	
-	cd "${tmpfolder}/generatedscripts/${_projectName}/"
-	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
-	perl -pi -e 's|\${EBROOTGAP}|\'${pipelinefolder}'|g'  "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
-	perl -pi -e 's|\${runID}|run01|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"
+	cd "${genFolder}"
+	perl -pi -e 's|workflow=\${EBROOTGAP}/workflow_diagnostics.csv|workflow=\${EBROOTGAP}/test_workflow.csv|' "${genFolder}/generate_template.sh"
+	perl -pi -e 's|\${EBROOTGAP}|\'${pipelinefolder}'|g'  "${genFolder}/generate_template.sh"
+	perl -pi -e 's|\${runID}|run01|' "${genFolder}/generate_template.sh"
 	
-	sed -i 's|gapVersion.*|gapVersion=GAP/betaAutotest;\\|' "${tmpfolder}/generatedscripts/${_projectName}/generate_template.sh"		
+	sed -i 's|gapVersion.*|gapVersion=GAP/betaAutotest;\\|' "${genFolder}/generate_template.sh"		
 
 	# changing values in the diagnostics parameters file
 	echo "bedToolsVersion,BEDTools/2.28.0-GCCcore-7.3.0" >> "${pipelinefolder}/parameters_diagnostics.csv"
@@ -55,22 +43,22 @@ function preparePipeline(){
 
 	module load  Molgenis-Compute/v19.01.1-Java-11-LTS
 	pwd
-	sh generate_template.sh -p "${_projectName}"
+	bash generate_template.sh -p "${_projectName}"
 	cd scripts
 
 	perl -pi -e 's|\${EBROOTGAP}|\'${pipelinefolder}'|g'  "PrepareGapPipeline_0.sh"
 
-	sh submit.sh
+	bash submit.sh
 
-	cd "${tmpfolder}/projects/${_projectName}/run01/jobs/"
-	sh submit.sh --qos=regular
+	cd "${tmpfolder}/projects/GAP/${_projectName}/run01/jobs/"
+	bash submit.sh --qos=regular
 }
 
 function checkIfFinished(){
 	local _projectName="NIST_TRIO"
 	count=0
 	minutes=0
-	while [ ! -f "${tmpfolder}/projects/${_projectName}/run01/jobs/s05_autoTestGAPResults_0.sh.finished" ]
+	while [ ! -f "${tmpfolder}/projects/GAP/${_projectName}/run01/jobs/s05_autoTestGAPResults_0.sh.finished" ]
 	do
 
 		echo "${_projectName} is not finished in ${minutes} minutes, sleeping for 2 minutes"
@@ -82,7 +70,7 @@ function checkIfFinished(){
 		then
 			echo "the test was not finished within 30 minutes, let's kill it"
 			echo -e "\n"
-			for i in $(ls "${tmpfolder}/projects/${_projectName}/run01/jobs/"*.sh)
+			for i in $(ls "${tmpfolder}/projects/GAP/${_projectName}/run01/jobs/"*.sh)
 			do
 				if [ ! -f "${i}.finished" ]
 				then
@@ -100,7 +88,7 @@ function checkIfFinished(){
 tmpdirectory="tmp01"
 groupName="umcg-gsad"
 
-pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp//GAP/betaAutotest/"
+pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp/GAP/betaAutotest/"
 tmpfolder="/groups/${groupName}/${tmpdirectory}"
 
 if [ -d "${pipelinefolder}" ]
