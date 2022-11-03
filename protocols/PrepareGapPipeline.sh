@@ -16,6 +16,7 @@
 #string gapVersion
 #string workDir
 #string workflowpath
+#string host
 
 umask 0007
 
@@ -56,8 +57,6 @@ mkdir -p -m 2770 "${projectJobsDir}"
 mkdir -p -m 2770 "${projectRawTmpDataDir}"
 
 rocketPoint=$(pwd)
-host=$(hostname -s)
-
 
 declare -a arrayUniqueMissingSampleNames
 
