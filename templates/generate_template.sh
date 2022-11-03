@@ -95,6 +95,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 -o workflowpath="${workflow};\
 outputdir=scripts/jobs;\
+host="${host}";\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
 gapVersion=$(module list | grep -o -P 'GAP(.+)');\
