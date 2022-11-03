@@ -1,28 +1,28 @@
-pipeline {
-	agent any
-
-	stages {
-		stage('ShellCheck') {
-			steps {
-				sh "check/shellcheck.sh"
-			}
-		}
-		stage('IndentationCheck') {
-			steps {
-				sh "check/indentationcheck.sh"
-			}
-		}
+node {
+	stage ('Checkout') {
+		checkout scm
 	}
+    stage ('Automated test') {
+        
+        echo "Copy test from repo to molgenis home on Gearshift"
+        sh "sudo scp test/autoTestGAP.sh airlock+gearshift:/home/umcg-molgenis/"
+        
+        echo "Login to Gearshift"
+        sh '''sudo ssh -T airlock+gearshift <<ENDSSH
+		echo "Starting automated test"
+		sh autoTestGAP.sh '''+env.CHANGE_ID+'''
+ENDSSH
+'''
+	}
+	stage('ShellCheck') {
+		sh "check/shellcheck.sh"			
+	}
+	stage('IndentationCheck') {
+		sh "check/indentationcheck.sh"
+	}	
 	post {
 		always {
-			script {
-				recordIssues (enabledForFailure: true, failOnError: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]], tools: [checkStyle(name: 'ShellCheck')], trendChartType: 'NONE')
-			}
+		recordIssues (enabledForFailure: true, failOnError: true, qualityGates: [[threshold: 1, type: 'TOTAL', unstable: false]], tools: [checkStyle(name: 'ShellCheck')], trendChartType: 'NONE')
 		}
-		//failure {
-		//	mail to: 'hpc.helpdesk@umcg.nl',
-		//		subject: "Failed Jenkins build: ${currentBuild.fullDisplayName}",
-		//		body: "Something is wrong with ${env.BUILD_URL}"
-		//}
 	}
 }
