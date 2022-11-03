@@ -1,4 +1,3 @@
-[umcg-molgenis@gearshift ~]$ cat test_GAP.sh 
 set -e
 set -u
 
