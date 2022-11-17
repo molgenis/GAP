@@ -89,10 +89,6 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --generate \
 -rundir "${genScripts}/scripts" \
 --runid "${runID}" \
--b slurm \
---header "${EBROOTGAP}/templates/slurm/header.ftl" \
---footer "${EBROOTGAP}/templates/slurm/footer.ftl" \
---submit "${EBROOTGAP}/templates/slurm/submit.ftl" \
 -o workflowpath="${workflow};\
 outputdir=scripts/jobs;\
 host="${host}";\
