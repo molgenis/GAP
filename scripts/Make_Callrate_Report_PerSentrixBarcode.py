@@ -21,10 +21,10 @@ output_file3 = open(output_file2, "w")
 print ("output is" + str(output_file3))
 
 for gtc_file in glob.glob(os.path.join(args.gtc_directory, args.SentrixBarcode+'*.gtc')):
-	print ("processing" + gtc_file)
-	manifest = BeadPoolManifest(args.manifest)
-	sample_id = os.path.basename(gtc_file)[:-4]
-	call_rate = str(GenotypeCalls(gtc_file).get_call_rate())
-	gender = GenotypeCalls(gtc_file).get_gender()
-	output_file3.write(sample_id + "\t" + str(call_rate) + "\t" + gender + "\n")
+        print ("processing" + gtc_file)
+        manifest = BeadPoolManifest(args.manifest)
+        sample_id = str(os.path.basename(gtc_file)[:-4])
+        call_rate = str(GenotypeCalls(gtc_file).get_call_rate())
+        gender = str(GenotypeCalls(gtc_file).get_gender())
+        output_file3.write(sample_id + "\t" + call_rate + "\t" + gender + "\n")
 output_file3.close()
