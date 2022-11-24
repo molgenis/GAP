@@ -44,7 +44,7 @@ for gtc_file in glob.glob(os.path.join(args.gtc_directory, sentrix_ID+'.gtc')):
 		output.write(delim.join(["Total SNPs", str(len(names))]) + "\n")
 		output.write(delim.join(["Num Samples", str(1)]) + "\n")
 		output.write(delim.join(["Total Samples", str(1)]) + "\n")
-		utput.write("[Data]" + "\n")
+		output.write("[Data]" + "\n")
 		output.write("SNP Name" + "\t" + "Sample ID" + "\t" + "Chr" + "\t" + "Position" + "\t" + "Log R Ratio" + "\t" + "B Allele Freq" + "\n")
 		for (names, chrom, map_info, logratio, BAF) in zip(names, chrom, map_info, logratio, BAF):
 			output.write(names + "\t" + array_ID + "\t" + chrom + "\t" + str(map_info) + "\t" + str(logratio) + "\t" + str(BAF) + "\n")
