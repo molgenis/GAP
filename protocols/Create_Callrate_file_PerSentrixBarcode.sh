@@ -17,7 +17,7 @@
 #string intermediateDir
 
 #Function to check if array contains value
-
+module purge
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
