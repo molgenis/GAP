@@ -16,9 +16,6 @@
 #string logsDir
 #string intermediateDir
 
-module purge
-module load "${pythonVersion}"
-module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
