@@ -41,8 +41,8 @@ function preparePipeline(){
 	echo "bedToolsVersion,BEDTools/2.28.0-GCCcore-7.3.0" >> "${pipelinefolder}/parameters_diagnostics.csv"
 	echo "ngsUtilsVersion,ngs-utils/21.04.2" >> "${pipelinefolder}/parameters_diagnostics.csv"
 
-	source /etc/bashrc
-	source /apps/modules//modules.bashrc
+	source "/etc/bashrc"
+	source "/apps/modules//modules.bashrc"
 	module list
 	module load  Molgenis-Compute/v19.01.1-Java-11-LTS
 	pwd
