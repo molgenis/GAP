@@ -42,6 +42,7 @@ function preparePipeline(){
 	echo "ngsUtilsVersion,ngs-utils/21.04.2" >> "${pipelinefolder}/parameters_diagnostics.csv"
 
 	module load  Molgenis-Compute/v19.01.1-Java-11-LTS
+	module list
 	pwd
 	bash generate_template.sh -p "${_projectName}"
 	cd scripts
