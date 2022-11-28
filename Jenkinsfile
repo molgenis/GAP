@@ -8,11 +8,13 @@ node {
         sh "sudo scp test/autoTestGAP.sh airlock+gearshift:/home/umcg-molgenis/"
         
         echo "Login to Gearshift"
-        sh '''sudo ssh -T airlock+gearshift <<ENDSSH
-		echo "Starting automated test"
-		sh autoTestGAP.sh '''+env.CHANGE_ID+'''
-ENDSSH
-'''
+	    
+	sh '''
+            sudo ssh -tt airlock+gearshift 'exec bash -l << 'ENDSSH'
+	    	echo "Starting automated test"
+		sh /home/umcg-molgenis/autoTestGAP.sh '''+env.CHANGE_ID+'''
+ENDSSH'
+        '''	
 	}
 	stage('ShellCheck') {
 		sh "check/shellcheck.sh"			
