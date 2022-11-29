@@ -29,9 +29,6 @@ mkdir -p "${calculateSDDir}/"
 makeTmpDir "${calculateSDDir}/"
 tmpCalculateSDDir="${MC_tmpFile}"
 
-module load "${pythonVersion}"
-module load "${beadArrayVersion}"
-module load "${gapVersion}"
 module load "${GTCtoVCFVersion}"
 module load "${HTSlibVersion}"
 

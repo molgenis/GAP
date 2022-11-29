@@ -16,8 +16,6 @@
 #string logsDir
 #string intermediateDir
 
-module load "${pythonVersion}"
-module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 

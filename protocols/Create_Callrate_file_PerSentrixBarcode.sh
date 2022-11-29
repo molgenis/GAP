@@ -18,8 +18,6 @@
 
 #Function to check if array contains value
 
-module load "${pythonVersion}"
-module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
 
