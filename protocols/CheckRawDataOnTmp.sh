@@ -43,14 +43,7 @@ max_index=${#Sample_ID[@]}-1
 ## Removing previously created data.requested file
 rm -f "${logsDir}/${Project}/${Project}.data.requested"
 
-declare -a arrayUniqueMissingSampleNames
-
-for sample in "${SentrixBarcode_A[@]}"
-do
-	array_contains arrayUniqueMissingSampleNames "${sample}" || arrayUniqueMissingSampleNames+=("${sample}")
-done
-	
-declare -a arrayMissingSampleNames
+declare -a arrayMissingPosition
 
 for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 do	
@@ -58,20 +51,14 @@ do
 	TMPDATADIR="${GTCtmpDataDir}/${SentrixBarcode_A[samplenumber]}/"
 	mkdir -vp "${TMPDATADIR}"
 	
-	for i in "${arrayUniqueMissingSampleNames[@]}"
-	do
-		if [[ -f "${TMPDATADIR}/missingIDATs.txt" ]]
-		then
-			arrayRejected=()
-			while read line
-			do
-				missingPosition=$(echo "${line}" | awk 'BEGIN {FS=":"}{print $2}')
-				missingSampleName=$(echo "${line}" | awk 'BEGIN {FS=":"}{print $1}')
-				arrayMissingPosition+=("${missingPosition}")
-				arrayMissingSampleNames+=("${missingSampleName}")
-			done<"${TMPDATADIR}/missingIDATs.txt"
-		fi
-	done
+	if [[ -f "${TMPDATADIR}/missingIDATs.txt" ]]
+	then
+		while read -r line
+		do
+			missingPosition=$(echo "${line}" | awk 'BEGIN {FS=":"}{print $2}')
+			arrayMissingPosition+=("${missingPosition}")
+		done<"${TMPDATADIR}/missingIDATs.txt"
+	fi
 	
 	## Check if data copying already started, so only checking if file exists (when it is not started, it will create an ${logsDir}/${project}/${project}.data.requested)
 	if [[ -f "${logsDir}/${Project}/${Project}.data.started" ]]
