@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #list SentrixBarcode_A
 #list SentrixPosition_A
 #string GTCtmpDataDir
@@ -33,7 +35,7 @@ array_contains_missingSamples () {
 		fi
 	done
 }
-arrayUniqueBarcodes=()
+
 allRawDataAvailable='true'
 
 mkdir -p "${logsDir}/${Project}/"
