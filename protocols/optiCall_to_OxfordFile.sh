@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=01:59:00 mem=10gb ppn=1
 
 #string Project
@@ -21,13 +19,13 @@ makeTmpDir "${outputFolder}"
 tmpOutputFolder="${MC_tmpFile}"
 
 
-if [[ -z "$inputFolder" ]]
+if [[ -z "${inputFolder}" ]]
 then
 	echo "Error: set input"
 	exit
 fi
 
-if [[ -z "$outputFolder" ]]
+if [[ -z "${outputFolder}" ]]
 then
 	echo "Error: set output"
 	exit

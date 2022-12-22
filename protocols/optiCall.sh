@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=23:59:00 mem=8gb ppn=2
 
 #string gapVersion

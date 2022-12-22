@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=1
 
 #string Project
@@ -50,7 +48,7 @@ mkdir -p "${diagnosticOutputFolder}/${Project}"
 INPUTARRAYS=()
 for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
 do
-	element_exists='$(array_contains INPUTARRAYS "${array}")'
+	element_exists="$(array_contains INPUTARRAYS "${array}")"
 	if [[ "${element_exists}" != '0' ]]; then
 		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
 	fi

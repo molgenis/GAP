@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string pythonVersion
@@ -41,7 +39,7 @@ done
 for i in "${samplelist[@]}"
 do
 	python "${EBROOTGAP}/scripts/Make_PennCNV_report_diagnosticsPerSentrixBarcode.py" "${bpmFile}" "${projectRawTmpDataDir}" "${tmpPennCNV_reportDir}" "${i}"
-	echo "processing $i"
+	echo "processing ${i}"
 	barcodeCombined=$(echo "${i}" | awk 'BEGIN {FS=":"}{print $1}')
 	echo "${barcodeCombined}"
 	echo "mv ${tmpPennCNV_reportDir}/${barcodeCombined}.txt ${resultDir}/PennCNV_reports/"
