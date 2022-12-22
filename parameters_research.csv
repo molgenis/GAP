@@ -1,15 +1,14 @@
 #Tools
-pythonVersion,Python/2.7.16-GCCcore-7.3.0-bare
-perlVersion,Perl/5.28.0-GCCcore-7.3.0
-beadArrayVersion,BeadArrayFiles/1.3.1-foss-2018b-Python-2.7.16
+pythonVersion,Python/3.10.4-GCCcore-11.3.0
+perlVersion,Perl/5.30.0-GCCcore-7.3.0-bare
+beadArrayVersion,BeadArrayFiles/1.3.3-foss-2022a-Python-3.10.4
 computeVersion,Molgenis-Compute/v19.01.1-Java-11-LTS
-pennCNVVersion,PennCNV/1.0.4-foss-2015b
-optiCallVersion,opticall/0.8.1-foss-2018b
-RPlusVersion,RPlus/3.6.1-foss-2018b-v21.10.1
+pennCNVVersion,PennCNV/1.0.4-foss-2018b
+optiCallVersion,opticall/0.8.1-GCCcore-11.3.0
+RPlusVersion,RPlus/4.0.3-foss-2018c-v21.12.10
 plinkVersion,PLINK/1.9-beta6-20190617
-
 zCallVersion,opticall/0.7.0-foss-2015b
-GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2015b-Python-2.7.11
+GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2018b-Python-2.7.16
 
 #references
 bpmFile,/apps/data/GSAarray/GSAMD-24v3-0-EA_20034606_A1.bpm
@@ -26,11 +25,11 @@ appsDir,${root}/apps/
 workDir,/groups/${group}/
 tmpDir,${workDir}/${tmpName}/
 tmpTmpdir,${tmpDir}/tmp/
-intermediateDir,${tmpTmpdir}/${Project}/${runid}/
-projectDir,${workDir}/${tmpName}/projects/
+intermediateDir,${tmpTmpdir}/GAP/${Project}/${runid}/
+projectDir,${workDir}/${tmpName}/projects/GAP/
 resultDir,${projectDir}/${Project}/${runid}/results/
 projectJobsDir,${projectDir}/${Project}/${runid}/jobs/
-genScripts,${tmpDir}/generatedscripts/${Project}
+genScripts,${tmpDir}/generatedscripts/GAP/${Project}
 diagnosticOutputFolder,${tmpDir}/DiagnosticOutput
 projectRawTmpDataDir,${projectDir}/${Project}/${runid}/rawdata/array/
 IDATprmDataDir,${workDir}/${prmName}/rawdata/array/IDAT/
@@ -39,7 +38,6 @@ IDATtmpDataDir,${workDir}/${tmpName}/rawdata/array/IDAT/
 GTCtmpDataDir,${workDir}/${tmpName}/rawdata/array/GTC/
 ateambotUser,${group}-ateambot
 logsDir,${workDir}/${tmpName}/logs/
-concordanceInputDir,/groups/umcg-gd/${tmpName}/Concordance/array/
 arrayFinalReport,${intermediateDir}/${Project}_${SentrixBarcode_A}_finalreport.txt
 finalReport,${resultDir}/${Project}_finalreport.txt
 samplesheet,${projectJobsDir}/${Project}.csv
