@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #list SentrixBarcode_A
 #list SentrixPosition_A
 #string GTCprmDataDir

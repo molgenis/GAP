@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=02:00:00 mem=2gb ppn=1
 
 #string intermediateDir
@@ -17,12 +15,12 @@ array_contains () {
 	local seeking=$2
 	local in=1
 	for element in "${!array-}"; do
-	if [[ "$element" == "$seeking" ]]; then
+	if [[ "${element}" == "${seeking}" ]]; then
 		in=0
 		break
 	fi
 	done
-	return $in
+	return "${in}"
 }
 
 makeTmpDir "${finalReport}"
@@ -32,7 +30,7 @@ INPUTREPORTS=()
 
 for file in "${arrayFinalReport[@]}"
 do
-	element_exists='$(array_contains INPUTREPORTS "${file}")'
+	element_exists="$(array_contains INPUTREPORTS "${file}")"
 	if [[ "${element_exists}" != '0' ]]; then
 		INPUTREPORTS+=("${file}")    # If file does not exist in array add it
 	fi
@@ -49,7 +47,7 @@ do
 		headerNumber=$(( $(head -30 "${i}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+2))
 		echo "headerNumber:${headerNumber}"
 	else
-		cat "${i}" | tail -n+"${headerNumber}" >> "${tmpFinalReport}"
+		tail -n+"${headerNumber}" "${i}" >> "${tmpFinalReport}"
 	fi
 done
 

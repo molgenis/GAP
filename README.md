@@ -94,7 +94,3 @@ And for each patient a VCF file is created. This vcf file is used for the concor
 ```
 7: PipelineFinished
 
-
-
-
-
