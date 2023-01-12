@@ -70,11 +70,9 @@ do
 	then
 		while read -r line
 		do
-			mapfile -t missingPosition < <(echo "${line}" | awk 'BEGIN {FS=":"}{print $2}')
-			mapfile -t missingSampleName < <(echo "${line}" | awk 'BEGIN {FS=":"}{print $1}')
-			# shellcheck disable=SC2128
+			missingPosition="$(echo "${line}" | awk 'BEGIN {FS=":"}{print $2}')"
+			missingSampleName="$(echo "${line}" | awk 'BEGIN {FS=":"}{print $1}')"
 			arrayMissingPosition+=("${missingPosition}")
-			# shellcheck disable=SC2128
 			arrayMissingSampleNames+=("${missingSampleName}")
 		done <"../../../../../../rawdata/array/GTC/${i}/missingIDATs.txt"
 	fi
@@ -83,16 +81,15 @@ done
 max_index=${#SentrixBarcode_A[@]}-1
 
 
-if [ "${pipeline}" == 'diagnostics' ] 
+if [[ "${pipeline}" == 'diagnostics' ]]
 then
 	for ((samplenumber = 0; samplenumber <= max_index; samplenumber++))
 	do
 		array_contains_missingSamples arrayMissingPosition "${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}"
-		if [ "${missing}" == "false" ]
+		if [[ "${missing}" == "false" ]]
 		then
 			ln -sf "../../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
 				"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
-
 			ln -sf "../../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
 			"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5"
 		else
@@ -105,7 +102,6 @@ else
 		mkdir -p "${SentrixBarcode_A[samplenumber]}"
 		ln -sf "../../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" \
 			"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc"
-
 		ln -sf "../../../../../../../rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5" \
 		"${projectRawTmpDataDir}/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc.md5"
 	done
@@ -125,7 +121,7 @@ then
 		if [[ "${teller}" -lt "${size}" ]]
 		then
 			missingIDATsGrepCommand+="${m}|"
-		elif [ "${teller}" == "${size}" ]
+		elif [[ "${teller}" == "${size}" ]]
 		then
 			echo "last line"
 			missingIDATsGrepCommand+="${m}"
@@ -177,7 +173,7 @@ runID=${runID}"
 # shellcheck disable=SC2002
 sampleSize=$(wc -l "${genScripts}/${Project}.csv" | awk '{print $1}')
 
-if [ -f "${Project}.removedSamples.csv" ]
+if [[ -f "${Project}.removedSamples.csv" ]]
 then
 	echo -e "\n################### THE FOLLOWING LINES ARE MISSING THE IDATS ###############\n"
 	cat "${Project}.removedSamples.csv"
@@ -185,7 +181,7 @@ then
 fi
 
 
-if [ "${pipeline}" == 'research' ] && [ "${sampleSize}" -gt 1000 ]
+if [[ "${pipeline}" == 'research' && "${sampleSize}" -gt 1000 ]]
 then
 	echo "Samplesize is ${sampleSize}"
 	ml "${perlVersion}"
