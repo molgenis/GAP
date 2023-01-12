@@ -18,6 +18,10 @@
 #string workflowpath
 #string host
 
+set -e
+set -u
+set -o pipefail
+
 umask 0007
 
 module load "${computeVersion}"
