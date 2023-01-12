@@ -19,13 +19,13 @@ makeTmpDir "${outputFolder}"
 tmpOutputFolder="${MC_tmpFile}"
 
 
-if [[ -z "$inputFolder" ]]
+if [[ -z "${inputFolder}" ]]
 then
 	echo "Error: set input"
 	exit
 fi
 
-if [[ -z "$outputFolder" ]]
+if [[ -z "${outputFolder}" ]]
 then
 	echo "Error: set output"
 	exit
@@ -38,10 +38,10 @@ fi
 
 	sampleFile="${output}.sample"
 
-	if [ -e $input ]
+	if [ -e "${input}" ]
 	then
 
-		awk -v chr=${chrNr} -v sampleFile="${sampleFile}" '
+		awk -v chr="${chrNr}" -v sampleFile="${sampleFile}" '
 
 		NR == 1 {
 			print "ID_1 ID_2 missing" > sampleFile
@@ -64,7 +64,7 @@ fi
 			ORS="";
 			print "\n"
 		}
-		' < ${input} > ${output}.gen
+		' < "${input}" > "${output}.gen"
 fi
 
 echo "mv ${tmpOutputFolder}/chr_${chrNr}.gen ${outputFolder}/"

@@ -19,28 +19,28 @@ array_ID = split_Sample_ID[0]
 sentrix_ID = split_Sample_ID[1]
 
 for gtc_file in glob.glob(os.path.join(args.gtc_directory, sentrix_ID+'.gtc')):
-	print "gtc_file is" + gtc_file
+	print ("gtc_file is" + gtc_file)
 	save_path = args.output_directory
-	print "save_path:" + save_path
+	print ("save_path:" + save_path)
 	gtc_output = os.path.join(args.output_directory, array_ID + ".txt")
-	print "gtc_output is" + gtc_output
-	
+	print ("gtc_output is" + gtc_output)
+
 	output = open(gtc_output, "w")
-	print "output is" + str(output)
+	print ("output is" + str(output))
 	if gtc_file.lower().endswith(".gtc"):
 		manifest = BeadPoolManifest(args.manifest)
 		names = manifest.names
 		chrom = manifest.chroms
-		map_info = manifest.map_infos 
+		map_info = manifest.map_infos
 		map_info2 = str(map_info)
 		logratio = GenotypeCalls( gtc_file ).get_logr_ratios()
 		BAF = GenotypeCalls( gtc_file ).get_ballele_freqs()
 		delim="\t"
-	    	output.write("[Header]\n")
+		output.write("[Header]\n")
 		output.write(delim.join(["GSGT Version", "1.9.4"]) + "\n")
 		output.write(delim.join(["Processing Date", date.today().strftime("%d/%m/%Y")]) + "\n")
 		output.write(delim.join(["Content", os.path.splitext(manifest.manifest_name)[0]]) + "\n")
-    		output.write(delim.join(["Num SNPs", str(len(names))]) + "\n")
+		output.write(delim.join(["Num SNPs", str(len(names))]) + "\n")
 		output.write(delim.join(["Total SNPs", str(len(names))]) + "\n")
 		output.write(delim.join(["Num Samples", str(1)]) + "\n")
 		output.write(delim.join(["Total Samples", str(1)]) + "\n")

@@ -36,14 +36,14 @@ do
     esac
 done
 
-if [[ -z "${tmpDirectory:-}" ]]; then tmpDirectory=$(basename $(cd ../../ && pwd )) ; fi ; echo "tmpDirectory=${tmpDirectory}"
-if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../ && pwd )) ; fi ; echo "group=${group}"
+if [[ -z "${tmpDirectory:-}" ]]; then tmpDirectory=$(basename $(cd ../../../ && pwd )) ; fi ; echo "tmpDirectory=${tmpDirectory}"
+if [[ -z "${group:-}" ]]; then group=$(basename $(cd ../../../../ && pwd )) ; fi ; echo "group=${group}"
 if [[ -z "${workDir:-}" ]]; then workDir="/groups/${group}/${tmpDirectory}" ; fi ; echo "workDir=${workDir}"
 if [[ -z "${filePrefix:-}" ]]; then filePrefix=$(basename $(pwd )) ; fi ; echo "filePrefix=${filePrefix}"
 if [[ -z "${Project:-}" ]]; then Project=$(basename $(pwd )) ; fi ; echo "Project=${Project}"
 if [[ -z "${runID:-}" ]]; then runID="run01" ; fi ; echo "runID=${runID}"
 if [[ -z  "${excludeGTCsFile}" ]];then excludeGTCsFile="FALSE" ; fi ; echo "excludeGTCsFile=${excludeGTCsFile}"
-genScripts="${workDir}/generatedscripts/${filePrefix}/"
+genScripts="${workDir}/generatedscripts/GAP/${filePrefix}/"
 samplesheet="${genScripts}/${filePrefix}.csv" ; mac2unix "${samplesheet}"
 
 ### Which pipeline to run
@@ -70,14 +70,10 @@ echo "pipeline: ${pipeline}"
 host=$(hostname -s)
 echo "${host}"
 
-projectDir="${workDir}/projects/${filePrefix}/${runID}/jobs/"
+projectDir="${workDir}/projects/GAP/${filePrefix}/${runID}/jobs/"
 workflow=${EBROOTGAP}/workflow_diagnostics.csv
 
-mkdir -p -m 2770 "${workDir}/projects/"
-mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/"
-mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/"
-mkdir -p -m 2770 "${workDir}/projects/${filePrefix}/${runID}/jobs/"
-
+mkdir -p -m 2770 "${projectDir}"
 
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${host}.csv" > "${genScripts}/parameters_host_converted.csv"
 perl "${EBROOTGAP}/scripts/convertParametersGitToMolgenis.pl" "${EBROOTGAP}/parameters_${group}.csv" > "${genScripts}/parameters_group_converted.csv"
@@ -95,6 +91,7 @@ sh "${EBROOTMOLGENISMINCOMPUTE}/molgenis_compute.sh" \
 --runid "${runID}" \
 -o workflowpath="${workflow};\
 outputdir=scripts/jobs;\
+host="${host}";\
 mainParameters=${genScripts}/parameters_converted.csv;\
 samplesheet=${samplesheet};\
 gapVersion=$(module list | grep -o -P 'GAP(.+)');\

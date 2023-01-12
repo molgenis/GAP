@@ -14,7 +14,7 @@ sed -e 1d "${callrateDir}/Callrates_${Project}.txt" > "${genderCheckDir}/callrat
 rm -f "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
 
 # reading callrate file and comparing the gender column
-while read line
+while read -r line
 do
 	genderIDColumn1=$(echo "${line}" | awk 'BEGIN { FS = "\t" } ; { print $1 }')
 	genderColumn1=$(echo "${genderIDColumn1}" | awk 'BEGIN { FS = "_" } ; { print $4 }')
@@ -22,7 +22,11 @@ do
 
 	if [[ "${genderColumn1}" != "${genderColumn2}" ]]
 	then
-		echo -e "gender check for sample ${genderIDColumn1} failed: gender from adlas:${genderColumn1}, gender callculated:${genderColumn2}" >> "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
+		printf 'Gender check for sample %s failed: gender from adlas is %s, but callculated gender from array is %s.\r\n' \
+			"${genderIDColumn1}" \
+			"${genderColumn1}" \
+			"${genderColumn2}" \
+			>> "${logsDir}/${Project}/run01.pipeline.gendercheckfailed"
 	fi
 
-done<"${genderCheckDir}/callratedata_${Project}.txt"
+done <"${genderCheckDir}/callratedata_${Project}.txt"

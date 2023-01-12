@@ -7,8 +7,12 @@
 #  * SC2015: Note that A && B || C is not if-then-else. C may run when A is true.
 #            We know and use this construct regularly to create "transactions"
 #            where C is only executed when both A and B have succeeded.
+#  * SC2154: Due to Molgenis Compute string initialization the warning is not valid 
 #
-export SHELLCHECK_OPTS="-e SC2004 -e SC2015"
+#  * SC2148: the shebang is declared in the header.ftl not in the protocols
+#
+
+export SHELLCHECK_OPTS="-e SC2004 -e SC2015 -e SC2154 -e SC2148"
 
 function showHelp() {
 	#

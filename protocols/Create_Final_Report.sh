@@ -27,7 +27,7 @@ module list
 makeTmpDir "${arrayFinalReport}"
 tmpArrayFinalReport="${MC_tmpFile}"
 
-python ${EBROOTGAP}/scripts/gtc_final_report.py \
+python "${EBROOTGAP}/scripts/gtc_final_report.py" \
 --manifest "${bpmFile}" \
 --samplesheet "${samplesheet}" \
 --gtc_directory "${projectRawTmpDataDir}/${SentrixBarcode_A}/" \
