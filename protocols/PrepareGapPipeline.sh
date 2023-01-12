@@ -41,17 +41,18 @@ array_contains_missingSamples () {
 	done
 }
 
+#Function to check if array contains value
 array_contains () {
-	local array="$1[@]"
+	local array="${1}[@]"
 	local seeking="${2}"
-	local in=1
+	local in='no'
 	for element in "${!array-}"; do
 		if [[ "${element}" == "${seeking}" ]]; then
-			in=0
+			in='yes'
 			break
 		fi
 	done
-	return "${in}"
+	echo "${in}"
 }
 
 # shellcheck disable=SC2174
@@ -63,7 +64,10 @@ declare -a arrayUniqueMissingSampleNames
 
 for sample in "${SentrixBarcode_A[@]}"
 do
-	array_contains arrayUniqueMissingSampleNames "${sample}" || arrayUniqueMissingSampleNames+=("${sample}")
+	element_exists="$(set -e; array_contains arrayUniqueMissingSampleNames "${sample}")"
+	if [[ "${element_exists}" == 'no' ]]; then
+		arrayUniqueMissingSampleNames+=("${sample}")
+	fi
 done
 	
 declare -a arrayMissingSampleNames
