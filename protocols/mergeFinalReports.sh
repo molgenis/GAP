@@ -8,19 +8,20 @@
 
 set -e
 set -u
+set -o pipefail
 
 #Function to check if array contains value
 array_contains () {
-	local array="$1[@]"
-	local seeking=$2
-	local in=1
+	local array="${1}[@]"
+	local seeking="${2}"
+	local in='no'
 	for element in "${!array-}"; do
-	if [[ "$element" == "$seeking" ]]; then
-		in=0
-		break
-	fi
+		if [[ "${element}" == "${seeking}" ]]; then
+			in='yes'
+			break
+		fi
 	done
-	return $in
+	echo "${in}"
 }
 
 makeTmpDir "${finalReport}"
@@ -30,7 +31,11 @@ INPUTREPORTS=()
 
 for file in "${arrayFinalReport[@]}"
 do
-	array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("$file")    # If bamFile does not exist in array add it
+	element_exists="$(set -e; array_contains INPUTREPORTS "${file}")"
+	if [[ "${element_exists}" == 'no' ]]; then
+		# If file does not exist in array add it.
+		INPUTREPORTS+=("${file}")
+	fi
 done
 
 first="true"
@@ -39,12 +44,13 @@ for i in "${INPUTREPORTS[@]}"
 do
 	if [[ ${first} == "true" ]]
 	then
-		cat ${i} > ${tmpFinalReport}
+		cat "${i}" > "${tmpFinalReport}"
 		first='false'
-		headerNumber=$(( $(head -30 "${i}" |grep -n "\[Data\]" | grep -Eo '^[^:]+')+2))
+		found="$(head -30 "${i}" | grep -n "\[Data\]" | grep -Eo '^[^:]+')"
+		headerNumber=$(( ${found} + 2))
 		echo "headerNumber:${headerNumber}"
 	else
-		cat ${i} | tail -n+${headerNumber} >> ${tmpFinalReport}
+		tail -n+"${headerNumber}" "${i}" >> "${tmpFinalReport}"
 	fi
 done
 

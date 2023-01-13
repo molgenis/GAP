@@ -27,14 +27,14 @@ tmpPennCNVDir="${MC_tmpFile}"
 
 cd "${pennCNVInputDir}"
 
-find $PWD -type f > ${tmpPennCNVDir}/${Project}.penncnv.list
+find "${PWD}" -type f > "${tmpPennCNVDir}/${Project}.penncnv.list"
 
-perl ${EBROOTPENNCNV}/detect_cnv.pl \
--test -hmm ${EBROOTPENNCNV}/lib/${hmmFile} \
--pfb ${pfbFile} \
--list ${tmpPennCNVDir}/${Project}.penncnv.list \
--log ${tmpPennCNVDir}/${Project}.penncnv.log \
--out ${tmpPennCNVDir}/${Project}.rawcnv
+perl "${EBROOTPENNCNV}/detect_cnv.pl" \
+-test -hmm "${EBROOTPENNCNV}/lib/${hmmFile}" \
+-pfb "${pfbFile}" \
+-list "${tmpPennCNVDir}/${Project}.penncnv.list" \
+-log "${tmpPennCNVDir}/${Project}.penncnv.log" \
+-out "${tmpPennCNVDir}/${Project}.rawcnv"
 
 cd -
 

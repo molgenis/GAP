@@ -32,7 +32,7 @@
    ⎝______________________________________________________________________________________⎠
 ```
 
-#### GAP Pipeline 
+  #### GAP Pipeline 
 
 The GAP pipeline consist of 7 steps:
 1: Create_PennCNV_Report_diagnostics
@@ -93,8 +93,4 @@ And for each patient a VCF file is created. This vcf file is used for the concor
 
 ```
 7: PipelineFinished
-
-
-
-
 

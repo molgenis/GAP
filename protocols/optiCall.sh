@@ -18,9 +18,9 @@ makeTmpDir "${optiCallDir}/"
 tmpOptiCallDir="${MC_tmpFile}"
 
 
-${EBROOTOPTICALL}/opticall \
--in ${optiCallDir}/${chr} \
--out ${tmpOptiCallDir}/${chr}
+"${EBROOTOPTICALL}/opticall" \
+-in "${optiCallDir}/${chr}" \
+-out "${tmpOptiCallDir}/${chr}"
 
 
 echo "mv ${tmpOptiCallDir}/${chr}.probs ${optiCallDir}/"

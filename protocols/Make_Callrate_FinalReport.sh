@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #MOLGENIS walltime=05:59:00 mem=10gb ppn=6
 
 #string Project
@@ -19,12 +17,12 @@ array_contains () {
 	local seeking=$2
 	local in=1
 	for element in "${!array-}"; do
-		if [[ "$element" == "$seeking" ]]; then
+		if [[ "${element}" == "${seeking}" ]]; then
 			in=0
 			break
 		fi
 	done
-	return $in
+	return "${in}"
 }
 
 module load "${gapVersion}"
@@ -34,7 +32,7 @@ INPUTARRAYS=()
 
 for array in "${SentrixBarcode_A[@]}"
 do
-	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("$array")    # Make a list of unique SentrixBarcode_A per project.
+	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("${array}")    # Make a list of unique SentrixBarcode_A per project.
 done
 
 ## Merge all Callrate files from different SentrixBarcode_A to one project Callrate file.

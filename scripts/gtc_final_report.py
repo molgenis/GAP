@@ -37,18 +37,18 @@ if args.samplesheet:
     found='false'
     # find rownumber for [Data] row
     with open(samplesheet, 'r') as fh:
-        for line in fh :
+            for line in fh :
 
-           if re.match("^\[Data\].*", line):
-               counter+=1
-               found='true'
-               break
-           else:
-              counter+=1
+                if re.match("^\[Data\].*", line):
+                    counter+=1
+                    found='true'
+                    break
+                else:
+                    counter+=1
     fh.close()
 
-    if found == 'false':
-        counter=0
+if found == 'false':
+    counter=0
 
     # read sampleheet after [Data] row, and fill sampleDict with Barcode_positions and samplesIDs.
     with open(samplesheet, 'r') as f1:
@@ -76,14 +76,14 @@ excludeIDArray={}
 if args.excludeGTCFileIDs:
     file = open(args.excludeGTCFileIDs,"r")
     for line in file:
-       #if IDs in file include the .gtc extension, create the without modifyingthe IDs, else add the extension.
+        #if IDs in file include the .gtc extension, create the without modifyingthe IDs, else add the extension.
         if '.gtc' in line:
-         excludeIDArray[line.rstrip('\n')]=line.rstrip('\n')
+            excludeIDArray[line.rstrip('\n')]=line.rstrip('\n')
         else:
-         excludeIDArray[line.rstrip('\n')+'.gtc']=line.rstrip('\n')+'.gtc'
+            excludeIDArray[line.rstrip('\n')+'.gtc']=line.rstrip('\n')+'.gtc'
 
-	
-	
+
+
 with open(args.output_file, "w") as output_handle:
     output_handle.write("[Header]\n")
     output_handle.write(delim.join(["Processing Date", datetime.now().strftime("%m/%d/%Y %I:%M %p")]) + "\n")
@@ -129,17 +129,17 @@ with open(args.output_file, "w") as output_handle:
             COMPLEMENT_MAP = {"A": "T", "T": "A", "C": "G", "G": "C", "D": "D", "I": "I"}
 
             if ref_strand == 2 :
-               #[A/G] to [T/C] where ref_strand = 2
-               new_snp = '['+ COMPLEMENT_MAP[snp[1]] + '/' + COMPLEMENT_MAP[snp[3]] + ']'
+                #[A/G] to [T/C] where ref_strand = 2
+                new_snp = '['+ COMPLEMENT_MAP[snp[1]] + '/' + COMPLEMENT_MAP[snp[3]] + ']'
             else:
-               new_snp=snp
-            # if samplesheet is given, replace Barcode_positions with sampleID.
-            if args.samplesheet:
-                if os.path.basename(gtc_file)[:-4] in sampleDict:
-		    sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
+                new_snp=snp
+                # if samplesheet is given, replace Barcode_positions with sampleID.
+                if args.samplesheet:
+                    if os.path.basename(gtc_file)[:-4] in sampleDict:
+                        sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
+                    else:
+                        sampleName = os.path.basename(gtc_file)[:-4]
                 else:
                     sampleName = os.path.basename(gtc_file)[:-4]
-            else:
-                sampleName = os.path.basename(gtc_file)[:-4]
 
             output_handle.write(delim.join([name, sampleName, str(chrom) , str(map_info) , str(new_snp), str(ref_strand),str(source_strands), code2genotype[genotype] , Allele[:-1] , Allele[1:] , str(raw_x), str(raw_y) ,str(x_norm), str(y_norm),str(BAF),str(logratio),str(genotype_score),ref_strand_genotype, source_strand_genotype]) + "\n")
