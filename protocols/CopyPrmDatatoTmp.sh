@@ -13,23 +13,27 @@ set -o pipefail
 
 #Function to check if array contains value
 array_contains () {
-	local array="$1[@]"
-	local seeking=$2
-	local in=1
+	local array="${1}[@]"
+	local seeking="${2}"
+	local in='no'
 	for element in "${!array-}"; do
 		if [[ "${element}" == "${seeking}" ]]; then
-			in=0
+			in='yes'
 			break
 		fi
 	done
-	return "${in}"
+	echo "${in}"
 }
 
 INPUTREPORTS=()
 
 for file in "${SentrixBarcode_A[@]}"
 do
-	array_contains INPUTREPORTS "${file}" || INPUTREPORTS+=("${file}")    # If GTC file does not exist in array add it
+	element_exists="$(set -e; array_contains INPUTREPORTS "${file}")"
+	if [[ "${element_exists}" == 'no' ]]; then
+		# If file does not exist in array add it.
+		INPUTREPORTS+=("${file}")
+	fi
 done
 
 for i in "${INPUTREPORTS[@]}"
