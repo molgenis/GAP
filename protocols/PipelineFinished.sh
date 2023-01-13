@@ -10,21 +10,21 @@ set -u
 
 # Touch log file for GAP_Automated for starting copying project data to PRM
 
-if [ -f "${logsDir}//${Project}/${runID}.pipeline.started" ]
+if [[ -f "${logsDir}//${Project}/${runID}.pipeline.started" ]]
 then
 	mv "${logsDir}/${Project}/${runID}.pipeline".{started,finished}
 else
 	touch "${logsDir}/${Project}/${runID}.pipeline.finished"
 fi
 
-if [ -f "${logsDir}/${Project}/${runID}.pipeline.failed" ]
+if [[ -f "${logsDir}/${Project}/${runID}.pipeline.failed" ]]
 then
 	rm -f "${logsDir}/${Project}/${runID}.pipeline.failed"
 fi
 
 echo "${logsDir}/${Project}/${runID}.pipeline.finished is created"
 
-if [ ! -d "${logsDir}/${Project}/" ]
+if [[ ! -d "${logsDir}/${Project}/" ]]
 then
 	mkdir -p "${logsDir}/${Project}/"
 fi

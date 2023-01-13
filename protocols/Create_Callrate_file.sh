@@ -16,27 +16,28 @@
 #string CallrateDir
 #string gapVersion
 
+set -e
+set -u
+set -o pipefail
+
 #Function to check if array contains value
 array_contains () {
-	local array="$1[@]"
-	local seeking=$2
-	local in=1
+	local array="${1}[@]"
+	local seeking="${2}"
+	local in='no'
 	for element in "${!array-}"; do
 		if [[ "${element}" == "${seeking}" ]]; then
-		in=0
-		break
-	fi
+			in='yes'
+			break
+		fi
 	done
-	return "${in}"
+	echo "${in}"
 }
 
 module load "${pythonVersion}"
 module load "${beadArrayVersion}"
 module load "${gapVersion}"
 module list
-
-set -e
-set -u
 
 mkdir -p "${CallrateDir}/"
 
@@ -48,9 +49,10 @@ mkdir -p "${diagnosticOutputFolder}/${Project}"
 INPUTARRAYS=()
 for array in "${SentrixBarcode_A}_${SentrixPosition_A}"[@]
 do
-	element_exists="$(array_contains INPUTARRAYS "${array}")"
-	if [[ "${element_exists}" != '0' ]]; then
-		INPUTARRAYS+=("${array}")    # If GTCfile does not exist in array add it
+	element_exists="$(set -e; array_contains INPUTARRAYS "${array}")"
+	if [[ "${element_exists}" == 'no' ]]; then
+		# If file does not exist in array add it.
+		INPUTARRAYS+=("${array}")
 	fi
 done
 
