@@ -24,7 +24,7 @@ EOH
 
 #Get command line options
 while getopts "i:o:h" opt; do
-	case "$opt" in
+	case "${opt}" in
 		i) input=$OPTARG ;;
 		o) output=$OPTARG ;;
 		h) showHelp;;
