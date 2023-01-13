@@ -38,7 +38,7 @@ fi
 
 	sampleFile="${output}.sample"
 
-	if [ -e "${input}" ]
+	if [[ -e "${input}" ]]
 	then
 
 		awk -v chr="${chrNr}" -v sampleFile="${sampleFile}" '
