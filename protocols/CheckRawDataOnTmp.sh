@@ -7,6 +7,10 @@
 #string logsDir
 #list Sample_ID
 
+set -e
+set -u
+set -o pipefail
+
 array_contains () {
 	local array="$1[@]"
 	local seeking="${2}"

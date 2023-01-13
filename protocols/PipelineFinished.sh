@@ -7,6 +7,7 @@
 
 set -e
 set -u
+set -o pipefail
 
 # Touch log file for GAP_Automated for starting copying project data to PRM
 

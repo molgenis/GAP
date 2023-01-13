@@ -22,6 +22,10 @@
 #string calculateSDDir
 #string pennCNV_reportDir
 
+set -e
+set -u
+set -o pipefail
+
 mkdir -p "${calculateSDDir}/"
 
 makeTmpDir "${calculateSDDir}/"

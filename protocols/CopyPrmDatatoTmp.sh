@@ -7,6 +7,10 @@
 #string Project
 #string logsDir
 
+set -e
+set -u
+set -o pipefail
+
 #Function to check if array contains value
 array_contains () {
 	local array="$1[@]"
