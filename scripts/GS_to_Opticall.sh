@@ -3,19 +3,48 @@
 set -e
 set -u
 
-## USAGE ##
 
-# bash GS_to_Opticall.sh \
-# -i inputfile  \ (finalreport file)
-# -o outputfolder
+function showHelp() {
+	#
+	# Display commandline help on STDOUT.
+	#
+	cat <<EOH
+===============================================================================================================
+Usage:
+	$(basename $0) OPTIONS
+Options:
+	-h	Show this help.
+	Required:
+	-i inputfile   (final report file)
+	-o outputDir
+===============================================================================================================
+EOH
+	trap - EXIT
+	exit 0
+}
 
 #Get command line options
-while getopts ":i:o:" opt; do
+while getopts "i:o:h" opt; do
 	case "$opt" in
 		i) input=$OPTARG ;;
 		o) output=$OPTARG ;;
+		h) showHelp;;
 	esac
 done
+
+if [[ -z "${input:-}" ]]
+then
+	echo -e '\nERROR: -i input GS final report file not specified.\n'
+	showHelp
+	exit 1
+fi
+if [[ -z "${output:-}" ]]
+then
+        echo -e "\nERROR: -o output dir not specified.\n"
+        showHelp
+	exit 1
+fi
+
 # Flag to extract header
 flag=1
 shift $(( OPTIND - 1 ))
