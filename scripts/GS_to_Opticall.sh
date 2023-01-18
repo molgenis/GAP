@@ -40,8 +40,8 @@ then
 fi
 if [[ -z "${output:-}" ]]
 then
-        echo -e "\nERROR: -o output dir not specified.\n"
-        showHelp
+	echo -e "\nERROR: -o output dir not specified.\n"
+	showHelp
 	exit 1
 fi
 
