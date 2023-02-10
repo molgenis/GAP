@@ -22,7 +22,7 @@ module list
 
 #1 Compress  and indexing the VCFfile
 
-project="/groups/umcg-gsad/tmp01/projects/GAP/NIST_TRIO"
+project="/groups/umcg-gsad/tmp09/projects/GAP/NIST_TRIO"
 
 for i in  $(ls "${project}/run01/results/vcf/"*".vcf")
 do
