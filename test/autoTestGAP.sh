@@ -38,8 +38,8 @@ function preparePipeline(){
 	sed -i 's|gapVersion.*|gapVersion=GAP/betaAutotest;\\|' "${genFolder}/generate_template.sh"		
 
 	# changing values in the diagnostics parameters file
-	echo "bedToolsVersion,BEDTools/2.28.0-GCCcore-7.3.0" >> "${pipelinefolder}/parameters_diagnostics.csv"
-	echo "ngsUtilsVersion,ngs-utils/21.04.2" >> "${pipelinefolder}/parameters_diagnostics.csv"
+	echo "bedToolsVersion,BEDTools-2.30.0-GCCcore-11.3.0" >> "${pipelinefolder}/parameters_diagnostics.csv"
+	echo "ngsUtilsVersion,ngs-utils/22.10.1" >> "${pipelinefolder}/parameters_diagnostics.csv"
 
 	module load  Molgenis-Compute/v19.01.1-Java-11-LTS
 	pwd
