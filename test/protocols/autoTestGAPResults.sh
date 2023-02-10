@@ -54,7 +54,7 @@ do
 	sample=$(basename "${file}" ".FINAL_FILTERED.vcf")
 	echo "Comparing the VCF file with the TRUE VCF for the sample sample : ${sample} ..."
 	export TERM=xterm-256color
-	"${EBROOTNGSMINUTILS}/vcf-compare_2.0.sh" -1 "/home/umcg-molgenis/GAP/vcf/${sample}.FINAL_TRUE_FILTERED.vcf" -2 "${i}" -o "${project}/temp/VCF_Compare/${sample}/"
+	"${EBROOTNGSMINUTILS}/bin/vcf-compare_2.0.sh" -1 "/home/umcg-molgenis/GAP/vcf/${sample}.FINAL_TRUE_FILTERED.vcf" -2 "${i}" -o "${project}/temp/VCF_Compare/${sample}/"
 
 	## Checking if the output is correct
 
