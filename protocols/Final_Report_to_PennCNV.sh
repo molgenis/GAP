@@ -15,6 +15,7 @@
 
 set -e
 set -u
+set -o pipefail
 
 module load "${pennCNVVersion}"
 module list

@@ -6,6 +6,9 @@
 #string genderCheckDir
 #string logsDir
 
+set -e
+set -u
+set -o pipefail
 
 mkdir -p "${genderCheckDir}"
 
