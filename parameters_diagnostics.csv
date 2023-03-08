@@ -2,7 +2,7 @@
 pythonVersion,Python/3.10.4-GCCcore-11.3.0
 perlVersion,Perl/5.34.1-GCCcore-11.3.0
 beadArrayVersion,BeadArrayFiles/1.3.3-foss-2022a-Python-3.10.4
-computeVersion,Molgenis-Compute/v19.01.1-Java-11-LTS
+computeVersion,Molgenis-Compute/20.03.1-Java-11-LTS
 GTCtoVCFVersion,GTCtoVCF/1.1.1-foss-2018b-Python-2.7.16
 HTSlibVersion,HTSlib/1.16-GCCcore-11.3.0
 
