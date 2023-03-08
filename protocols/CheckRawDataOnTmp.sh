@@ -43,7 +43,7 @@ allRawDataAvailable='true'
 mkdir -p "${logsDir}/${Project}/"
 max_index=${#Sample_ID[@]}-1
 ## Removing previously created data.requested file
-rm -f "${logsDir}/${Project}/${Project}.data.requested"
+rm -f "${logsDir}/${Project}/${Project}.dataFromPrm.requested"
 
 declare -a arrayMissingPosition
 
@@ -62,8 +62,8 @@ do
 		done<"${TMPDATADIR}/missingIDATs.txt"
 	fi
 	
-	## Check if data copying already started, so only checking if file exists (when it is not started, it will create an ${logsDir}/${project}/${project}.data.requested)
-	if [[ -f "${logsDir}/${Project}/${Project}.data.started" ]]
+	## Check if data copying already started, so only checking if file exists (when it is not started, it will create an ${logsDir}/${project}/${project}.dataFromPrm.requested)
+	if [[ -f "${logsDir}/${Project}/${Project}.dataFromPrm.started" ]]
 	then
 		dataProcessingStarted='true'
 	fi
@@ -75,7 +75,7 @@ do
 		then
 			if [[ "${dataProcessingStarted}" == 'false' ]]
 			then
-				echo "${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" >> "${logsDir}/${Project}/${Project}.data.requested"
+				echo "rawdata/array/GTC/${SentrixBarcode_A[samplenumber]}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc" >> "${logsDir}/${Project}/${Project}.dataFromPrm.requested"
 			fi
 			echo "${TMPDATADIR}/${SentrixBarcode_A[samplenumber]}_${SentrixPosition_A[samplenumber]}.gtc is missing"
 			allRawDataAvailable='false'
@@ -90,16 +90,15 @@ done
 if [[ "${allRawDataAvailable}" == 'true' ]]
 then
 	echo "rawdata already available"
-	if [[  -f "${logsDir}/${Project}/${Project}.data.started" ]]
+	if [[  -f "${logsDir}/${project}/${project}.dataFromPrm.started" ]]
 	then
-		mv "${logsDir}/${Project}/${Project}.data."{started,finished}
+		mv "${logsDir}/${project}/${project}.dataFromPrm."{started,finished}
 	else
-		
-		touch "${logsDir}/${Project}/${Project}.data.finished"
+		touch "${logsDir}/${project}/${project}.dataFromPrm.finished"
 	fi
 else
+	rm -f "${logsDir}/${project}/${project}.dataFromPrm.finished"
 	echo "all Data is not yet available, exiting"
-	rm -f "${logsDir}/${Project}/${Project}.data.finished"
 	trap - EXIT
 	exit 0
 fi
