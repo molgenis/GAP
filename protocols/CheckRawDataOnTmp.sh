@@ -62,7 +62,7 @@ do
 		done<"${TMPDATADIR}/missingIDATs.txt"
 	fi
 	
-	## Check if data copying already started, so only checking if file exists (when it is not started, it will create an ${logsDir}/${project}/${project}.dataFromPrm.requested)
+	## Check if data copying already started, so only checking if file exists (when it is not started, it will create an ${logsDir}/${Project}/${Project}.dataFromPrm.requested)
 	if [[ -f "${logsDir}/${Project}/${Project}.dataFromPrm.started" ]]
 	then
 		dataProcessingStarted='true'
@@ -90,14 +90,14 @@ done
 if [[ "${allRawDataAvailable}" == 'true' ]]
 then
 	echo "rawdata already available"
-	if [[  -f "${logsDir}/${project}/${project}.dataFromPrm.started" ]]
+	if [[  -f "${logsDir}/${Project}/${Project}.dataFromPrm.started" ]]
 	then
-		mv "${logsDir}/${project}/${project}.dataFromPrm."{started,finished}
+		mv "${logsDir}/${Project}/${Project}.dataFromPrm."{started,finished}
 	else
-		touch "${logsDir}/${project}/${project}.dataFromPrm.finished"
+		touch "${logsDir}/${Project}/${Project}.dataFromPrm.finished"
 	fi
 else
-	rm -f "${logsDir}/${project}/${project}.dataFromPrm.finished"
+	rm -f "${logsDir}/${Project}/${Project}.dataFromPrm.finished"
 	echo "all Data is not yet available, exiting"
 	trap - EXIT
 	exit 0
