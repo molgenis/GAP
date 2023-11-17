@@ -11,18 +11,22 @@
 #string intermediateDir
 #string diagnosticOutputFolder
 
+set -e
+set -u
+set -o pipefail
+
 #Function to check if array contains value
 array_contains () {
-	local array="$1[@]"
-	local seeking=$2
-	local in=1
+	local array="${1}[@]"
+	local seeking="${2}"
+	local in='no'
 	for element in "${!array-}"; do
 		if [[ "${element}" == "${seeking}" ]]; then
-			in=0
+			in='yes'
 			break
 		fi
 	done
-	return "${in}"
+	echo "${in}"
 }
 
 module load "${gapVersion}"
@@ -32,7 +36,11 @@ INPUTARRAYS=()
 
 for array in "${SentrixBarcode_A[@]}"
 do
-	array_contains INPUTARRAYS "${array}" || INPUTARRAYS+=("${array}")    # Make a list of unique SentrixBarcode_A per project.
+	element_exists="$(set -e; array_contains INPUTARRAYS "${array}")"
+	if [[ "${element_exists}" == 'no' ]]; then
+		# If file does not exist in array add it.
+		INPUTARRAYS+=("${array}")
+	fi
 done
 
 ## Merge all Callrate files from different SentrixBarcode_A to one project Callrate file.

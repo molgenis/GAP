@@ -10,6 +10,7 @@
 
 set -e
 set -u
+set -o pipefail
 
 inputFolder="${optiCallDir}"
 outputFolder="${genSampleDir}"
