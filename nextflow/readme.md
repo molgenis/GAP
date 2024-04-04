@@ -14,7 +14,7 @@ main.nf (path the main nf script)
 # optionals:
 ```
 --gtcDir path where array slide directories are located.(See: gtcDir folder structure example )
--resume  (Resume a prevouisly crashed run )
+-resume  (Resume a previously crashed run )
 -with-report [file name] (Metrics about a workflow execution.)
 -with-timeline [file name] (Timeline for all processes executed in your pipeline.)
 ```
@@ -82,7 +82,7 @@ Sample_ID,Sample_Plate,Sample_Name,Project,AMP_Plate,Sample_Well,SentrixBarcode_
 1234,WG1234567,DNA-1,projectName,WG1234567,A09,12345678910,R09C02,,28-7-2021,,,,m,research,,WG1234567,WG1234567,WG1234567,WG1234567,WG1234567,WG1234567,WG1234567,WG1234567,,,,,,,,GAP,GSAMD-24v3-0-EA_20034606_A1.bpm,referentie_GSAMD_V3_20210115.egt
 ```	
 
-# Important collums to mention:
+Important columns to mention:
 
 - Sample_Name: Is used the replace SentrixBarcode_A + SentrixPosition_A the correponding samplename.
 - Project: This name is used for projectDirs and project file names.
