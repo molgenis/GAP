@@ -4,16 +4,20 @@ module load nextflow/21.10.4-Java-11-LTS
 #
 ## nextflow command
 #
+```
 nextflow run \
 -profile local \ <slurm | local>
 --samplesheet samplesheet.csv (Default gap samplesheet.)
 main.nf (path the main nf script)
+```
 
 # optionals:
+```
 --gtcDir path where array slide directories are located.(See: gtcDir folder structure example )
 -resume  (Resume a prevouisly crashed run )
 -with-report [file name] (Metrics about a workflow execution.)
 -with-timeline [file name] (Timeline for all processes executed in your pipeline.)
+```
 
 #
 ## GAP Nextflow(NF) pipeline
@@ -22,6 +26,7 @@ main.nf (path the main nf script)
 The GAP NF pipeline consist of 5 steps:
 
 1: gtcToFinalReport
+
 ```
 Converts gct file the Illumina finalreport format using tool: Illumina: BeadArrayFiles
 
@@ -30,16 +35,19 @@ output: final report per arrayslide
 ```
 
 2: mergeFinalReports
+
 ```
 Converts the final report per arrayslide into one big final report.
 ```
 
 3: finalReportToOptical
+
 ```
 Converts the final report into Opticall input format.
 ```
 
 4: OptiCall
+
 ```
 Runs optiCall to call genotypes.
 
@@ -59,6 +67,7 @@ the call will be NN but the posterior probabilities might not have P(NN) as the 
 ```
 
 5: OptiCallToGenSample
+
 ```
 Converts Opticall output files into .gen and .sample Oxford file format.
 ```
@@ -87,7 +96,7 @@ Sample_ID,Sample_Plate,Sample_Name,Project,AMP_Plate,Sample_Well,SentrixBarcode_
 #
 ## expected gtcDir folder structure:
 #
-
+```
 ├── gtcDir:
 │   ├── 203273230154 ( SentrixBarcode_A )
 │   │   ├── 203273230154_R08C02.gtc ( SentrixBarcode_A + SentrixPosition_A .gtc )
@@ -99,3 +108,4 @@ Sample_ID,Sample_Plate,Sample_Name,Project,AMP_Plate,Sample_Well,SentrixBarcode_
 │   │   ├── 203281940081_R09C01.gtc
 │   │   └── 203281940081_R11C01.gtc
             etc...
+```
