@@ -73,7 +73,7 @@ Converts Opticall output files into .gen and .sample Oxford file format.
 ```
 
 #
-## gap samplessheet format (comma separated csv)
+## gap samplesheet format (comma separated csv)
 #
 
 Example:

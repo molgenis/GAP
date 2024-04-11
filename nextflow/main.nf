@@ -3,7 +3,7 @@
 nextflow.enable.dsl=2
 
 log.info """\
-         A G C T - N F   P I P E L I N E
+         G A P - N F   P I P E L I N E
          ===================================
          outdir       : ${params.outdir}
          manifest     : ${params.manifest}
