@@ -48,7 +48,7 @@ fi
 
 		NR > 1 {
 
-			ORS="";
+			ORS=" ";
 			print chr, $1, $2, substr($3,1,1), substr($3,2,1);
 			for(i=0;i<sampleCount;i+=1){
 				x = 4 + i * 4
