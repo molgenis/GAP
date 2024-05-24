@@ -9,7 +9,7 @@ function preparePipeline(){
 	pwd
 	rsync -r --verbose --recursive --links --no-perms --times --group --no-owner --devices --specials ${pipelinefolder}/test/rawdata/203693990030 ${tmpfolder}/rawdata/array/GTC/
 
-	rm -rf "${tmpfolder}/generatedscripts/GAP/${_projectName}/"
+	rm -rf "${tmpfolder}/generatedscripts/${_projectName}/"
 
 	rm -rf "${tmpfolder}/projects/GAP/${_projectName}/"
 
@@ -17,7 +17,7 @@ function preparePipeline(){
 
 	rm -rf "${tmpfolder}/logs/${_projectName}/"
 
-	genFolder="${tmpfolder}/generatedscripts/GAP/${_projectName}/"
+	genFolder="${tmpfolder}/generatedscripts/${_projectName}/"
 	mkdir "${genFolder}"
 	mkdir "${tmpfolder}/logs/${_projectName}/"
 
