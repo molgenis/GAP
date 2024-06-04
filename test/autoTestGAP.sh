@@ -53,8 +53,8 @@ function preparePipeline(){
 	cd "${tmpfolder}/projects/GAP/${_projectName}/run01/jobs/"
 
 	perl -pi -e 's|--cpus-per-task 6|--cpus-per-task 2|' *.sh
-	perl -pi -e 's|--mem 10gb|--mem 5gb|' *.sh
-	perl -pi -e 's|--mem 8gb|--mem 5gb|' *.sh
+	perl -pi -e 's|--mem 10gb|--mem 6gb|' *.sh
+	perl -pi -e 's|--mem 8gb|--mem 6gb|' *.sh
   
 	bash submit.sh --qos=regular
 }
