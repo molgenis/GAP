@@ -25,7 +25,7 @@ process echoFinalReport {
 
 process gtcToFinalReport {
   label 'small'
-  module = ['BeadArrayFiles/1.3.1-foss-2018b-Python-2.7.16','GAP/2.3.1']
+  module = ['$params.beadArrayVersion, $params.gapVersion]
   input:
   tuple val(barcode), val(Project), val(manifestFile)
 
@@ -58,7 +58,7 @@ process  mergeFinalReports() {
 
   script:
   """
-  mkdir "$params.outdir/tmp"
+  mkdir -p "$params.outdir/tmp"
   mv $report_list "$params.outdir/tmp"
   mergeFinalReports.sh "$params.outdir/tmp/" 'finalreport.txt'
   rm -r "$params.outdir/tmp"
@@ -78,14 +78,14 @@ process finalReportToOptical {
   script:
   """
 
-  GS_to_Opticall.sh -i 'finalreport.txt' -o ./
+  GS_to_Opticall_includeControls.sh -c "$params.recalculate" -i 'finalreport.txt' -c 'no' -o ./
 """
 }
 
 process OptiCall {
   label 'large'
   errorStrategy 'ignore'
-  module = ['opticall/0.8.1-foss-2018b']
+  module = ['$params.opticallVersion']
   publishDir "$params.outdir/opticall", mode: 'copy'
   echo false
 

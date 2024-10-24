@@ -136,10 +136,12 @@ with open(args.output_file, "w") as output_handle:
             # if samplesheet is given, replace Barcode_positions with sampleID.
             if args.samplesheet:
                 if os.path.basename(gtc_file)[:-4] in sampleDict:
-		    sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
+                    sampleName = sampleDict[os.path.basename(gtc_file)[:-4]]
                 else:
                     sampleName = os.path.basename(gtc_file)[:-4]
             else:
                 sampleName = os.path.basename(gtc_file)[:-4]
 
-            output_handle.write(delim.join([name, sampleName, str(chrom) , str(map_info) , str(new_snp), str(ref_strand),str(source_strands), code2genotype[genotype] , Allele[:-1] , Allele[1:] , str(raw_x), str(raw_y) ,str(x_norm), str(y_norm),str(BAF),str(logratio),str(genotype_score),ref_strand_genotype, source_strand_genotype]) + "\n")
+            a1=Allele[:-1].decode("utf-8")
+            a2=Allele[1:].decode("utf-8")
+            output_handle.write(delim.join([name, sampleName, str(chrom) , str(map_info) , str(new_snp), str(ref_strand),str(source_strands), code2genotype[genotype] , a1 , a2 , str(raw_x), str(raw_y) ,str(x_norm), str(y_norm),str(BAF),str(logratio),str(genotype_score),ref_strand_genotype, source_strand_genotype]) + "\n")

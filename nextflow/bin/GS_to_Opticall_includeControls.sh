@@ -15,6 +15,7 @@ Options:
 	-h	Show this help.
 	Required:
 	-i inputfile   (final report file)
+	-c recalculate
 	-o outputDir
 ===============================================================================================================
 EOH
@@ -23,9 +24,10 @@ EOH
 }
 
 #Get command line options
-while getopts "i:o:h" opt; do
+while getopts "i:o:c:h" opt; do
 	case "${opt}" in
 		i) input=$OPTARG ;;
+		c) recalculate=$OPTARG ;;
 		o) output=$OPTARG ;;
 		h) showHelp;;
 	esac
@@ -43,6 +45,13 @@ then
         showHelp
 	exit 1
 fi
+if [[ -z "${recalculate:-}" ]]
+then
+    	echo -e "\nERROR: -c recalculate not specified.\n"
+        showHelp
+        exit 1
+fi
+
 
 # Flag to extract header
 flag=1
@@ -80,7 +89,7 @@ rm -f *"tmp"*
 rm -f "info"
 awk -v headerNumber="${headerNumber}" '{if(NR>headerNumber){print >> $2".tmp"}}' "${input}"
 # Extract info of all snps in the first condition + intensities of first sample
-for a in *tmp;
+	for a in *tmp;
 	do
 	sid="${a%.tmp}"
 	if [[ "${flag}" -eq 1 ]]
@@ -93,9 +102,71 @@ for a in *tmp;
 		less "${a}" | awk -F "\t" -v name="${sid}" -v chr="${chr}" -v snp="${my_snp}" -v al="${alleles}" -v c="${coor}" -v A="${intA}" -v B="${intB}" 'BEGIN { print name "A" "\t" name "B" }{ print $A "\t" $B}' > "${a}.tmp2"
 	fi
 	done
+	
+	## If there was no recalculation done we need to include the .tmp2 files from the GDIO controls
+	if [[ "${recalculate}" == 'no' ]]
+	then
+		echo "no recalculation was done, start to unpack /apps/data/PGx/gdio_controls.tar.gz in ${output}"
+		tar xvzf '/apps/data/PGx/gdio_controls.tar.gz' -C "${output}"
+	elif [[ "${recalculate}" == 'yes' ]]
+	then
+		echo "all good"
+	else
+		echo "recalculate is nothing? [${recalculate}]"
+		exit 1
+	fi
+	
+	ls -1 *.tmp2 | split -l 500 -d - tmp2list
+
+	for list in tmp2list*
+	do 
+	cat << EOH > "${output}/job_${list}.sh"
+#!/bin/bash
+#SBATCH --job-name=list_${list}
+#SBATCH --output=${output}/job_${list}.out
+#SBATCH --error=${output}/job_${list}.err
+#SBATCH --time=05:59:00
+#SBATCH --cpus-per-task 1
+#SBATCH --mem 8gb
+#SBATCH --open-mode=append
+#SBATCH --export=NONE
+#SBATCH --get-user-env=60L
+
+set -o  pipefail
+set -eu
+
+paste \$(cat ${output}/$list) > ${output}/merge${list##lists} 
+
+touch ${output}/${list}.list.finished
+
+EOH
+
+	echo "$list done"
+	sbatch "${output}/job_${list}.sh"
+
+	done	
+	
+	sizeOfList=$(ls -1 tmp2list* | wc -l)
+	sizeOfList=$((sizeOfList +1))
+	count=0
+	touch "${output}/fake.list.finished"
+	finished=$(ls -1 ${output}/*.list.finished | wc -l)
+	while [[ "${sizeOfList}" -ne  "${finished}" ]]
+	do
+		finished=$(ls -1 ${output}/*.list.finished | wc -l)
+		sleep 120
+		count=$((count+2))
+		if [[ "${count}" -eq '30' ]]
+		then
+			echo "not finished in time"
+			exit 1
+		fi
+		
+	done
+	echo "done"
+	
 # Paste all intensities and paste snp info with the merged intensities
-paste *"tmp2" > "final.tmp"
-paste "info" "final.tmp" > "all_final.tmp"
+paste "info" mergetmp2list* > "all_final.tmp"
 # Split by chromosome
 awk '{if(NR>1){print >> $1".tmp3"}}' "all_final.tmp"
 
@@ -115,6 +186,7 @@ cd "${output}"
 #	rm _tmp_${i}*
 #done
 
-rm *tmp*
+rm *tmp* 
+rm *list*
 rm info
 cd -
