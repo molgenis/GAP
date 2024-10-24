@@ -43,8 +43,6 @@ then
 fi
 if [[ -z "${nextflow:-}" ]] 
 then 
-	ml 'GAP/2.8.0'
-	
 	nextflow="${EBROOTGAP}/main.nf"
 	echo "nextflow workflow will be set to: ${EBROOTGAP}/main.nf (part of the GAP/2.8.0 release)"
 fi
