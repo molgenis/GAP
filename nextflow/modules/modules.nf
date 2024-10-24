@@ -25,7 +25,7 @@ process echoFinalReport {
 
 process gtcToFinalReport {
   label 'small'
-  module = ['$params.beadArrayVersion, $params.gapVersion]
+  module = ["$params.beadArrayVersion", "$params.gapVersion"]
   input:
   tuple val(barcode), val(Project), val(manifestFile)
 
@@ -85,7 +85,7 @@ process finalReportToOptical {
 process OptiCall {
   label 'large'
   errorStrategy 'ignore'
-  module = ['$params.opticallVersion']
+  module = ["$params.opticallVersion"]
   publishDir "$params.outdir/opticall", mode: 'copy'
   echo false
 
