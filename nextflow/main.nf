@@ -10,6 +10,7 @@ log.info """\
          samplesheet  : ${params.samplesheet}
          launchDir    : ${params.launchDir}
          recalculate  : ${params.recalculate}
+         controls  : ${params.controls}
          """
          .stripIndent()
 
