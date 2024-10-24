@@ -25,7 +25,7 @@ EOH
 }
 
 #Get command line options
-while getopts "i:o:c:h" opt; do
+while getopts "i:o:c:r:h" opt; do
 	case "${opt}" in
 		i) input=$OPTARG ;;
 		r) recalculate=$OPTARG ;;
