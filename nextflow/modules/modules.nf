@@ -78,7 +78,7 @@ process finalReportToOptical {
   script:
   """
 
-  GS_to_Opticall_includeControls.sh -c "$params.recalculate" -i 'finalreport.txt' -c 'no' -o ./
+  GS_to_Opticall.sh -r "$params.recalculate" -i 'finalreport.txt' -c 'params.controls' -o ./
 """
 }
 
