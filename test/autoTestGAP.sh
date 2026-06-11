@@ -90,7 +90,7 @@ function checkIfFinished(){
 	echo ""
 }
 
-tmpdirectory="tmp09"
+tmpdirectory="${tmpName}"
 groupName="umcg-gsad"
 
 pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp/GAP/betaAutotest/"
