@@ -1,5 +1,5 @@
  #GAP 
-   Short for Genotyping Array Pipeline.
+   Short for Genotyping Array Pipeline. 
    Consist of the following workflow:
 
 ```
