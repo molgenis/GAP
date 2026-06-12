@@ -89,9 +89,17 @@ function checkIfFinished(){
 	echo "${_projectName} test succeeded!"
 	echo ""
 }
-
-tmpdirectory="${tmpName}"
+host=$(hostname -s)
 groupName="umcg-gsad"
+
+if [[ "${host}" == "talos" ]]
+then
+	tmpdirectory="tmp08"
+elif [[ "${host}" == "hyperchicken" ]]
+then
+	tmpdirectory="tmp09"
+else
+	echo "No valid host to run Jenkins."
 
 pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp/GAP/betaAutotest/"
 tmpfolder="/groups/${groupName}/${tmpdirectory}"
