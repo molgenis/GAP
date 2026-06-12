@@ -100,6 +100,7 @@ then
 	tmpdirectory="tmp09"
 else
 	echo "No valid host to run Jenkins."
+fi
 
 pipelinefolder="/groups/${groupName}/${tmpdirectory}/tmp/GAP/betaAutotest/"
 tmpfolder="/groups/${groupName}/${tmpdirectory}"
