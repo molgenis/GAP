@@ -2,7 +2,7 @@ def finished_first = null
 
 parallel(
     Talos: {
-        node('Talos') {
+        node {
             try {
             	stage ('Checkout') {
 					checkout scm
@@ -33,7 +33,7 @@ ENDSSH'
     },
 
     Hyperchicken: {
-        node('Hyperchicken') {
+        node {
             try {
             	stage ('Checkout') {
 					checkout scm
